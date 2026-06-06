@@ -1,0 +1,1546 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Inter+Tight:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root {
+  /* Muted Tactical Alert Colors — optimized for light mode contrast */
+  --color-emergency-red: #D64545;
+  --color-critical-red: #D64545;
+  --color-warning-orange: #DF9A51;
+  --color-safety-green: #57A573;
+  --color-rescue-blue: #5B8DEF;
+  
+  /* Tactical Accents */
+  --color-ai-accent: #5B8DEF;
+  --color-satellite: #4272D7;
+  --color-success: #57A573;
+  --color-warning-glow: #DF9A51;
+
+  /* Surface System — Tactical Cream Theme */
+  --color-bg-dark: #F5F3EE;       /* Backdrop warm cream */
+  --color-panel-dark: #EFECE5;    /* Sidebar panel warm cream */
+  --color-card-bg: #FAF9F6;       /* Elevated off-white cards (richer than pure white) */
+  --color-hover-surface: #ECE8DE;  /* Hover state soft beige */
+  --color-border: rgba(0, 0, 0, 0.08); /* Minimal dark border */
+
+  /* Text Colors — high contrast charcoal & dark gray */
+  --color-text-primary: #2C2A29;
+  --color-text-secondary: #374151;
+  --color-text-muted: #4B5563;
+  --color-text-disabled: #9CA3AF;
+  
+  /* Legacy */
+  --color-lora-purple: #5B8DEF;
+  
+  /* Typography — Inter system */
+  --font-heading: 'Inter Tight', 'Inter', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--color-bg-dark);
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  height: 100vh;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Premium smooth scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.03);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.12);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.24);
+}
+
+h1, h2, h3, h4, h5 {
+  font-family: var(--font-heading);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+/* Type Scale */
+.type-hero { font-size: 34px; font-weight: 700; }
+.type-section { font-size: 20px; font-weight: 600; }
+.type-card-title { font-size: 17px; font-weight: 600; }
+.type-body { font-size: 14px; font-weight: 400; }
+.type-label { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
+.type-metric { font-size: 30px; font-weight: 700; font-family: var(--font-heading); }
+.type-mono { font-family: var(--font-mono); font-size: 11px; }
+
+/* Lucide Icon Global Overrides — 1.75 stroke, consistent sizing */
+svg.lucide, [data-lucide] {
+  stroke-width: 1.75 !important;
+}
+
+/* ================================= LAYOUT SETUP ================================= */
+.app-container {
+  display: grid;
+  grid-template-columns: auto auto 1fr; /* Phone mockup (collapsible) -> Sidebar -> Map area */
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  background-color: var(--color-bg-dark);
+}
+
+/* Collapsible phone pane wrapper */
+.phone-pane {
+  width: 400px;
+  height: 100vh;
+  background-color: var(--color-panel-dark);
+  border-right: 1px solid var(--color-border);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+  overflow: hidden;
+  transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s, padding 0.4s;
+  z-index: 20;
+}
+
+.phone-pane.collapsed {
+  width: 0;
+  padding: 0;
+  opacity: 0;
+  border-right: none;
+  pointer-events: none;
+}
+
+/* iPhone 17 Pro Max Chassis Mockup */
+.phone-mockup {
+  width: 350px;
+  height: 720px;
+  background-color: #0c0b0a;
+  border-radius: 46px;
+  /* Simulating ultra-thin titanium bezel and premium metallic border */
+  box-shadow: 
+    0 0 0 3px #2C2A29,                      /* Inner bezel border */
+    0 0 0 4px #7E776F,                      /* Titanium grey band border */
+    0 0 0 6px var(--color-bg-dark),         /* Cream wrapper boundary */
+    0 20px 50px rgba(139, 128, 115, 0.18),  /* Soft warm elevation shadow */
+    inset 0 0 12px rgba(255, 255, 255, 0.15);/* Bezel light reflection */
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  perspective: 1200px;
+  transform-style: preserve-3d;
+}
+
+/* Futuristic Interactive 3D Dynamic Island */
+.dynamic-island {
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 95px;
+  height: 25px;
+  background: rgba(10, 10, 10, 0.95);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6), inset 0 0 1px 1px rgba(255, 255, 255, 0.12);
+  transition: 
+    width 0.48s cubic-bezier(0.175, 0.885, 0.32, 1.25),
+    height 0.48s cubic-bezier(0.175, 0.885, 0.32, 1.25),
+    top 0.48s cubic-bezier(0.175, 0.885, 0.32, 1.25),
+    border-radius 0.48s ease,
+    background-color 0.4s ease,
+    border-color 0.4s ease,
+    box-shadow 0.4s ease;
+  overflow: hidden;
+  cursor: pointer;
+  transform-style: preserve-3d;
+}
+
+.dynamic-island:hover {
+  width: 130px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.05);
+}
+
+/* Expanded Control Widget state */
+.dynamic-island.expanded {
+  width: 320px;
+  height: 200px;
+  top: 12px;
+  border-radius: 26px;
+  background: rgba(15, 15, 17, 0.98);
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.85), inset 0 0 2px rgba(255, 255, 255, 0.2);
+  padding: 16px;
+  cursor: default;
+}
+
+/* Outage Blackout state (caution flash) */
+.dynamic-island.blackout {
+  width: 256px;
+  height: 36px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #7F1D1D 0%, #450A0A 100%);
+  border-color: rgba(239, 68, 68, 0.5);
+  box-shadow: 0 0 18px rgba(239, 68, 68, 0.35);
+  animation: blackout-island-pulse 1.5s infinite alternate;
+}
+
+@keyframes blackout-island-pulse {
+  0% { border-color: rgba(239, 68, 68, 0.4); box-shadow: 0 0 12px rgba(239, 68, 68, 0.25); }
+  100% { border-color: rgba(239, 68, 68, 0.8); box-shadow: 0 0 22px rgba(239, 68, 68, 0.55); }
+}
+
+/* Broadcasting state (expanded & animated) */
+.dynamic-island.broadcasting {
+  width: 240px;
+  height: 38px;
+  border-radius: 24px;
+  background-color: #050505;
+  border: 1px solid rgba(255, 46, 95, 0.35);
+  box-shadow: 0 0 18px rgba(255, 46, 95, 0.2);
+}
+
+/* Online state (pill indicator) */
+.dynamic-island.online-mesh {
+  width: 154px;
+  height: 28px;
+  border-radius: 20px;
+  border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+.phone-screen {
+  flex: 1;
+  background-color: var(--color-bg-dark);
+  border-radius: 38px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border);
+}
+
+.phone-status-bar {
+  height: 44px;
+  padding: 18px 24px 0 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  z-index: 90;
+}
+
+.phone-content {
+  flex: 1;
+  padding: 18px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  background-image: 
+    linear-gradient(rgba(0, 0, 0, 0.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.015) 1px, transparent 1px);
+  background-size: 16px 16px;
+}
+
+.phone-nav {
+  height: 58px;
+  background-color: rgba(244, 239, 230, 0.85);
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  z-index: 90;
+  padding-bottom: 8px;
+  backdrop-filter: blur(10px);
+}
+
+.phone-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  background: none;
+  border: none;
+  flex: 1;
+  transition: color 0.2s, font-weight 0.2s;
+  gap: 5px;
+  position: relative;
+}
+
+.phone-nav-item:hover {
+  color: var(--color-text-secondary);
+}
+
+.phone-nav-item.active {
+  color: #B91C1C !important;
+  font-weight: 700 !important;
+}
+
+.phone-nav-item.active::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 22%;
+  right: 22%;
+  height: 3px;
+  background-color: #B91C1C;
+  border-radius: 0 0 2px 2px;
+}
+
+/* ================================= LEFT SIDEBAR PANEL ================================= */
+.left-sidebar-pane {
+  width: 360px;
+  height: 100vh;
+  background: rgba(244, 239, 230, 0.85); /* Warm cream transparency */
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-right: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  z-index: 10;
+  box-shadow: 10px 0 30px rgba(139, 128, 115, 0.08);
+}
+
+.sidebar-header {
+  padding: 24px; /* Strict 24px layout grid */
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.sidebar-title-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sidebar-title {
+  font-family: var(--font-heading);
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+.sidebar-subtitle {
+  font-size: 9px;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  font-weight: 600;
+  font-family: var(--font-mono);
+}
+
+.sidebar-actions-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+/* Clean, non-neon reset button */
+.clean-action-link {
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+.clean-action-link:hover {
+  color: var(--color-emergency-red);
+}
+
+/* Clean tab bar */
+.sidebar-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--color-border);
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 14px;
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  font-family: var(--font-heading);
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+  border-bottom: 2px solid transparent;
+}
+.tab-btn:hover {
+  color: var(--color-text-primary);
+  background-color: rgba(0, 0, 0, 0.02);
+}
+.tab-btn.active {
+  color: var(--color-text-primary);
+  border-bottom-color: var(--color-rescue-blue);
+  background-color: rgba(37, 99, 235, 0.06);
+  /* No text-shadow glow — matte design */
+}
+
+.sidebar-scrollable-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Sidebar Section Titles */
+.sidebar-sec-title {
+  font-size: 9px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--color-text-muted);
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ================================= TACTICAL CARDS ================================= */
+.alert-card {
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 8px; /* Industrial blocky corners */
+  padding: 16px; /* Strict 16px inner spacing */
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 
+    0 1px 2px rgba(0,0,0,0.04),
+    0 8px 24px rgba(15,23,42,0.04); /* Soft double-shadow depth */
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.alert-card::before {
+  content: none; /* No gradient overlay — matte */
+}
+
+.alert-card:hover {
+  background: var(--color-hover-surface);
+  border-color: rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px); /* 2px hover elevation lift */
+  box-shadow: 
+    0 1px 2px rgba(0,0,0,0.04),
+    0 12px 32px rgba(15,23,42,0.06);
+}
+
+.alert-card.selected {
+  background: rgba(37, 99, 235, 0.06);
+  border-color: rgba(37, 99, 235, 0.3);
+  box-shadow: none;
+}
+
+/* Card Hierarchy: Critical gets emphasis, others are subtle */
+.alert-card.critical {
+  border-left: 3px solid var(--color-critical-red);
+  background: rgba(220, 38, 38, 0.04);
+  border-color: rgba(220, 38, 38, 0.15);
+  border-left-color: var(--color-critical-red);
+}
+.alert-card.critical:hover {
+  box-shadow: 
+    0 1px 2px rgba(0,0,0,0.04),
+    0 12px 32px rgba(220, 38, 38, 0.08);
+}
+.alert-card.high {
+  border-left: 3px solid var(--color-warning-orange);
+}
+.alert-card.medium {
+  border-left: 3px solid var(--color-rescue-blue);
+}
+.alert-card.low {
+  border-left: 3px solid var(--color-safety-green);
+  opacity: 0.85;
+}
+
+/* KPI metrics inside sidebar */
+.sidebar-metrics-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.sidebar-metric-card {
+  background-color: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: all 0.2s ease;
+}
+
+.sidebar-metric-card:hover {
+  border-color: rgba(0, 0, 0, 0.12);
+  background-color: var(--color-hover-surface);
+}
+
+/* ================================= MAP AREA (HERO) ================================= */
+.map-pane {
+  position: relative;
+  height: 100vh;
+  width: 100%;
+  background-color: var(--color-panel-dark);
+  overflow: hidden;
+  perspective: 1500px;
+}
+
+.map-pane::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: conic-gradient(from 0deg, rgba(37, 99, 235, 0.03) 0deg, transparent 75deg, transparent 360deg);
+  pointer-events: none;
+  z-index: 6;
+  animation: map-radar-sweep 10s linear infinite;
+  transform-origin: center center;
+}
+
+@keyframes map-radar-sweep {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Subtle tactical grid overlay — replaces holographic scanner */
+.map-pane::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
+  background-image:
+    linear-gradient(rgba(0, 0, 0, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.025) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: 5;
+  opacity: 0;
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.map-pane.tilted-view::before {
+  opacity: 1;
+}
+
+.map-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  transition: transform 1.2s cubic-bezier(0.19, 1, 0.22, 1), box-shadow 1.2s ease, border-radius 1.2s ease;
+}
+
+/* 3D Tilted View transform rules */
+.map-pane.tilted-view .map-container {
+  transform: rotateX(38deg) rotateZ(-8deg) translateY(-25px) scale(1.02);
+  box-shadow: 
+    0 40px 100px rgba(0, 0, 0, 0.95),
+    inset 0 0 40px rgba(0, 0, 0, 0.8);
+  border-radius: 28px;
+}
+
+/* 3D standalone alignment */
+.map-pane.tilted-view .custom-beacon-leaflet-container {
+  transform: rotateX(-38deg) rotateZ(8deg) translateY(-12px) !important;
+  transform-origin: bottom center;
+}
+
+.custom-beacon-leaflet-container {
+  transition: transform 1.2s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+/* Floating toggler for phone mockup */
+.phone-toggle-btn {
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  z-index: 100;
+  height: 32px;
+  background: var(--color-card-bg);
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  color: var(--color-text-primary);
+  padding: 0 10px;
+  border-radius: 12px; /* Flat, tactical radius */
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 2px 8px rgba(139, 128, 115, 0.08);
+  transition: all 0.2s ease;
+}
+.phone-toggle-btn:hover {
+  background: var(--color-hover-surface);
+  border-color: rgba(0, 0, 0, 0.15);
+}
+
+/* Minimal Map controls top-right */
+.map-layer-controls {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  z-index: 100;
+  display: flex;
+  gap: 8px;
+}
+
+.minimal-pill-btn {
+  height: 32px;
+  background: var(--color-card-bg);
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  color: var(--color-text-secondary);
+  padding: 0 10px;
+  border-radius: 12px; /* Flat, tactical radius */
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 2px 8px rgba(139, 128, 115, 0.08);
+  transition: all 0.2s;
+}
+
+.minimal-pill-btn:hover {
+  background: var(--color-hover-surface);
+  border-color: rgba(0, 0, 0, 0.15);
+  color: var(--color-text-primary);
+}
+
+.minimal-pill-btn.active {
+  background: var(--color-rescue-blue) !important;
+  color: #fff !important;
+  border-color: var(--color-rescue-blue) !important;
+  box-shadow: none !important;
+}
+
+.minimal-pill-btn.active.glow-red {
+  background: var(--color-emergency-red) !important;
+  border-color: var(--color-emergency-red) !important;
+  box-shadow: none !important;
+}
+
+.minimal-pill-btn.active.glow-green {
+  background: var(--color-safety-green) !important;
+  border-color: var(--color-safety-green) !important;
+  box-shadow: none !important;
+}
+
+/* Tactical Matte Low-Height Button */
+.btn-tactical {
+  height: 40px;
+  padding: 0 16px;
+  border-radius: 12px;
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(139, 128, 115, 0.05);
+  transition: all 0.2s ease;
+  outline: none;
+}
+.btn-tactical:hover {
+  background: var(--color-hover-surface);
+  border-color: rgba(0, 0, 0, 0.15);
+}
+.btn-tactical:active {
+  background: rgba(0, 0, 0, 0.04);
+}
+.btn-tactical.primary {
+  background: var(--color-rescue-blue);
+  border-color: var(--color-rescue-blue);
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2);
+}
+.btn-tactical.primary:hover {
+  background: rgba(37, 99, 235, 0.9);
+}
+.btn-tactical.danger {
+  background: var(--color-emergency-red);
+  border-color: var(--color-emergency-red);
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.2);
+}
+.btn-tactical.danger:hover {
+  background: rgba(220, 38, 38, 0.9);
+}
+.btn-tactical.success {
+  background: var(--color-safety-green);
+  border-color: var(--color-safety-green);
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(22, 163, 74, 0.2);
+}
+.btn-tactical.success:hover {
+  background: rgba(22, 163, 74, 0.9);
+}
+
+/* ================================= AUTHENTIC MAP TILES & MAP SHAPES ================================= */
+/* Cream tile filter applied to CartoDB Positron maps */
+.cream-map-tiles {
+  filter: sepia(20%) contrast(115%) brightness(88%) hue-rotate(-5deg) saturate(1.22) !important;
+  opacity: 0.72 !important;
+}
+
+.satellite-map-tiles {
+  filter: sepia(18%) contrast(115%) brightness(92%) saturate(0.85);
+}
+
+/* Tactical Map Dot & Line Grid depth texture overlay */
+.map-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    radial-gradient(rgba(0, 0, 0, 0.02) 1px, transparent 0),
+    linear-gradient(rgba(0, 0, 0, 0.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.015) 1px, transparent 1px);
+  background-size: 24px 24px, 48px 48px, 48px 48px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Imperfect disaster zone vector styling */
+.imperfect-flood-zone {
+  filter: url(#disaster-noise-filter) blur(1.8px) drop-shadow(0 0 2px rgba(214, 69, 69, 0.15)) !important;
+}
+
+.drone-flight-path {
+  stroke-dasharray: 6, 6;
+  animation: flow-dash 1.6s linear infinite;
+}
+
+.mesh-routing-path {
+  stroke-dasharray: 8, 6;
+  animation: flow-dash 1.2s linear infinite;
+}
+
+/* ================================= MAP MARKER BEACONS ================================= */
+@keyframes pulse-ring {
+  0% { transform: scale(0.5); opacity: 0.85; }
+  100% { transform: scale(2); opacity: 0; }
+}
+
+.pulse-beacon-critical {
+  width: 10px;
+  height: 10px;
+  background-color: var(--color-critical-red);
+  border-radius: 50%;
+  border: 1.5px solid var(--color-bg-dark);
+  position: relative;
+}
+.pulse-beacon-critical::after {
+  content: '';
+  position: absolute;
+  top: -9px;
+  left: -9px;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  border: 1.5px solid var(--color-critical-red);
+  animation: pulse-ring 1.8s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
+}
+
+.pulse-beacon-high {
+  width: 10px;
+  height: 10px;
+  background-color: var(--color-critical-red); /* Victim high-severity is red */
+  border-radius: 50%;
+  border: 1.5px solid var(--color-bg-dark);
+  position: relative;
+}
+.pulse-beacon-high::after {
+  content: '';
+  position: absolute;
+  top: -9px;
+  left: -9px;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  border: 1.5px solid var(--color-critical-red);
+  animation: pulse-ring 2.4s cubic-bezier(0.2, 0.8, 0.2, 1) infinite; /* slightly slower pulse */
+}
+
+.beacon-safezone {
+  width: 10px;
+  height: 10px;
+  background-color: var(--color-rescue-blue); /* Resource is blue */
+  border-radius: 0; /* Pure square shape */
+  border: 1.5px solid var(--color-bg-dark);
+  position: relative;
+}
+
+.beacon-volunteer {
+  width: 10px;
+  height: 10px;
+  background-color: var(--color-safety-green); /* Volunteer is green */
+  border: 1.5px solid var(--color-bg-dark);
+  transform: rotate(45deg); /* Diamond shape */
+  transform-origin: center;
+}
+
+/* ================================= DECRPYT MODALS & FORMS ================================= */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(15, 23, 42, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+  animation: fade-in 0.2s;
+}
+
+.modal-content {
+  background: var(--color-panel-dark);
+  border: 1px solid var(--color-border);
+  box-shadow: 0 20px 45px rgba(139, 128, 115, 0.15);
+  border-radius: 12px;
+  width: 500px;
+  max-width: 90%;
+  max-height: 85vh;
+  overflow-y: auto;
+  padding: 24px;
+  animation: scale-in 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.form-control {
+  background-color: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-primary);
+  border-radius: 6px;
+  padding: 8px 10px;
+  outline: none;
+  font-family: var(--font-body);
+  font-size: 11px;
+  transition: border-color 0.2s;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.04);
+}
+
+.form-control:focus {
+  border-color: var(--color-rescue-blue);
+}
+
+.form-label {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+  display: block;
+}
+
+/* Status Indicators */
+.dashboard-status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border: 1px solid rgba(22, 163, 74, 0.2);
+  background: rgba(22, 163, 74, 0.06);
+  color: var(--color-safety-green);
+  cursor: pointer;
+}
+
+.dashboard-status-indicator.offline {
+  border-color: rgba(217, 119, 6, 0.2);
+  background: rgba(217, 119, 6, 0.06);
+  color: var(--color-warning-orange);
+}
+
+/* Deficit Indicators - Progress Bars */
+.deficit-bar-bg {
+  height: 6px;
+  background-color: rgba(0, 0, 0, 0.06);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+/* Info Alert Box inside Telemetry */
+.clean-info-box {
+  background-color: rgba(37, 99, 235, 0.05);
+  border: 1px solid rgba(37, 99, 235, 0.15);
+  padding: 10px 12px;
+  border-radius: 12px;
+}
+
+.clean-info-box-title {
+  font-size: 9px;
+  font-weight: 800;
+  color: var(--color-rescue-blue);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+}
+
+/* Radar loop widget styling inside phone */
+.radar-circle {
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  border: 1px solid rgba(225, 29, 72, 0.1);
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 10px auto;
+  background: rgba(0,0,0,0.1);
+}
+
+.radar-sweep-hand {
+  position: absolute;
+  width: 65px;
+  height: 65px;
+  top: 0;
+  left: 0;
+  border-top-left-radius: 100%;
+  background: linear-gradient(135deg, rgba(225, 29, 72, 0.15) 0%, rgba(225, 29, 72, 0) 70%);
+  transform-origin: 100% 100%;
+  animation: radar-sweep 3s linear infinite;
+}
+
+.radar-node {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background-color: var(--color-rescue-blue);
+}
+
+/* Custom spinning propellers on custom SVG Drone marker */
+.drone-prop {
+  transform-origin: center;
+  animation: drone-prop-spin 0.08s linear infinite;
+}
+
+.drone-prop-1 { transform-origin: 5px 5px; }
+.drone-prop-2 { transform-origin: 35px 5px; }
+.drone-prop-3 { transform-origin: 5px 35px; }
+.drone-prop-4 { transform-origin: 35px 35px; }
+
+/* SOS Pulse Button — industrial emergency switch */
+.pulse-button {
+  background: #DC2626 !important;
+  border: 2px solid #991B1B !important;
+  box-shadow: 0 6px 16px rgba(220, 38, 38, 0.12), inset 0 -2px 0 rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+  border-radius: 12px !important; /* Industrial blocky shape */
+  color: #ffffff !important;
+  font-family: var(--font-heading);
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  animation: sos-hardware-breath 2.5s ease-in-out infinite;
+}
+
+@keyframes sos-hardware-breath {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 6px 16px rgba(220, 38, 38, 0.12), inset 0 -2px 0 rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+  50% {
+    transform: scale(1.02);
+    box-shadow: 0 8px 22px rgba(220, 38, 38, 0.18), inset 0 -2px 0 rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  }
+}
+
+.pulse-button:hover {
+  transform: scale(1.03) translateY(-1px) !important;
+  box-shadow: 0 10px 24px rgba(220, 38, 38, 0.22), inset 0 -2px 0 rgba(0, 0, 0, 0.08) !important;
+}
+
+.pulse-button:active {
+  transform: scale(0.95) translateY(1px) !important;
+  box-shadow: 0 2px 6px rgba(220, 38, 38, 0.08), inset 0 4px 10px rgba(0, 0, 0, 0.3) !important;
+  border-color: #7F1D1D !important;
+}
+
+/* Keyframe Animations */
+@keyframes radar-sweep {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes drone-prop-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Dynamic Wave Ripple effect for SOS Broadcasting state */
+.dynamic-island-wave {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--color-emergency-red);
+  position: relative;
+}
+
+.dynamic-island-wave::after {
+  content: '';
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1px solid var(--color-emergency-red);
+  animation: pulse-ring 1.5s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
+}
+
+@keyframes flow-dash {
+  to {
+    stroke-dashoffset: -20;
+  }
+}
+
+/* Layered radial gradient for danger zones */
+.danger-zone-radial {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(220, 69, 69, 0.26) 0%,
+    rgba(220, 69, 69, 0.10) 45%,
+    transparent 70%
+  );
+  pointer-events: none;
+  animation: danger-zone-pulse 4s ease-in-out infinite;
+}
+
+@keyframes danger-zone-pulse {
+  0%, 100% { transform: translate(-50%, -50%) scale(0.92); opacity: 0.8; }
+  50% { transform: translate(-50%, -50%) scale(1.08); opacity: 1; }
+}
+
+/* Subtle map radar sweep overlay */
+.radar-sweep-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: conic-gradient(from 0deg, rgba(91, 141, 239, 0.04) 0deg, transparent 75deg, transparent 360deg);
+  pointer-events: none;
+  z-index: 10;
+  animation: map-radar-sweep 16s linear infinite;
+}
+
+/* Satellite view orbital transitions */
+.map-container {
+  transition: transform 1.2s cubic-bezier(0.19, 1, 0.22, 1), box-shadow 1.2s ease, border-radius 1.2s ease, filter 0.8s ease !important;
+}
+
+.map-container.layer-swap-transition {
+  transform: rotateX(42deg) rotateZ(-12deg) scale(0.94) translateY(-40px) !important;
+  filter: brightness(0.65) saturate(0.8) blur(1px) !important;
+}
+
+/* Phase 4 Refinement Keyframes */
+@keyframes live-status-pulse {
+  0%, 100% { opacity: 0.45; }
+  50% { opacity: 1; }
+}
+
+.live-status-dot-blink {
+  animation: live-status-pulse 1.4s infinite ease-in-out;
+}
+
+@keyframes terminal-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.terminal-cursor {
+  display: inline-block;
+  width: 7px;
+  height: 12px;
+  background-color: var(--color-emergency-red);
+  margin-left: 4px;
+  vertical-align: middle;
+  animation: terminal-blink 0.8s step-end infinite;
+}
+
+@keyframes feed-log-enter {
+  0% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.feed-log-item-animated {
+  animation: feed-log-enter 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Uttarakhand Terrain Visual Styling */
+.helipad-marker-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background-color: var(--color-rescue-blue);
+  border: 1.5px solid #ffffff;
+  color: #ffffff;
+  font-family: var(--font-heading);
+  font-size: 13px;
+  font-weight: 800;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+.helipad-marker-icon.safe {
+  background-color: var(--color-safety-green);
+}
+.helipad-marker-icon.foggy {
+  background-color: var(--color-warning-orange);
+  animation: live-status-pulse 1.8s infinite ease-in-out;
+}
+
+.landslide-marker-icon {
+  width: 22px;
+  height: 22px;
+  background-color: #D97706;
+  border: 1.5px solid #ffffff;
+  border-radius: 4px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 11px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.blackout-signal-zone {
+  stroke-dasharray: 4, 4;
+  animation: flow-dash 3s linear infinite;
+}
+
+/* Atmospheric weather overlays & elevation shading */
+.weather-fog-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><filter id="fog-filter"><feTurbulence type="fractalNoise" baseFrequency="0.015" numOctaves="3" result="noise"/><feColorMatrix type="matrix" values="1 0 0 0 1  0 1 0 0 1  0 0 1 0 1  0 0 0 0.08 0"/></filter><rect width="100%" height="100%" filter="url(%23fog-filter)"/></svg>');
+  background-size: 400px 400px;
+  pointer-events: none;
+  z-index: 8;
+  opacity: 0.035;
+  animation: fog-drift 60s linear infinite;
+}
+
+@keyframes fog-drift {
+  0% { background-position: 0 0; }
+  100% { background-position: 400px 400px; }
+}
+
+/* Subtle rain grain texture overlay — Kedarnath cloudburst atmosphere */
+.weather-rain-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 200%;
+  height: 200%;
+  background-image: 
+    repeating-linear-gradient(
+      -70deg,
+      transparent,
+      transparent 8px,
+      rgba(100, 120, 150, 0.025) 8px,
+      rgba(100, 120, 150, 0.025) 9px
+    );
+  pointer-events: none;
+  z-index: 9;
+  animation: rain-fall 3s linear infinite;
+}
+
+@keyframes rain-fall {
+  0% { transform: translateY(-50%); }
+  100% { transform: translateY(0%); }
+}
+
+/* Subtle rolling cloud shadow that drifts across the terrain */
+.weather-cloud-shadow-overlay {
+  position: absolute;
+  top: -20%;
+  left: -20%;
+  width: 140%;
+  height: 80%;
+  background: radial-gradient(
+    ellipse at 60% 40%,
+    rgba(30, 35, 50, 0.06) 0%,
+    rgba(20, 25, 40, 0.04) 35%,
+    transparent 65%
+  );
+  pointer-events: none;
+  z-index: 6;
+  animation: cloud-drift 45s ease-in-out infinite alternate;
+}
+
+@keyframes cloud-drift {
+  0% { transform: translateX(-15%) translateY(-5%); opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { transform: translateX(25%) translateY(8%); opacity: 0.7; }
+}
+
+/* SOS armed/broadcasting button state — tactical orange pulse */
+.sos-armed-button {
+  background: linear-gradient(135deg, #C6925B 0%, #A0633A 100%);
+  color: white;
+  border: 2px solid rgba(198, 146, 91, 0.5);
+  cursor: pointer;
+  box-shadow:
+    0 8px 18px rgba(198, 146, 91, 0.3),
+    inset 0 -2px 0 rgba(0,0,0,0.12);
+  animation: sos-armed-breathe 1.2s ease-in-out infinite;
+}
+
+@keyframes sos-armed-breathe {
+  0%, 100% { box-shadow: 0 8px 18px rgba(198, 146, 91, 0.3), inset 0 -2px 0 rgba(0,0,0,0.12); transform: scale(1); }
+  50% { box-shadow: 0 12px 30px rgba(198, 146, 91, 0.5), inset 0 -2px 0 rgba(0,0,0,0.12); transform: scale(1.03); }
+}
+
+/* Critical event popup slide-down animation */
+@keyframes slide-down-popup {
+  0% { opacity: 0; transform: translateX(-50%) translateY(-24px); }
+  100% { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+/* Spinner keyframe for network-switching icon */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Alert interruption toast — slides up from bottom */
+@keyframes slide-up-toast {
+  0% { opacity: 0; transform: translateY(16px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* Tactical micro camera shake — critical alert only (5px max, 500ms) */
+.map-shake {
+  animation: map-shake-anim 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+@keyframes map-shake-anim {
+  0%  { transform: translate(0, 0) rotate(0deg); }
+  10% { transform: translate(-4px, -2px) rotate(-0.3deg); }
+  20% { transform: translate(4px, 2px) rotate(0.3deg); }
+  30% { transform: translate(-3px, 1px) rotate(-0.2deg); }
+  40% { transform: translate(3px, -3px) rotate(0.2deg); }
+  50% { transform: translate(-2px, 2px) rotate(-0.1deg); }
+  60% { transform: translate(2px, 1px) rotate(0.1deg); }
+  70% { transform: translate(-1px, -1px) rotate(0deg); }
+  80% { transform: translate(1px, 0) rotate(0deg); }
+  90% { transform: translate(-1px, 0) rotate(0deg); }
+  100%{ transform: translate(0, 0) rotate(0deg); }
+}
+
+/* Red vignette flash on critical alert (800ms auto-fade) */
+@keyframes map-red-flash {
+  0%   { opacity: 1; }
+  40%  { opacity: 0.85; }
+  100% { opacity: 0; }
+}
+
+
+.map-elevation-depth-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    radial-gradient(ellipse at 20% 15%, rgba(50, 40, 30, 0.09) 0%, transparent 55%),
+    radial-gradient(ellipse at 80% 80%, rgba(30, 25, 20, 0.07) 0%, transparent 50%),
+    radial-gradient(circle at 50% 30%, transparent 45%, rgba(27, 24, 21, 0.12) 80%),
+    linear-gradient(rgba(139, 128, 115, 0.04) 0%, rgba(0, 0, 0, 0.08) 100%);
+  pointer-events: none;
+  z-index: 7;
+}
+
+/* ================================= DYNAMIC COMMAND HUD STYLES ================================= */
+
+/* Animated mesh signal pulse rings */
+.mesh-pulse-ring {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(91, 141, 239, 0.45);
+  border: 1px solid var(--color-bg-dark);
+  position: relative;
+  box-shadow: 0 0 6px rgba(91, 141, 239, 0.4);
+  transform: translate(-6px, -6px);
+}
+
+.mesh-pulse-ring::after {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: -8px;
+  right: -8px;
+  bottom: -8px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(91, 141, 239, 0.65);
+  animation: mesh-ring-pulse 2.2s cubic-bezier(0.25, 0, 0, 1) infinite;
+}
+
+@keyframes mesh-ring-pulse {
+  0% { transform: scale(0.6); opacity: 1; }
+  100% { transform: scale(3.5); opacity: 0; }
+}
+
+/* Map brightness pulsing during network-outage transition */
+@keyframes map-network-pulse {
+  0%, 100% { filter: brightness(1) sepia(20%) contrast(115%); }
+  50% { filter: brightness(0.78) sepia(22%) contrast(110%) saturate(1.15); }
+}
+
+.map-pulse-network-offline {
+  animation: map-network-pulse 1.8s ease-in-out infinite;
+}
+
+/* Route compromised blinking alert overlay */
+.route-compromised-flash {
+  animation: route-compromised-blink 0.8s infinite alternate;
+}
+
+@keyframes route-compromised-blink {
+  0% { opacity: 0.25; stroke: #4B5563; }
+  100% { opacity: 0.95; stroke: var(--color-critical-red); }
+}
+
+/* SOS Form Transmitting State Active Pulse */
+.sos-transmitting-button {
+  background: linear-gradient(135deg, var(--color-emergency-red) 0%, #7F1C1C 100%) !important;
+  color: white !important;
+  border: 2px solid rgba(220, 38, 38, 0.6) !important;
+  box-shadow: 0 0 20px rgba(220, 38, 38, 0.6) !important;
+  animation: button-transmit-pulse 0.8s ease-in-out infinite alternate;
+  cursor: not-allowed !important;
+}
+
+@keyframes button-transmit-pulse {
+  0% { transform: scale(1); box-shadow: 0 0 10px rgba(220, 38, 38, 0.4); }
+  100% { transform: scale(1.02); box-shadow: 0 0 25px rgba(220, 38, 38, 0.8); }
+}
+
+/* Telecom tower Offline indicator ping */
+.offline-tower-wrapper {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.offline-tower-ping {
+  position: absolute;
+  top: -22px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--color-critical-red);
+  box-shadow: 0 0 6px var(--color-critical-red);
+  animation: live-status-pulse 1.2s infinite ease-in-out;
+}
+
+/* Phase 6 Keynote Enhancements CSS */
+
+/* Starlink Uplink/Downlink beams */
+.satellite-uplink-beam, .satellite-downlink-beam {
+  stroke-dasharray: 4, 8;
+  animation: satellite-beam-flow 1.5s linear infinite;
+}
+
+@keyframes satellite-beam-flow {
+  0% { stroke-dashoffset: 24; }
+  100% { stroke-dashoffset: 0; }
+}
+
+/* Weather Overlays */
+.map-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.map-container.weather-storm::after, .map-container.weather-cloudburst::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1000;
+  background-image: linear-gradient(105deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.06) 50%, rgba(255,255,255,0) 100%);
+  background-size: 200% 200%;
+  animation: rain-grain-flow 0.8s linear infinite;
+}
+
+.map-container.weather-cloudburst::after {
+  background-image: linear-gradient(105deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.12) 50%, rgba(255,255,255,0) 100%);
+  animation: rain-grain-flow 0.4s linear infinite;
+}
+
+@keyframes rain-grain-flow {
+  0% { background-position: 0% 0%; }
+  100% { background-position: 100% 100%; }
+}
+
+/* Drifting Fog/Clouds overlay */
+.map-container.weather-storm::before, .map-container.weather-cloudburst::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 200%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 999;
+  background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0) 70%),
+              radial-gradient(circle, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 60%);
+  opacity: 0.8;
+  animation: fog-drift-flow 45s linear infinite;
+}
+
+@keyframes fog-drift-flow {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
+}
+
+/* Active packet node expanding rings */
+.packet-node-pulse-ring {
+  transform-origin: center;
+  animation: packet-node-pulse-anim 1.5s ease-out infinite;
+}
+
+@keyframes packet-node-pulse-anim {
+  0% { r: 50; opacity: 0.8; }
+  100% { r: 600; opacity: 0; }
+}
+
+/* Flashing towers Offline state */
+.offline-tower-wrapper.compromised svg {
+  animation: offline-tower-flash 1s infinite alternate;
+}
+
+@keyframes offline-tower-flash {
+  0% { filter: drop-shadow(0 0 1px rgba(194, 106, 106, 0.4)); }
+  100% { filter: drop-shadow(0 0 6px var(--color-critical-red)); }
+}
+

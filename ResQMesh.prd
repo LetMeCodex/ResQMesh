@@ -1,0 +1,481 @@
+Product Requirements Document (PRD)
+Project Name
+ResQMesh
+Tagline
+
+“When networks fail, people become the network.”
+
+1. Executive Summary
+
+ResQMesh is an AI-powered offline-first emergency communication platform designed for disaster situations where traditional internet and cellular infrastructure fails.
+
+The platform enables users to:
+
+send SOS alerts without internet,
+relay emergency messages through nearby devices,
+locate safe zones,
+connect with volunteers,
+share resources,
+and help rescue teams prioritize emergencies using AI.
+
+ResQMesh combines:
+
+peer-to-peer mesh communication concepts,
+AI emergency classification,
+volunteer coordination,
+offline accessibility,
+and disaster-response visualization
+
+into one unified emergency response ecosystem.
+
+The hackathon MVP demonstrates how nearby smartphones can act as communication relay nodes during disasters.
+
+2. Problem Statement
+
+During disasters such as:
+
+floods,
+earthquakes,
+landslides,
+wildfires,
+riots,
+stampedes,
+train accidents,
+network blackouts,
+
+internet and telecom infrastructure often become unavailable.
+
+As a result:
+
+victims cannot request help,
+rescue teams lack visibility,
+emergency response becomes delayed,
+local resources remain uncoordinated,
+and critical lives are lost.
+
+Existing emergency applications heavily rely on internet connectivity and centralized infrastructure, making them unreliable exactly when they are needed most.
+
+3. Vision Statement
+
+To create a resilient decentralized emergency communication ecosystem where nearby devices collaborate to keep communication alive during disasters, ensuring faster rescue coordination and saving lives even without internet connectivity.
+
+4. Goals
+Primary Goals
+Enable offline SOS communication.
+Prioritize emergencies using AI.
+Coordinate rescue efforts efficiently.
+Improve disaster response visibility.
+Build an accessible emergency ecosystem.
+Secondary Goals
+Resource sharing.
+Volunteer coordination.
+Safe-zone discovery.
+Community-powered communication.
+5. Target Users
+Primary Users
+Disaster Victims
+
+People affected by:
+
+floods
+earthquakes
+fires
+accidents
+landslides
+Rescue Teams
+NGOs
+Disaster response forces
+Medical responders
+Volunteers
+Secondary Users
+Local communities
+Government agencies
+Event organizers
+Trekking groups
+Rural populations
+6. Key Value Proposition
+
+ResQMesh ensures emergency communication survives even when traditional communication infrastructure collapses.
+
+Core innovation:
+
+Smartphones become temporary emergency communication nodes.
+
+7. Product Scope
+MVP Scope (Hackathon Build)
+Must Build
+SOS alert creation
+Nearby node simulation
+Message relay visualization
+AI severity classification
+Rescue dashboard
+Resource screen
+Volunteer mode
+Safe zone listing
+Firebase backend
+Responsive UI
+Future Scope
+Real Bluetooth mesh communication
+Multi-hop routing
+End-to-end encryption
+Satellite fallback
+Drone relay support
+Government integration
+Offline maps
+Predictive disaster analytics
+8. Functional Requirements
+8.1 SOS Alert System
+Description
+
+Allows users to send emergency alerts.
+
+Features
+One-tap SOS button
+Emergency categories
+Voice/text input
+Auto location
+Battery metadata
+Timestamp
+User identification
+Emergency Types
+Medical
+Fire
+Flood
+Violence
+Trapped
+Food/Water
+Shelter
+Missing Person
+Inputs
+Field	Type
+Emergency Type	Dropdown
+Message	Text
+Voice Input	Audio
+Location	Auto
+Battery %	Auto
+Outputs
+
+Structured SOS object.
+
+8.2 Offline Relay Layer
+Description
+
+Messages are relayed through nearby devices.
+
+MVP Behavior
+
+Simulated nearby node relay.
+
+Future Behavior
+
+Bluetooth/WiFi Direct mesh communication.
+
+Message Metadata
+Field	Description
+Alert ID	Unique identifier
+Hop Count	Relay count
+TTL	Expiry
+Sender ID	Origin
+Timestamp	Creation time
+Status	Sent/Relayed/Uploaded
+8.3 AI Emergency Classification
+Description
+
+AI analyzes incoming emergency messages.
+
+AI Tasks
+classify category
+detect severity
+assign priority
+summarize message
+suggest action
+detect fake/spam alerts
+Severity Levels
+Low
+Medium
+High
+Critical
+Example Output
+{
+  "category": "Medical",
+  "severity": "Critical",
+  "priorityScore": 96,
+  "summary": "Person unconscious and needs urgent medical support.",
+  "suggestedAction": "Dispatch ambulance immediately"
+}
+8.4 Rescue Dashboard
+Description
+
+Centralized monitoring interface.
+
+Features
+Alert board
+Heatmap
+Volunteer assignment
+Resource management
+Severity filtering
+Live alert updates
+Dashboard Components
+Overview Stats
+Active alerts
+Critical alerts
+Volunteers
+Resources
+Alert Cards
+Severity color
+Message summary
+Location
+Time
+Priority score
+8.5 Volunteer System
+Features
+Register as volunteer
+Add skills
+Set availability
+Accept assignments
+Volunteer Skills
+First aid
+Medical
+Driving
+Swimming
+Rescue transport
+Local guide
+8.6 Resource Sharing
+Resource Types
+Water
+Food
+Shelter
+Medicine
+Power banks
+Transport
+Features
+Add resources
+Nearby availability
+Match resources to alerts
+8.7 Safe Zone Finder
+Features
+Hospitals
+Relief camps
+Police stations
+Shelters
+9. Non-Functional Requirements
+Performance
+Fast SOS creation
+Lightweight UI
+Low battery usage
+Accessibility
+Large buttons
+High contrast
+Multilingual support
+Voice support
+Reliability
+Message duplication prevention
+Retry mechanisms
+Offline-first architecture
+Scalability
+
+Architecture should support:
+
+multiple regions
+thousands of alerts
+distributed nodes
+Security
+Firebase authentication
+Role-based dashboard access
+Basic validation
+10. User Flow
+Victim Flow
+Open App
+↓
+Press SOS
+↓
+Select Emergency
+↓
+Add Message
+↓
+Send Alert
+↓
+Nearby Relay
+↓
+Dashboard Receives
+↓
+AI Prioritizes
+↓
+Volunteer Assigned
+↓
+Status Updates
+Volunteer Flow
+Enable Volunteer Mode
+↓
+Add Skills
+↓
+Receive Nearby Alerts
+↓
+Accept Task
+↓
+Navigate to Victim
+↓
+Resolve Case
+Rescue Admin Flow
+Open Dashboard
+↓
+View Critical Alerts
+↓
+Review AI Summary
+↓
+Assign Resources
+↓
+Track Resolution
+11. UI/UX Requirements
+Design Language
+Emergency-focused
+Minimal
+Trustworthy
+Fast interaction
+High readability
+Color Palette
+Purpose	Color
+Critical	#E53935
+Emergency Dark	#B71C1C
+Safe	#2E7D32
+Warning	#FB8C00
+Rescue Blue	#1565C0
+Background	#F7F9FC
+Typography
+Type	Font
+Heading	Poppins
+Body	Inter
+Button	Inter Medium
+UX Principles
+One-tap actions
+Minimal typing
+Large CTA buttons
+Clear status indicators
+12. Technical Architecture
+Frontend
+Mobile App
+React Native Expo
+NativeWind/Tailwind
+Dashboard
+Next.js
+Tailwind CSS
+Backend
+Firebase Firestore
+Firebase Authentication
+Firebase Cloud Functions
+AI
+Gemini API/OpenAI API
+Maps
+Mapbox/Leaflet
+Offline Communication
+MVP
+
+Simulated relay
+
+Future
+Nearby Connections API
+Bluetooth LE
+WiFi Direct
+13. Database Schema
+Users
+Field	Type
+userId	string
+name	string
+phone	string
+role	string
+location	object
+battery	number
+SOS Alerts
+Field	Type
+alertId	string
+emergencyType	string
+message	string
+severity	string
+priorityScore	number
+location	object
+status	string
+hopCount	number
+Resources
+Field	Type
+resourceId	string
+type	string
+quantity	string
+location	object
+Volunteers
+Field	Type
+volunteerId	string
+skills	array
+availability	boolean
+14. APIs
+AI Analysis API
+Input
+
+Emergency message.
+
+Output
+severity
+category
+summary
+action
+Firebase APIs
+createAlert()
+updateAlert()
+assignVolunteer()
+addResource()
+15. AI Prompt
+Analyze this emergency SOS message.
+
+Return:
+- category
+- severity
+- priority score
+- summary
+- suggested action
+
+Message:
+{message}
+16. Demo Scenario
+Scenario
+
+Flood disaster with internet failure.
+
+Demo Steps
+User sends SOS.
+Nearby node receives relay.
+Dashboard receives alert.
+AI marks alert CRITICAL.
+Volunteer assigned.
+Safe zone displayed.
+17. Success Metrics
+MVP Success
+SOS successfully created
+Dashboard receives alerts
+AI classification works
+Demo flow runs smoothly
+Real-World Success
+Faster response times
+Better rescue prioritization
+Improved communication resilience
+18. Risks
+Risk	Mitigation
+Real mesh networking complexity	Simulate relay
+Time limitation	Focus on UI + flow
+API delays	Use mock data
+Battery drain	Simulate optimization
+19. Competitive Advantage
+Existing Apps	ResQMesh
+Internet dependent	Offline-first
+No AI prioritization	AI emergency analysis
+No mesh relay	Device relay concept
+Limited local coordination	Community resource sharing
+20. Future Scope
+Real decentralized networking
+Government disaster integration
+Satellite communication
+Drone relay
+IoT sensors
+Predictive AI disaster analysis
+Wearable integration
+21. Pitch Summary
+
+“ResQMesh transforms smartphones into a decentralized emergency communication network. During disasters when internet infrastructure fails, nearby devices relay SOS messages offline until rescue teams receive them. AI prioritizes emergencies, coordinates volunteers, and helps save lives faster.”
