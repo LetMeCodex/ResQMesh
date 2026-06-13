@@ -30,6 +30,51 @@ import {
   Compass,
   Zap
 } from 'lucide-react';
+import { initializeApp, getApps } from 'firebase/app';
+import { getFirestore, collection, addDoc, onSnapshot, query, orderBy } from 'firebase/firestore';
+
+// Global Firebase handles
+let firebaseApp = null;
+let firestoreDb = null;
+
+const DEFAULT_FIREBASE_CONFIG = {
+  projectId: "directionless-beauty",
+  appId: "1:485571902380:web:a3a36461958398ed93d809",
+  storageBucket: "directionless-beauty.firebasestorage.app",
+  apiKey: "AIzaSyD8vJJNF3OWGJgGaaRG55BxecVxDO9hhSE",
+  authDomain: "directionless-beauty.firebaseapp.com",
+  messagingSenderId: "485571902380",
+  measurementId: "G-CH6RPYYJ3S",
+  projectNumber: "485571902380",
+  version: "2"
+};
+
+const initFirebase = (configStrOrObj) => {
+  try {
+    let config = null;
+    if (typeof configStrOrObj === 'string') {
+      if (!configStrOrObj.trim()) return { success: false, error: 'Empty config' };
+      config = JSON.parse(configStrOrObj);
+    } else {
+      config = configStrOrObj;
+    }
+    
+    if (!config || !config.apiKey || !config.projectId) {
+      return { success: false, error: 'Missing key fields (apiKey, projectId)' };
+    }
+    
+    const apps = getApps();
+    if (apps.length === 0) {
+      firebaseApp = initializeApp(config);
+    } else {
+      firebaseApp = apps[0];
+    }
+    firestoreDb = getFirestore(firebaseApp);
+    return { success: true, db: firestoreDb };
+  } catch (e) {
+    return { success: false, error: e.message };
+  }
+};
 
 // Web Audio Synthesizer for Offline Hardware Command Sound Effects with Spatial Stereo Panning
 const playSystemSound = (type, pan = 0) => {
@@ -555,15 +600,17 @@ export default function App() {
   const [settings, setSettings] = useState(() => {
     const cached = localStorage.getItem(STORAGE_KEY_SETTINGS);
     const defaultKey = 'AQ.Ab8RN6Lr-pMhbTm4mbYslC3CKV6UR8nWOeO6iDSixi-8ddbBHA';
-    if (!cached) return { geminiApiKey: defaultKey, offlineSync: true };
+    const defaultFirebaseConfigStr = JSON.stringify(DEFAULT_FIREBASE_CONFIG, null, 2);
+    if (!cached) return { geminiApiKey: defaultKey, offlineSync: true, firebaseConfigText: defaultFirebaseConfigStr };
     try {
       const parsed = JSON.parse(cached);
       return {
         geminiApiKey: parsed.geminiApiKey || defaultKey,
-        offlineSync: parsed.offlineSync ?? true
+        offlineSync: parsed.offlineSync ?? true,
+        firebaseConfigText: parsed.firebaseConfigText || defaultFirebaseConfigStr
       };
     } catch {
-      return { geminiApiKey: defaultKey, offlineSync: true };
+      return { geminiApiKey: defaultKey, offlineSync: true, firebaseConfigText: defaultFirebaseConfigStr };
     }
   });
 
@@ -597,9 +644,72 @@ export default function App() {
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [showAssignModal, setShowAssignModal] = useState(false);
   const [showDecryptionView, setShowDecryptionView] = useState(false);
-  const [decryptingAnimation, setDecryptingAnimation] = useState(false);
   const [syncQueue, setSyncQueue] = useState([]);
   
+  const [firebaseStatus, setFirebaseStatus] = useState('Disconnected');
+  const [mobileView, setMobileView] = useState('victim'); // 'victim' | 'map' | 'command' (mobile responsiveness state)
+
+  // Initialize Firebase on mount / setting change
+  useEffect(() => {
+    if (settings.firebaseConfigText) {
+      const res = initFirebase(settings.firebaseConfigText);
+      if (res.success) {
+        setFirebaseStatus('Connected');
+        console.log('Firebase initialized successfully');
+      } else {
+        setFirebaseStatus('Error');
+        console.warn('Firebase init failed:', res.error);
+      }
+    } else {
+      const res = initFirebase(DEFAULT_FIREBASE_CONFIG);
+      if (res.success) {
+        setFirebaseStatus('Connected');
+      }
+    }
+  }, [settings.firebaseConfigText]);
+
+  // Real-time Firestore updates listener
+  useEffect(() => {
+    if (firebaseStatus !== 'Connected' || !firestoreDb) return;
+    try {
+      const q = query(collection(firestoreDb, 'alerts'), orderBy('createdAt', 'desc'));
+      const unsubscribe = onSnapshot(q, (snapshot) => {
+        const fbAlerts = [];
+        snapshot.forEach((doc) => {
+          const data = doc.data();
+          fbAlerts.push({
+            ...data,
+            alertId: data.alertId || doc.id
+          });
+        });
+        
+        setAlerts(prev => {
+          const merged = [...fbAlerts];
+          prev.forEach(localAlert => {
+            if (!merged.some(a => a.alertId === localAlert.alertId)) {
+              merged.push(localAlert);
+            }
+          });
+          // Sort by date desc
+          merged.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+          return merged;
+        });
+      });
+      return () => unsubscribe();
+    } catch (e) {
+      console.error('Firestore alerts listener error:', e);
+    }
+  }, [firebaseStatus]);
+
+  // Invalidate Leaflet map size on responsive view switch
+  useEffect(() => {
+    if (mapInstance) {
+      setTimeout(() => {
+        mapInstance.invalidateSize();
+      }, 200);
+    }
+  }, [mobileView, mapInstance]);
+
   // Winning Features states
   const [mapBaseLayer, setMapBaseLayer] = useState('standard');
   const [showFloodOverlay, setShowFloodOverlay] = useState(false);
@@ -2139,7 +2249,10 @@ JSON Output Format:
           setSyncQueue(prev => [newAlert, ...prev]);
           setRelayLogs(prev => [...prev, '⚡ Dashboard is Offline. Packet cached on server gateway waiting for network sync!']);
         } else {
-          setAlerts(prev => [newAlert, ...prev]);
+          setAlerts(prev => {
+            if (prev.some(a => a.alertId === newAlert.alertId)) return prev;
+            return [newAlert, ...prev];
+          });
           setRelayLogs(prev => [...prev, '✓ Success! Alert uploaded and processed by Rescue Command AI.']);
           playSystemSound('aiPrediction'); // subtle synth tick on AI triage update
           
@@ -2151,6 +2264,17 @@ JSON Output Format:
           // Automatically enable UAV routes layer
           setMapLayers(prev => ({ ...prev, uavRoutes: true }));
           injectFeedbackLog(`🚀 UAV Drone-01 launched automatically to Mock Victim coords. ETA: 2m 31s.`, 'success');
+
+          // Sync to Firebase!
+          if (firestoreDb) {
+            addDoc(collection(firestoreDb, 'alerts'), newAlert)
+              .then(() => {
+                console.log('[Firebase] Alert successfully synced to Firestore!');
+              })
+              .catch(err => {
+                console.error('[Firebase] Alert sync failed:', err);
+              });
+          }
         }
 
         setIsRelaying(false);
@@ -2310,9 +2434,40 @@ JSON Output Format:
   };
 
   return (
-    <div className="app-container">
+    <div className={`app-container mobile-view-${mobileView}`}>
+      {/* Mobile view navigation top bar */}
+      <div className="mobile-view-toggle">
+        <button 
+          className={`mobile-toggle-btn ${mobileView === 'victim' ? 'active' : ''}`}
+          onClick={() => {
+            setMobileView('victim');
+            playSystemSound('tick');
+          }}
+        >
+          📱 Victim App
+        </button>
+        <button 
+          className={`mobile-toggle-btn ${mobileView === 'map' ? 'active' : ''}`}
+          onClick={() => {
+            setMobileView('map');
+            playSystemSound('tick');
+          }}
+        >
+          🗺️ Command Map
+        </button>
+        <button 
+          className={`mobile-toggle-btn ${mobileView === 'command' ? 'active' : ''}`}
+          onClick={() => {
+            setMobileView('command');
+            playSystemSound('tick');
+          }}
+        >
+          📊 Dashboard
+        </button>
+      </div>
+
       {/* =================================LEFT PANE: MOBILE PHONE SIMULATOR =================================*/}
-      <div className={`phone-pane ${showPhoneSimulator ? '' : 'collapsed'}`}>
+      <div className={`phone-pane ${showPhoneSimulator ? '' : 'collapsed'} ${mobileView === 'victim' ? 'mobile-visible' : 'mobile-hidden'}`}>
         <div className="phone-mockup">
           {/* Futuristic iPhone 17 Pro Max Dynamic Island with 3D Tilt, Click Expansion, and Blackout Morph */}
           <div 
@@ -2886,7 +3041,7 @@ JSON Output Format:
 
       {/* =================================RIGHT PANE: FULL-SCREEN MAP & COMMAND INTERFACE =================================*/}
       {/* =================================CENTER COLUMN: CONSOLIDATED LEFT SIDEBAR =================================*/}
-      <div className="left-sidebar-pane">
+      <div className={`left-sidebar-pane ${mobileView === 'command' ? 'mobile-visible' : 'mobile-hidden'}`}>
         {/* Sidebar Header */}
         <div className="sidebar-header">
           <div className="sidebar-title-container">
@@ -3380,7 +3535,7 @@ JSON Output Format:
       </div>
 
       {/* =================================RIGHT COLUMN: HERO MAP PANE (Unobstructed) =================================*/}
-      <div className={`map-pane ${is3dTiltedView ? 'tilted-view' : ''} ${isMapShaking ? 'map-shake' : ''}`}>
+      <div className={`map-pane ${is3dTiltedView ? 'tilted-view' : ''} ${isMapShaking ? 'map-shake' : ''} ${mobileView === 'map' ? 'mobile-visible' : 'mobile-hidden'}`}>
         
         {/* Floating Toggle Button for Mobile Simulator */}
         <button
@@ -3980,6 +4135,20 @@ JSON Output Format:
               />
               <p style={{ fontSize: '10px', color: 'var(--color-text-muted)', marginTop: '6px', lineHeight: '1.4' }}>
                 If provided, incoming offline messages will be parsed live using the <b>Gemini 1.5 Flash</b> API to translate regional languages and score priorities. If left empty, the app uses local emergency matching heuristics.
+              </p>
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">Firebase Configuration JSON</label>
+              <textarea
+                placeholder="Paste Firebase Config JSON here..."
+                value={settings.firebaseConfigText || ''}
+                onChange={(e) => setSettings({ ...settings, firebaseConfigText: e.target.value })}
+                className="form-control"
+                style={{ width: '100%', height: '80px', fontFamily: 'var(--font-mono)', fontSize: '10px', resize: 'vertical' }}
+              />
+              <p style={{ fontSize: '10px', color: 'var(--color-text-muted)', marginTop: '6px', lineHeight: '1.4' }}>
+                Paste the configuration JSON from your Firebase console to synchronize alerts in real-time.
               </p>
             </div>
 

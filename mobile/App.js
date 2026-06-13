@@ -37,6 +37,17 @@ const initFirebase = (configStr) => {
     return { success: false, error: e.message };
   }
 };
+const DEFAULT_FIREBASE_CONFIG = {
+  projectId: "directionless-beauty",
+  appId: "1:485571902380:web:a3a36461958398ed93d809",
+  storageBucket: "directionless-beauty.firebasestorage.app",
+  apiKey: "AIzaSyD8vJJNF3OWGJgGaaRG55BxecVxDO9hhSE",
+  authDomain: "directionless-beauty.firebaseapp.com",
+  messagingSenderId: "485571902380",
+  measurementId: "G-CH6RPYYJ3S",
+  projectNumber: "485571902380",
+  version: "2"
+};
 
 export default function App() {
   // Navigation: 'home' | 'sos_form' | 'relay_status' | 'report_gap' | 'safe_zones' | 'settings'
@@ -52,9 +63,21 @@ export default function App() {
   const [batteryAwareRouting, setBatteryAwareRouting] = useState(true);
   
   // Custom Firebase & Waveform elements
-  const [firebaseConfigText, setFirebaseConfigText] = useState('');
+  const [firebaseConfigText, setFirebaseConfigText] = useState(JSON.stringify(DEFAULT_FIREBASE_CONFIG, null, 2));
   const [firebaseStatus, setFirebaseStatus] = useState('Disconnected');
   const [waveformBars, setWaveformBars] = useState([10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10]);
+
+  // Auto-connect Firebase on mount
+  useEffect(() => {
+    if (firebaseConfigText) {
+      const res = initFirebase(firebaseConfigText);
+      if (res.success) {
+        setFirebaseStatus('Connected');
+      } else {
+        setFirebaseStatus('Error');
+      }
+    }
+  }, []);
 
   // Simulation Relay states
   const [relayStep, setRelayStep] = useState(0); // 0: scanning, 1: found, 2: stored, 3: hopped, 4: uploaded

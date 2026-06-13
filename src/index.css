@@ -4055,6 +4055,149 @@ svg.lucide, [data-lucide] {
   }
 }
 
+/* ================================= MOBILE RESPONSIVENESS OVERRIDES ================================= */
+.mobile-view-toggle {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  /* Layout shifts */
+  .app-container {
+    grid-template-columns: 1fr !important;
+    grid-template-rows: auto 1fr !important;
+    height: 100vh !important;
+    width: 100vw !important;
+    overflow: hidden !important;
+  }
+  
+  .mobile-view-toggle {
+    display: flex !important;
+    width: 100vw;
+    height: 48px;
+    background-color: var(--color-panel-dark);
+    border-bottom: 1px solid var(--color-border);
+    justify-content: space-around;
+    align-items: center;
+    padding: 0 8px;
+    z-index: 1000;
+  }
+  
+  .mobile-toggle-btn {
+    flex: 1;
+    height: 100%;
+    border: none;
+    background: none;
+    color: var(--color-text-muted);
+    font-family: var(--font-heading);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+  }
+  
+  .mobile-toggle-btn:hover {
+    color: var(--color-text-primary);
+  }
+  
+  .mobile-toggle-btn.active {
+    color: var(--color-rescue-blue);
+    border-bottom-color: var(--color-rescue-blue);
+    background-color: rgba(37, 99, 235, 0.05);
+  }
+
+  /* Pane visibility controls */
+  .mobile-hidden {
+    display: none !important;
+  }
+  
+  .mobile-visible {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100vw !important;
+    height: calc(100vh - 48px) !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+  }
+
+  /* Phone pane responsive overrides */
+  .phone-pane {
+    width: 100vw !important;
+    height: calc(100vh - 48px) !important;
+    padding: 0 !important;
+    background-color: #F8F8F6 !important;
+  }
+  
+  .phone-mockup {
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    transform: none !important;
+    background-color: #F8F8F6 !important;
+  }
+  
+  .phone-screen {
+    border-radius: 0 !important;
+    border: none !important;
+    height: 100% !important;
+    width: 100% !important;
+  }
+  
+  .phone-status-bar {
+    padding-top: 10px !important;
+  }
+  
+  .dynamic-island {
+    top: 6px !important;
+    transform: translateX(-50%) rotateX(0deg) rotateY(0deg) translateZ(0px) !important;
+  }
+
+  .dynamic-island.expanded {
+    top: 6px !important;
+    width: 90% !important;
+    transform: translateX(-50%) !important;
+  }
+
+  /* Sidebar responsive overrides */
+  .left-sidebar-pane {
+    width: 100vw !important;
+    height: calc(100vh - 48px) !important;
+    border-right: none !important;
+    box-shadow: none !important;
+  }
+
+  /* Map pane responsive overrides */
+  .map-pane {
+    width: 100vw !important;
+    height: calc(100vh - 48px) !important;
+  }
+  
+  .map-pane.tilted-view .map-container {
+    transform: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+  
+  .map-pane.tilted-view .custom-beacon-leaflet-container {
+    transform: none !important;
+  }
+
+  /* Hide the phone simulator toggle button on mobile since we have the tab view */
+  .phone-toggle-btn {
+    display: none !important;
+  }
+}
+
+
 
 
 
