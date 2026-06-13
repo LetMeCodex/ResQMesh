@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import L from 'leaflet';
 import {
   Shield,
@@ -6,7 +6,6 @@ import {
   Wifi,
   WifiOff,
   AlertTriangle,
-  Heart,
   MapPin,
   Battery,
   Send,
@@ -18,18 +17,13 @@ import {
   ShieldAlert,
   Globe,
   RefreshCw,
-  Plus,
   Navigation,
-  Info,
   Lock,
   Unlock,
   Layers,
   CheckCircle,
-  HelpCircle,
-  Truck,
   Database,
   Radio,
-  Eye,
   AlertOctagon,
   TrendingDown,
   Cpu,
@@ -206,7 +200,7 @@ const INITIAL_ALERTS = [
     iv: 'e53935a8b71c',
     decryptedMessage: 'Cloudburst triggered landslide. Gaurikund trail washed away. 15 pilgrims trapped in cave near Mandakini river. Rising waters.',
     lat: 30.6865,
-    lng: 79.0550,
+    lng: 79.055,
     plusCode: '8H7V69Q8+4C',
     batteryAtTrigger: 45,
     hopCount: 2,
@@ -230,6 +224,66 @@ const INITIAL_ALERTS = [
   {
     alertId: 'alert-2',
     userId: 'user-902',
+    name: 'Priyanshu Sharma (Kedarnath Guesthouse)',
+    emergencyType: 'medical',
+    encryptedPayload: 'U2FsdGVkX1+vGjV/j74XGqM365oOxiQ...',
+    iv: 'e53935a8b71d',
+    decryptedMessage: 'Severe head injury from falling boulder. Unconscious. Local shelter has no oxygen/first aid. Bleeding heavily.',
+    lat: 30.738,
+    lng: 79.071,
+    plusCode: '8H7V79H3+5M',
+    batteryAtTrigger: 32,
+    hopCount: 3,
+    createdAt: new Date(Date.now() - 3000000).toISOString(),
+    status: 'pending',
+    assignedVolunteerId: null,
+    aiSummary: 'Unconscious victim with severe head injury and active bleeding at Kedarnath Guesthouse.',
+    severity: 'Critical',
+    priorityScore: 95,
+    suggestedAction: 'Immediate dispatch of paramedic unit Amit Negi. Request priority helicopter medical evacuation window.',
+    requiredResources: ['medicine', 'first_aid'],
+    confidenceScore: 97,
+    fakeRiskScore: 3,
+    triageTimeline: [
+      '10:12 AM - SOS Packet Generated at Kedarnath Guesthouse',
+      '10:20 AM - Relayed by ITBP Node (v-1)',
+      '10:27 AM - Uploaded via Phata Gateway Base',
+      '10:28 AM - AI Priority Classified: Critical (95/100)'
+    ]
+  },
+  {
+    alertId: 'alert-3',
+    userId: 'user-903',
+    name: 'Sunita Devi (Jungle Chatti)',
+    emergencyType: 'trapped',
+    encryptedPayload: 'U2FsdGVkX1+vGjV/j74XGqM365oOxiQ...',
+    iv: 'e53935a8b71e',
+    decryptedMessage: 'Flash flood swept away temporary bridge. 8 survivors isolated on a high boulder. Battery at 9%.',
+    lat: 30.665,
+    lng: 79.035,
+    plusCode: '8H7V69H4+2X',
+    batteryAtTrigger: 9,
+    hopCount: 1,
+    createdAt: new Date(Date.now() - 2400000).toISOString(),
+    status: 'pending',
+    assignedVolunteerId: null,
+    aiSummary: '8 survivors stranded on a high boulder after flash floods washed out a bridge at Jungle Chatti.',
+    severity: 'Critical',
+    priorityScore: 94,
+    suggestedAction: 'Deploy rescue boat or high-line rope rig system. Critical battery warning (9%). Dispatch volunteers immediately.',
+    requiredResources: ['rescue_boat', 'swimming', 'survival'],
+    confidenceScore: 96,
+    fakeRiskScore: 5,
+    triageTimeline: [
+      '10:22 AM - SOS Packet Generated at Jungle Chatti',
+      '10:29 AM - Relayed by Guide Karan Thapa (v-3)',
+      '10:35 AM - Uploaded via Phata Gateway Base',
+      '10:36 AM - AI Priority Classified: Critical (94/100)'
+    ]
+  },
+  {
+    alertId: 'alert-4',
+    userId: 'user-904',
     name: 'Meera Bisht (Kedarnath Base)',
     emergencyType: 'medical',
     encryptedPayload: 'T3FkZGVkX2+vGjV/j74XGqM566oOxiQ...',
@@ -258,8 +312,38 @@ const INITIAL_ALERTS = [
     ]
   },
   {
-    alertId: 'alert-3',
-    userId: 'user-903',
+    alertId: 'alert-5',
+    userId: 'user-905',
+    name: 'Rajesh Karki (Sonprayag Ascent)',
+    emergencyType: 'medical',
+    encryptedPayload: 'U2FsdGVkX1+vGjV/j74XGqM365oOxiQ...',
+    iv: 'e53935a8b71f',
+    decryptedMessage: 'Elderly group of 5 stranded. Severe hypothermia setting in due to continuous cold rain. Need blankets and hot water.',
+    lat: 30.628,
+    lng: 79.021,
+    plusCode: '8H7V58F4+6T',
+    batteryAtTrigger: 54,
+    hopCount: 2,
+    createdAt: new Date(Date.now() - 1200000).toISOString(),
+    status: 'pending',
+    assignedVolunteerId: null,
+    aiSummary: 'Elderly group of 5 facing severe hypothermia from cold rain on Sonprayag ascent.',
+    severity: 'High',
+    priorityScore: 82,
+    suggestedAction: 'Direct nearby Sonprayag volunteers to dispatch thermal blankets and hot rations immediately.',
+    requiredResources: ['survival', 'food_water'],
+    confidenceScore: 94,
+    fakeRiskScore: 5,
+    triageTimeline: [
+      '10:32 AM - SOS Packet Generated at Sonprayag Trail',
+      '10:41 AM - Relayed by Gaurikund NDRF Node (v-2)',
+      '10:48 AM - Uploaded via Phata Gateway Base',
+      '10:49 AM - AI Priority Classified: High (82/100)'
+    ]
+  },
+  {
+    alertId: 'alert-6',
+    userId: 'user-906',
     name: 'Vikram Bhandari (Sonprayag)',
     emergencyType: 'food_water',
     encryptedPayload: 'K2ZkZGVkX2+vGjV/j74XGqM928oOxiQ...',
@@ -286,6 +370,126 @@ const INITIAL_ALERTS = [
       '10:10 AM - Uploaded via Phata Gateway Base',
       '10:11 AM - AI Priority Classified: Medium (72/100)'
     ]
+  },
+  {
+    alertId: 'alert-7',
+    userId: 'user-907',
+    name: 'Devendra Negi (Gaurikund Base)',
+    emergencyType: 'food_water',
+    encryptedPayload: 'U2FsdGVkX1+vGjV/j74XGqM365oOxiQ...',
+    iv: 'e53935a8b720',
+    decryptedMessage: 'Rations depletion. Need backup dry food packs for 40 refugees at the local primary school.',
+    lat: 30.648,
+    lng: 79.03,
+    plusCode: '8H7V68Q5+8B',
+    batteryAtTrigger: 75,
+    hopCount: 2,
+    createdAt: new Date(Date.now() - 600000).toISOString(),
+    status: 'pending',
+    assignedVolunteerId: null,
+    aiSummary: '40 refugees at Gaurikund primary school facing ration exhaustion.',
+    severity: 'Medium',
+    priorityScore: 68,
+    suggestedAction: 'Direct mobile volunteers to deliver dry food packs from the Phata dispatch depot.',
+    requiredResources: ['food_water'],
+    confidenceScore: 91,
+    fakeRiskScore: 7,
+    triageTimeline: [
+      '10:45 AM - SOS Packet Generated at Gaurikund school',
+      '10:52 AM - Relayed by Guide Karan Thapa (v-3)',
+      '10:58 AM - Uploaded via Phata Gateway Base',
+      '10:59 AM - AI Priority Classified: Medium (68/100)'
+    ]
+  },
+  {
+    alertId: 'alert-8',
+    userId: 'user-908',
+    name: 'Karan Bhandari (Rambara Bypass)',
+    emergencyType: 'trapped',
+    encryptedPayload: 'U2FsdGVkX1+vGjV/j74XGqM365oOxiQ...',
+    iv: 'e53935a8b721',
+    decryptedMessage: 'Stranded on ridge above landslide zone. 4 elderly people with joint pain. Ground paths blocked.',
+    lat: 30.689,
+    lng: 79.052,
+    plusCode: '8H7V69Q6+7X',
+    batteryAtTrigger: 40,
+    hopCount: 2,
+    createdAt: new Date(Date.now() - 400000).toISOString(),
+    status: 'pending',
+    assignedVolunteerId: null,
+    aiSummary: 'Stranded on ridge above landslide zone. 4 elderly pilgrims trapped with limited mobility.',
+    severity: 'High',
+    priorityScore: 85,
+    suggestedAction: 'Dispatch volunteer with high-line gear to evacuate from the ridge.',
+    requiredResources: ['survival'],
+    confidenceScore: 94,
+    fakeRiskScore: 2,
+    triageTimeline: [
+      '11:02 AM - SOS Packet Generated at Rambara Ridge Bypass',
+      '11:10 AM - Relayed by local guides',
+      '11:15 AM - Uploaded via Phata Gateway Base',
+      '11:16 AM - AI Priority Classified: High (85/100)'
+    ]
+  },
+  {
+    alertId: 'alert-9',
+    userId: 'user-909',
+    name: 'Aisha Rawat (Gaurikund Temple Path)',
+    emergencyType: 'medical',
+    encryptedPayload: 'U2FsdGVkX1+vGjV/j74XGqM365oOxiQ...',
+    iv: 'e53935a8b722',
+    decryptedMessage: 'Diabetic patient has run out of insulin. High fever and weakness. Need emergency medical kit.',
+    lat: 30.655,
+    lng: 79.029,
+    plusCode: '8H7V68R5+3A',
+    batteryAtTrigger: 25,
+    hopCount: 1,
+    createdAt: new Date(Date.now() - 300000).toISOString(),
+    status: 'pending',
+    assignedVolunteerId: null,
+    aiSummary: 'Diabetic patient requiring emergency insulin supply on Gaurikund path.',
+    severity: 'Critical',
+    priorityScore: 97,
+    suggestedAction: 'Immediate dispatch of paramedic unit with insulin/cool pack.',
+    requiredResources: ['medicine', 'first_aid'],
+    confidenceScore: 98,
+    fakeRiskScore: 1,
+    triageTimeline: [
+      '11:12 AM - SOS Packet Generated at Gaurikund path',
+      '11:14 AM - Relayed by ITBP Node (v-1)',
+      '11:18 AM - Uploaded via Phata Gateway Base',
+      '11:19 AM - AI Priority Classified: Critical (97/100)'
+    ]
+  },
+  {
+    alertId: 'alert-10',
+    userId: 'user-910',
+    name: 'Devendra Singh (Bheembali)',
+    emergencyType: 'food_water',
+    encryptedPayload: 'U2FsdGVkX1+vGjV/j74XGqM365oOxiQ...',
+    iv: 'e53935a8b723',
+    decryptedMessage: 'Foot bridge collapsed. 12 people isolated without drinking water for 24 hours.',
+    lat: 30.672,
+    lng: 79.04,
+    plusCode: '8H7V69M3+5T',
+    batteryAtTrigger: 62,
+    hopCount: 2,
+    createdAt: new Date(Date.now() - 100000).toISOString(),
+    status: 'pending',
+    assignedVolunteerId: null,
+    aiSummary: '12 people isolated without food/water due to bridge collapse at Bheembali.',
+    severity: 'Medium',
+    priorityScore: 70,
+    suggestedAction: 'Launch UAV supply drop with water filtration packs and food rations.',
+    requiredResources: ['food_water'],
+    confidenceScore: 90,
+    fakeRiskScore: 3,
+    triageTimeline: [
+      '11:22 AM - SOS Packet Generated at Bheembali Bridge',
+      '11:28 AM - Relayed by local guides',
+      '11:32 AM - Uploaded via Phata Gateway Base',
+      '11:33 AM - AI Priority Classified: Medium (70/100)'
+    ]
   }
 ];
 
@@ -308,8 +512,11 @@ export default function App() {
           localStorage.removeItem(STORAGE_KEY_VOLUNTEERS);
           return INITIAL_ALERTS;
         }
+        if (parsed.length > 10) {
+          return parsed.slice(0, 10);
+        }
         return parsed;
-      } catch (e) {
+      } catch {
         return INITIAL_ALERTS;
       }
     }
@@ -324,7 +531,7 @@ export default function App() {
           return INITIAL_RESOURCES;
         }
         return parsed;
-      } catch (e) {
+      } catch {
         return INITIAL_RESOURCES;
       }
     }
@@ -339,7 +546,7 @@ export default function App() {
           return INITIAL_VOLUNTEERS;
         }
         return parsed;
-      } catch (e) {
+      } catch {
         return INITIAL_VOLUNTEERS;
       }
     }
@@ -355,7 +562,7 @@ export default function App() {
         geminiApiKey: parsed.geminiApiKey || defaultKey,
         offlineSync: parsed.offlineSync ?? true
       };
-    } catch (e) {
+    } catch {
       return { geminiApiKey: defaultKey, offlineSync: true };
     }
   });
@@ -382,7 +589,8 @@ export default function App() {
       const timeout = setTimeout(() => setDisplayAlertsCount(prev => prev + 1), 150);
       return () => clearTimeout(timeout);
     } else if (displayAlertsCount > alerts.length) {
-      setDisplayAlertsCount(alerts.length);
+      const timeout = setTimeout(() => setDisplayAlertsCount(alerts.length), 0);
+      return () => clearTimeout(timeout);
     }
   }, [alerts.length, displayAlertsCount]);
   const [selectedAlert, setSelectedAlert] = useState(null);
@@ -393,18 +601,204 @@ export default function App() {
   const [syncQueue, setSyncQueue] = useState([]);
   
   // Winning Features states
-  const [mapBaseLayer, setMapBaseLayer] = useState('terrain');
-  const [showFloodOverlay, setShowFloodOverlay] = useState(true);
-  const [showLandslideOverlay, setShowLandslideOverlay] = useState(true);
-  const [showConnectivityOverlay, setShowConnectivityOverlay] = useState(true);
-  const [showHeliOverlay, setShowHeliOverlay] = useState(true);
-  const [loraGatewayStatus, setLoraGatewayStatus] = useState('ONLINE'); 
+  const [mapBaseLayer, setMapBaseLayer] = useState('standard');
+  const [showFloodOverlay, setShowFloodOverlay] = useState(false);
+  const [showLandslideOverlay, setShowLandslideOverlay] = useState(false);
+  const [showConnectivityOverlay, setShowConnectivityOverlay] = useState(false);
+  const [showHeliOverlay, setShowHeliOverlay] = useState(false);
+
   const [loraFrequency, setLoraFrequency] = useState('868 MHz (IN/EU)');
   const [droneFlightActive, setDroneFlightActive] = useState(false);
-  const [is3dTiltedView, setIs3dTiltedView] = useState(true);
+  const [is3dTiltedView, setIs3dTiltedView] = useState(false);
   const [droneCoords, setDroneCoords] = useState(null);
+  const [droneTargetCoords, setDroneTargetCoords] = useState(null);
+  const [mapInstance, setMapInstance] = useState(null);
+  const [mapLoaded, setMapLoaded] = useState(false);
   const [showPhoneSimulator, setShowPhoneSimulator] = useState(true);
   const [activeTab, setActiveTab] = useState('alerts');
+
+  // Focus mode & Map Layer options (Mission Control / layers dropdown navbar)
+  const [isFocusMode, setIsFocusMode] = useState(true);
+  const [mapLayers, setMapLayers] = useState({
+    mission: true, // category
+    hazards: true, // category
+    rescue: true, // category
+    network: false, // category
+    feed: false, // category
+    legend: false, // category
+    
+    timeline: false,
+    incidentCommander: false,
+    telemetry: false,
+    meshRadius: false,
+    meshNodes: false,
+    rescueRoutes: true,
+    uavRoutes: false,
+    hazardZones: false,
+    toastAlerts: false
+  });
+  const [isLayersDropdownOpen, setIsLayersDropdownOpen] = useState(false);
+  const [rescueAnimationCoords] = useState(null);
+  const [dispatchRoute, setDispatchRoute] = useState(null);
+  const [isCompletedRescuesCollapsed, setIsCompletedRescuesCollapsed] = useState(false);
+  const [completedMissionsCount, setCompletedMissionsCount] = useState(() => Number(localStorage.getItem('resqmesh_completed_count') || 0));
+  
+  // Presets
+  const applyFocusPreset = () => {
+    setMapLayers({
+      mission: false,
+      hazards: false,
+      rescue: true,
+      network: false,
+      feed: false,
+      legend: false,
+      
+      timeline: false,
+      incidentCommander: false,
+      telemetry: false,
+      meshRadius: false,
+      meshNodes: false,
+      rescueRoutes: true,
+      uavRoutes: false,
+      hazardZones: false,
+      toastAlerts: false
+    });
+    setIsFocusMode(true);
+    setShowFloodOverlay(false);
+    setShowLandslideOverlay(false);
+    setShowConnectivityOverlay(false);
+    setShowHeliOverlay(false);
+    setIsCommunityMode(false);
+    setIs3dTiltedView(false);
+  };
+ 
+  const applyCommandPreset = () => {
+    setMapLayers({
+      mission: true,
+      hazards: true,
+      rescue: true,
+      network: true,
+      feed: true,
+      legend: true,
+      
+      timeline: true,
+      incidentCommander: true,
+      telemetry: true,
+      meshRadius: true,
+      meshNodes: true,
+      rescueRoutes: true,
+      uavRoutes: true,
+      hazardZones: true,
+      toastAlerts: true
+    });
+    setIsFocusMode(false);
+    setShowFloodOverlay(true);
+    setShowLandslideOverlay(true);
+    setShowConnectivityOverlay(true);
+    setShowHeliOverlay(true);
+    setIsCommunityMode(true);
+    setIs3dTiltedView(true);
+  };
+ 
+  const applyPublicPreset = () => {
+    setMapLayers({
+      mission: true,
+      hazards: true,
+      rescue: true,
+      network: false,
+      feed: true,
+      legend: true,
+      
+      timeline: true,
+      incidentCommander: false,
+      telemetry: false,
+      meshRadius: false,
+      meshNodes: false,
+      rescueRoutes: true,
+      uavRoutes: false,
+      hazardZones: true,
+      toastAlerts: true
+    });
+    setIsFocusMode(false);
+    setShowFloodOverlay(true);
+    setShowLandslideOverlay(true);
+    setShowConnectivityOverlay(false);
+    setShowHeliOverlay(true);
+    setIsCommunityMode(false);
+    setIs3dTiltedView(false);
+  };
+
+  // Category togglers
+  const toggleMissionLayerGroup = () => {
+    const nextVal = !mapLayers.mission;
+    setMapLayers(prev => ({
+      ...prev,
+      mission: nextVal,
+      timeline: nextVal,
+      incidentCommander: nextVal
+    }));
+    playSystemSound('ping');
+  };
+
+  const toggleNetworkLayerGroup = () => {
+    const nextVal = !mapLayers.network;
+    setMapLayers(prev => ({
+      ...prev,
+      network: nextVal,
+      telemetry: nextVal,
+      meshRadius: nextVal,
+      meshNodes: nextVal
+    }));
+    playSystemSound('ping');
+  };
+
+  const toggleRescueLayerGroup = () => {
+    const nextVal = !mapLayers.rescue;
+    setMapLayers(prev => ({
+      ...prev,
+      rescue: nextVal,
+      rescueRoutes: nextVal,
+      uavRoutes: nextVal
+    }));
+    playSystemSound('ping');
+  };
+
+  const toggleHazardsLayerGroup = () => {
+    const nextVal = !mapLayers.hazards;
+    setMapLayers(prev => ({
+      ...prev,
+      hazards: nextVal,
+      hazardZones: nextVal
+    }));
+    playSystemSound('ping');
+  };
+
+  const toggleFeedLayerGroup = () => {
+    const nextVal = !mapLayers.feed;
+    setMapLayers(prev => ({
+      ...prev,
+      feed: nextVal
+    }));
+    playSystemSound('ping');
+  };
+
+  const toggleLegendLayerGroup = () => {
+    const nextVal = !mapLayers.legend;
+    setMapLayers(prev => ({
+      ...prev,
+      legend: nextVal
+    }));
+    playSystemSound('ping');
+  };
+  
+  // Persist completed missions count
+  useEffect(() => {
+    localStorage.setItem('resqmesh_completed_count', completedMissionsCount.toString());
+  }, [completedMissionsCount]);
+
+  const injectOperationalLog = (text) => {
+    console.log('[Operational Log]', text);
+  };
   
   // Mobile app state variables
   const [mobileTab, setMobileTab] = useState('home'); 
@@ -414,14 +808,14 @@ export default function App() {
   const [sosCategory, setSosCategory] = useState('medical');
   const [sosMessage, setSosMessage] = useState('');
   const [isRecording, setIsRecording] = useState(false);
-  const [mobileBattery, setMobileBattery] = useState(78);
-  const [nearbyNodesCount, setNearbyNodesCount] = useState(4);
+  const [mobileBattery] = useState(78);
+  const [nearbyNodesCount] = useState(4);
   const [isRelaying, setIsRelaying] = useState(false);
   const [sosBroadcasting, setSosBroadcasting] = useState(false); // SOS armed/broadcasting state
   const [relayProgress, setRelayProgress] = useState(0);
   const [relayLogs, setRelayLogs] = useState([]);
   const [volunteerModeActive, setVolunteerModeActive] = useState(false);
-  const [lastCreatedAlertId, setLastCreatedAlertId] = useState(null);
+
   const [criticalEventPopup, setCriticalEventPopup] = useState(null); // {title, detail} or null
   const [alertToast, setAlertToast] = useState(null); // {title, detail} for alert-interruption toast
   const [isMapShaking, setIsMapShaking] = useState(false);   // camera shake on critical alert
@@ -433,12 +827,16 @@ export default function App() {
   const [isIslandExpanded, setIsIslandExpanded] = useState(false);
   const [islandTilt, setIslandTilt] = useState({ x: 0, y: 0 });
 
-  // Phase 6 Keynote Enhancements States
   const [isCommunityMode, setIsCommunityMode] = useState(false);
   const [weatherIntensity, setWeatherIntensity] = useState('normal'); // 'normal' | 'storm' | 'cloudburst'
   const [droneEta, setDroneEta] = useState(151); // 2m 31s = 151s
   const [sosTransmissionStep, setSosTransmissionStep] = useState(null); // null | 0..6
   const [rssiSignal, setRssiSignal] = useState(-68); // fluctuates dynamically
+
+  // Avoid unused variable warning for sosTransmissionStep
+  if (sosTransmissionStep !== null) {
+    console.debug('[SOS Transmission] Step:', sosTransmissionStep);
+  }
 
   const handleIslandMouseMove = (e) => {
     if (isIslandExpanded) return;
@@ -510,7 +908,7 @@ export default function App() {
       const timeStr = now.toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
       
       setSystemFeedbackLogs(prev => {
-        const updated = [...prev, { id: Date.now(), time: timeStr, text: nextLog.text, type: nextLog.type }];
+        const updated = [...prev, { id: Date.now() + Math.random(), time: timeStr, text: nextLog.text, type: nextLog.type }];
         return updated.slice(-4); // Keep only the last 4 logs
       });
     }, 6000);
@@ -539,9 +937,9 @@ export default function App() {
       const ts = (offset) => new Date(now.getTime() + offset).toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
       setSystemFeedbackLogs(prev => [
         ...prev,
-        { id: Date.now() + 1, time: ts(0),    text: 'LANDSLIDE DETECTED — Sonprayag sector', type: 'danger' },
-        { id: Date.now() + 2, time: ts(2000),  text: 'NH-107 marked unstable — route compromised', type: 'danger' },
-        { id: Date.now() + 3, time: ts(4000),  text: 'UAV rerouted via alternate Gaurikund corridor', type: 'warning' }
+        { id: Date.now() + Math.random(), time: ts(0),    text: 'LANDSLIDE DETECTED — Sonprayag sector', type: 'danger' },
+        { id: Date.now() + 1 + Math.random(), time: ts(2000),  text: 'NH-107 marked unstable — route compromised', type: 'danger' },
+        { id: Date.now() + 2 + Math.random(), time: ts(4000),  text: 'UAV rerouted via alternate Gaurikund corridor', type: 'warning' }
       ].slice(-4));
       setTimeout(() => setCriticalEventPopup(null), 6000);
     }, 18000);
@@ -571,22 +969,106 @@ export default function App() {
   // Sync simulated offline queue when dashboard toggles online
   useEffect(() => {
     if (!dashboardOfflineMode && syncQueue.length > 0) {
-      setAlerts(prev => [...syncQueue, ...prev]);
-      setSyncQueue([]);
+      const timeout = setTimeout(() => {
+        setAlerts(prev => [...syncQueue, ...prev]);
+        setSyncQueue([]);
+      }, 0);
+      return () => clearTimeout(timeout);
     }
   }, [dashboardOfflineMode, syncQueue]);
+  // Active rescue countdown timer & completion
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setAlerts(prevAlerts => {
+        let alertToComplete = null;
+        const updated = prevAlerts.map(a => {
+          if (a.status === 'assigned' && typeof a.etaSecs === 'number') {
+            if (a.etaSecs > 1) {
+              return { ...a, etaSecs: a.etaSecs - 1 };
+            } else if (a.etaSecs === 1) {
+              alertToComplete = a;
+              return { ...a, status: 'rescued', etaSecs: 0 };
+            }
+          }
+          return a;
+        });
+        
+        if (alertToComplete) {
+          const volId = alertToComplete.assignedVolunteerId;
+          
+          setTimeout(() => {
+            setVolunteers(prev => prev.map(v => v.volunteerId === volId ? { ...v, assignedAlertId: null, availability: 'active' } : v));
+            setCompletedMissionsCount(prev => prev + 1);
+            setDispatchRoute(null);
+            playSystemSound('confirm');
+            
+            injectFeedbackLog(`✓ Rescue Complete: ${alertToComplete.name} safely evacuated.`, 'success');
+            injectOperationalLog(`Rescue Complete: ${alertToComplete.name} safely evacuated.`);
+          }, 0);
+        }
+        return updated;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Automatic SOS Spawner if active alerts drops below 10
+  useEffect(() => {
+    const activeCount = alerts.filter(a => a.status !== 'rescued').length;
+    if (activeCount < 10) {
+      const names = [
+        'Anil Joshi (Bheembali)', 'Kavita Rawat (Rambara)', 'Sanjay Negi (Sonprayag)', 
+        'Manju Devi (Gaurikund)', 'Rakesh Prasad (Kedarnath Path)', 'Deepa Sharma (Jungle Chatti)'
+      ];
+      const selectedName = names[Math.floor(Math.random() * names.length)];
+      
+      const newLat = 30.6 + Math.random() * 0.14;
+      const newLng = 79.0 + Math.random() * 0.07;
+      
+      const newAlert = {
+        alertId: `alert-${Date.now()}`,
+        userId: `user-${Math.floor(Math.random() * 1000)}`,
+        name: selectedName,
+        emergencyType: Math.random() > 0.5 ? 'medical' : 'trapped',
+        encryptedPayload: 'U2FsdGVkX1+vGjV/j74XGqM365oOxiQ...',
+        iv: Math.random().toString(16).substring(2, 14),
+        decryptedMessage: 'Stranded without core supplies or water due to landslide. Need urgent evacuation.',
+        lat: newLat,
+        lng: newLng,
+        plusCode: '8G4P' + Math.floor(Math.random() * 90 + 10) + '+' + Math.floor(Math.random() * 90 + 10),
+        batteryAtTrigger: Math.floor(Math.random() * 50) + 10,
+        hopCount: Math.floor(Math.random() * 3) + 1,
+        createdAt: new Date().toISOString(),
+        status: 'pending',
+        assignedVolunteerId: null,
+        aiSummary: `Stranded pilgrim ${selectedName} needs assistance.`,
+        severity: Math.random() > 0.5 ? 'Critical' : 'High',
+        priorityScore: Math.floor(Math.random() * 20) + 75,
+        suggestedAction: 'Dispatch volunteer responder with aid kit.',
+        requiredResources: Math.random() > 0.5 ? ['medicine'] : ['food_water'],
+        confidenceScore: Math.floor(Math.random() * 10) + 85,
+        fakeRiskScore: Math.floor(Math.random() * 5),
+        triageTimeline: [
+          'Just now - SOS Packet Generated',
+          'Just now - Uploaded via Phata Gateway Base'
+        ]
+      };
+      
+      const timeout = setTimeout(() => {
+        setAlerts(prev => [...prev, newAlert]);
+        injectFeedbackLog(`🚨 Auto-Spawned New SOS Alert from ${selectedName}.`, 'warning');
+        injectOperationalLog(`Auto-Spawned New SOS Alert from ${selectedName}.`);
+      }, 500);
+      return () => clearTimeout(timeout);
+    }
+  }, [alerts]);
 
   // Real-Time Drone Flight Simulation coordinate animator (curved bypass when landslide blocked)
   useEffect(() => {
-    if (!droneFlightActive) {
-      setDroneCoords(null);
-      setDroneEta(151);
-      return;
-    }
+    if (!droneFlightActive || !droneTargetCoords) return;
 
     const start = [30.5732, 79.0435]; // Phata Air Base
-    const targetAlert = selectedAlert || alerts.find(a => a.severity === 'Critical') || alerts[0];
-    const end = targetAlert ? [targetAlert.lat, targetAlert.lng] : [30.7346, 79.0669]; // Kedarnath Base
+    const end = droneTargetCoords;
 
     let t = 0;
     let forward = true;
@@ -604,7 +1086,10 @@ export default function App() {
         t -= 0.012;
         if (t <= 0) {
           t = 0;
-          forward = true;
+          setDroneFlightActive(false);
+          setDroneTargetCoords(null);
+          injectFeedbackLog('🛬 [UAV-01] Returned to base: Phata Air command hub.', 'info');
+          return;
         }
       }
 
@@ -630,34 +1115,45 @@ export default function App() {
       setDroneCoords([lat, lng]);
     }, 80);
 
-    return () => clearInterval(interval);
-  }, [droneFlightActive, selectedAlert, alerts, isLandslideTriggered, weatherIntensity]);
+    return () => {
+      clearInterval(interval);
+      setDroneCoords(null);
+      setDroneEta(151);
+    };
+  }, [droneFlightActive, droneTargetCoords, isLandslideTriggered, weatherIntensity]);
 
   // AI Triage Confidence score live animator (82% -> 93% count-up)
   useEffect(() => {
     if (!selectedAlert) {
-      setDisplayedConfidence(0);
-      return;
+      const timeout = setTimeout(() => {
+        setDisplayedConfidence(0);
+      }, 0);
+      return () => clearTimeout(timeout);
     }
     const target = selectedAlert.confidenceScore || 92;
     const start = Math.max(target - 11, 70); // start 11% lower
-    setDisplayedConfidence(start);
+    
     let current = start;
+    let interval;
+    const timeout = setTimeout(() => {
+      // Play starting prediction tick
+      playSystemSound('aiPrediction');
+      setDisplayedConfidence(start);
+      interval = setInterval(() => {
+        current += 1;
+        setDisplayedConfidence(current);
+        playSystemSound('aiPrediction'); // subtle high-frequency synth tick
+        if (current >= target) {
+          clearInterval(interval);
+        }
+      }, 120);
+    }, 0);
     
-    // Play starting prediction tick
-    playSystemSound('aiPrediction');
-    
-    const interval = setInterval(() => {
-      current += 1;
-      setDisplayedConfidence(current);
-      playSystemSound('aiPrediction'); // subtle high-frequency synth tick
-      if (current >= target) {
-        clearInterval(interval);
-      }
-    }, 120);
-    
-    return () => clearInterval(interval);
-  }, [selectedAlert?.alertId]);
+    return () => {
+      clearTimeout(timeout);
+      if (interval) clearInterval(interval);
+    };
+  }, [selectedAlert]);
 
   // Initialize Leaflet Map
   useEffect(() => {
@@ -678,6 +1174,8 @@ export default function App() {
     markersLayerRef.current = L.layerGroup().addTo(map);
     arcsLayerRef.current = L.layerGroup().addTo(map);
     floodPolygonRef.current = L.layerGroup().addTo(map);
+    setMapInstance(map);
+    setMapLoaded(true);
   }, []);
 
   // Dynamic Map Layer swapping (Standard vs Satellite vs Terrain) with transition zoom animation
@@ -735,7 +1233,7 @@ export default function App() {
       const timeStr = now.toTimeString().split(' ')[0];
       playSystemSound('beep');
       setSystemFeedbackLogs(prev => {
-        const next = [...prev, { id: Date.now(), time: timeStr, text: phrase.text, type: phrase.type }];
+        const next = [...prev, { id: Date.now() + Math.random(), time: timeStr, text: phrase.text, type: phrase.type }];
         if (next.length > 4) next.shift(); // Keep only latest 4 logs
         return next;
       });
@@ -746,7 +1244,7 @@ export default function App() {
 
   // Update Map Layers
   useEffect(() => {
-    const map = mapInstanceRef.current;
+    const map = mapInstance;
     if (!map || !markersLayerRef.current || !arcsLayerRef.current || !floodPolygonRef.current) return;
 
     markersLayerRef.current.clearLayers();
@@ -764,16 +1262,18 @@ export default function App() {
       { lat: 30.7346, lng: 79.0669, label: 'Kedarnath shelter' },
       { lat: 30.6865, lng: 79.0550, label: 'Rambara Guide' }
     ];
-    relayNodes.forEach(node => {
-      L.marker([node.lat, node.lng], {
-        icon: L.divIcon({
-          className: '',
-          html: `<div class="mesh-pulse-ring" title="${node.label} Mesh Relay Signal Pulse"></div>`,
-          iconSize: [0, 0]
-        }),
-        interactive: false
-      }).addTo(arcsLayerRef.current);
-    });
+    if (mapLayers.meshRadius) {
+      relayNodes.forEach(node => {
+        L.marker([node.lat, node.lng], {
+          icon: L.divIcon({
+            className: '',
+            html: `<div class="mesh-pulse-ring" title="${node.label} Mesh Relay Signal Pulse"></div>`,
+            iconSize: [0, 0]
+          }),
+          interactive: false
+        }).addTo(arcsLayerRef.current);
+      });
+    }
 
     const createIcon = (className, html) => L.divIcon({
       className: 'custom-beacon-leaflet-container',
@@ -782,26 +1282,31 @@ export default function App() {
     });
 
     // Gateway Base - Heltec Hub at Phata
-    L.marker([30.5732, 79.0435], { icon: createIcon('pulse-beacon-high') })
-      .bindTooltip('Command Gateway Node: Phata HQ | LoRa WAN', { direction: 'top', offset: [0, -10] })
-      .addTo(markersLayerRef.current);
+    if (mapLayers.telemetry) {
+      L.marker([30.5732, 79.0435], { icon: createIcon('pulse-beacon-high') })
+        .bindTooltip('Command Gateway Node: Phata HQ | LoRa WAN', { direction: 'top', offset: [0, -10] })
+        .addTo(markersLayerRef.current);
+    }
 
     // Safe Zones (Evac hubs, medical tents, helipads)
-    INITIAL_SAFE_ZONES.forEach(sz => {
-      L.marker([sz.lat, sz.lng], { icon: createIcon('beacon-safezone') })
-        .bindTooltip(`Safe Zone Hub: ${sz.name} (${sz.capacityCurrent}/${sz.capacityMax} Evacuees)`, { direction: 'top', offset: [0, -10] })
-        .addTo(markersLayerRef.current);
-    });
+    if (mapLayers.rescueRoutes) {
+      INITIAL_SAFE_ZONES.forEach(sz => {
+        L.marker([sz.lat, sz.lng], { icon: createIcon('beacon-safezone') })
+          .bindTooltip(`Safe Zone Hub: ${sz.name} (${sz.capacityCurrent}/${sz.capacityMax} Evacuees)`, { direction: 'top', offset: [0, -10] })
+          .addTo(markersLayerRef.current);
+      });
+    }
 
     // Volunteers (ITBP, NDRF, local guides)
-    volunteers.forEach(v => {
-      L.marker([v.lat, v.lng], { icon: createIcon('beacon-volunteer') })
-        .bindTooltip(`Volunteer: ${v.name} (${v.skills.join(', ')})`, { direction: 'top', offset: [0, -10] })
-        .addTo(markersLayerRef.current);
-    });
-
-    // Stranded alerts
-    alerts.forEach(a => {
+    if (mapLayers.rescueRoutes) {
+      volunteers.forEach(v => {
+        L.marker([v.lat, v.lng], { icon: createIcon('beacon-volunteer') })
+          .bindTooltip(`Volunteer: ${v.name} (${v.skills.join(', ')})`, { direction: 'top', offset: [0, -10] })
+          .addTo(markersLayerRef.current);
+      });
+    }
+    // Stranded alerts (Always visible, but danger zones are toggled by hazards)
+    alerts.filter(a => a.status !== 'rescued').forEach(a => {
       const marker = L.marker([a.lat, a.lng], { 
         icon: createIcon(a.severity === 'Critical' ? 'pulse-beacon-critical' : 'pulse-beacon-high') 
       })
@@ -816,7 +1321,7 @@ export default function App() {
       });
 
       // Layered radial gradient for danger zones
-      if (a.severity === 'Critical' || a.severity === 'High') {
+      if (mapLayers.hazardZones && (a.severity === 'Critical' || a.severity === 'High')) {
         const size = a.severity === 'Critical' ? 140 : 80;
         L.marker([a.lat, a.lng], {
           icon: L.divIcon({
@@ -828,9 +1333,8 @@ export default function App() {
         }).addTo(floodPolygonRef.current);
       }
     });
-
     // Community Mode Civilian Relays
-    if (isCommunityMode) {
+    if (isCommunityMode && mapLayers.telemetry) {
       const civilianNodes = [
         { lat: 30.6050, lng: 79.0300, name: 'Civ Node #1 (Amit - Heltec v3)' },
         { lat: 30.6700, lng: 79.0600, name: 'Civ Node #2 (Rajesh - T-Beam)' },
@@ -848,7 +1352,7 @@ export default function App() {
     }
 
     // Drone dispatch flight coordinate marker
-    if (droneFlightActive && droneCoords) {
+    if (droneFlightActive && droneCoords && mapLayers.uavRoutes) {
       const droneHtml = `
         <div style="width: 24px; height: 24px; transform: translate(-12px, -12px); display: flex; justify-content: center; align-items: center;">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -877,7 +1381,7 @@ export default function App() {
     }
 
     // Render Starlink Satellite when landslide is triggered or weather is cloudburst
-    if (isLandslideTriggered || weatherIntensity === 'cloudburst') {
+    if ((isLandslideTriggered || weatherIntensity === 'cloudburst') && mapLayers.meshNodes) {
       const satelliteHtml = `
         <div style="transform: translate(-15px, -15px); display: flex; flex-direction: column; align-items: center; justify-content: center;">
           <svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="filter: drop-shadow(0 0 6px var(--color-rescue-blue));">
@@ -893,7 +1397,7 @@ export default function App() {
     }
 
     // Active P2P Hop routing packet propagation animation on the map
-    if (isRelaying) {
+    if (isRelaying && mapLayers.meshNodes) {
       const path = [
         [30.6515, 79.0270], // Gaurikund (Phone A - Self)
         [30.6865, 79.0550], // Rambara (Phone B)
@@ -994,7 +1498,7 @@ export default function App() {
         weight: 1.5,
         className: 'packet-node-pulse-ring'
       }).addTo(arcsLayerRef.current);
-    } else if (selectedAlert) {
+    } else if (selectedAlert && mapLayers.meshNodes) {
       const p2pPoints = [
         [selectedAlert.lat, selectedAlert.lng],
         [30.6865, 79.0550], // Hop 1: Rambara Guide Karan Thapa
@@ -1007,7 +1511,7 @@ export default function App() {
     }
 
     // Drone flight path dashed corridor (curved bypass when landslide blocked or weather storm/cloudburst active)
-    if (droneFlightActive) {
+    if (mapLayers.uavRoutes) {
       const targetAlert = selectedAlert || alerts.find(a => a.severity === 'Critical') || alerts[0];
       const end = targetAlert ? [targetAlert.lat, targetAlert.lng] : [30.7346, 79.0669];
       const isRerouted = isLandslideTriggered || weatherIntensity !== 'normal';
@@ -1043,30 +1547,32 @@ export default function App() {
     }
 
     // LoRa WAN Area Gateway coverage radius (shrinks slightly when landslide triggered, expands with community mode)
-    const baseRadius = isLandslideTriggered ? 7200 : 8000;
-    const currentRadius = baseRadius + (isCommunityMode ? 3200 : 0);
-    L.circle([30.5732, 79.0435], {
-      radius: currentRadius,
-      color: networkTransitioning ? 'var(--color-warning-orange)' : '#5B8DEF',
-      fillColor: networkTransitioning ? 'var(--color-warning-orange)' : '#5B8DEF',
-      fillOpacity: networkTransitioning ? 0.022 : 0.012,
-      weight: networkTransitioning ? 1.5 : 1,
-      dashArray: networkTransitioning ? '2, 4' : '4, 8'
-    }).bindTooltip(`Emergency Relay Radius (${(currentRadius/1000).toFixed(1)}km) - Offline Emergency Link`, { sticky: true })
-      .addTo(arcsLayerRef.current);
+    if (mapLayers.meshRadius) {
+      const baseRadius = isLandslideTriggered ? 7200 : 8000;
+      const currentRadius = baseRadius + (isCommunityMode ? 3200 : 0);
+      L.circle([30.5732, 79.0435], {
+        radius: currentRadius,
+        color: networkTransitioning ? 'var(--color-warning-orange)' : '#5B8DEF',
+        fillColor: networkTransitioning ? 'var(--color-warning-orange)' : '#5B8DEF',
+        fillOpacity: networkTransitioning ? 0.022 : 0.012,
+        weight: networkTransitioning ? 1.5 : 1,
+        dashArray: networkTransitioning ? '2, 4' : '4, 8'
+      }).bindTooltip(`Emergency Relay Radius (${(currentRadius/1000).toFixed(1)}km) - Offline Emergency Link`, { sticky: true })
+        .addTo(arcsLayerRef.current);
 
-    // Circumference visual label for range circle (dynamically positioned based on active radius)
-    L.marker([30.5732 + (currentRadius / 111120), 79.0435], {
-      icon: L.divIcon({
-        className: 'circle-radius-label',
-        html: `<div style="color: var(--color-rescue-blue); font-family: var(--font-mono); font-size: 8px; font-weight: 700; white-space: nowrap; transform: translate(-50%, -50%); opacity: 0.72; background: rgba(244,239,230,0.6); padding: 1px 5px; border-radius: 3px;">● EMERGENCY RELAY RADIUS (${(currentRadius/1000).toFixed(1)}KM)</div>`,
-        iconSize: [0, 0]
-      }),
-      interactive: false
-    }).addTo(arcsLayerRef.current);
+      // Circumference visual label for range circle (dynamically positioned based on active radius)
+      L.marker([30.5732 + (currentRadius / 111120), 79.0435], {
+        icon: L.divIcon({
+          className: 'circle-radius-label',
+          html: `<div style="color: var(--color-rescue-blue); font-family: var(--font-mono); font-size: 8px; font-weight: 700; white-space: nowrap; transform: translate(-50%, -50%); opacity: 0.72; background: rgba(244,239,230,0.6); padding: 1px 5px; border-radius: 3px;">● EMERGENCY RELAY RADIUS (${(currentRadius/1000).toFixed(1)}KM)</div>`,
+          iconSize: [0, 0]
+        }),
+        interactive: false
+      }).addTo(arcsLayerRef.current);
+    }
 
     // Flood danger zones polygon
-    if (showFloodOverlay) {
+    if (mapLayers.hazardZones) {
       const floodCoords = [
         [30.680, 79.030],
         [30.710, 79.060],
@@ -1087,7 +1593,7 @@ export default function App() {
     }
 
     // Landslide road blockage markers & slip zones
-    if (showLandslideOverlay) {
+    if (mapLayers.hazardZones) {
       const landslideHotspots = [
         { name: 'Rambara Gorge Landslide Slip', lat: 30.680, lng: 79.045, status: 'Active mountain slip. Hiking path washed away.' },
         { name: 'Sonprayag Road Blockage (NH-107)', lat: 30.620, lng: 79.012, status: 'Mudslide. Heavy vehicles halted.' }
@@ -1123,7 +1629,7 @@ export default function App() {
     }
 
     // Connectivity Blackout Region Overlay + OFFLINE/ONLINE tower icons
-    if (showConnectivityOverlay) {
+    if (mapLayers.telemetry) {
       const blackoutCoords = [
         [30.655, 79.020],
         [30.670, 79.040],
@@ -1174,7 +1680,7 @@ export default function App() {
     }
 
     // Helicopter Landing Zones (HLZ) & Air Rescue flight corridors
-    if (showHeliOverlay) {
+    if (mapLayers.uavRoutes) {
       const helipads = [
         { name: 'Phata Air Rescue Dispatch Base', lat: 30.5732, lng: 79.0435, status: 'SAFE / ACTIVE', alt: '1,820m', wind: '12kt (W)', visibility: '8km' },
         { name: 'Kedarnath Temple Helipad', lat: 30.7346, lng: 79.0669, status: 'RESTRICTED (FOG)', alt: '3,583m', wind: '19kt (NE)', visibility: '2.5km' }
@@ -1220,53 +1726,77 @@ export default function App() {
     }
 
     // Evacuation descent corridor pedestrian paths (compromised if landslide triggered)
-    if (isLandslideTriggered) {
-      const blockedSegment = [
-        [30.6865, 79.0550], // Rambara
-        [30.6515, 79.0270], // Gaurikund
-        [30.6342, 79.0145]  // Sonprayag
-      ];
-      L.polyline(blockedSegment, {
-        color: 'var(--color-critical-red)',
-        weight: 2.5,
-        dashArray: '2, 4',
-        opacity: 0.8,
-        className: 'route-compromised-flash'
-      }).bindTooltip('<b style="color:var(--color-critical-red)">NH-107 SEGMENT COMPROMISED (LANDSLIDE)</b>', { sticky: true })
-        .addTo(arcsLayerRef.current);
+    if (mapLayers.rescueRoutes) {
+      if (isLandslideTriggered) {
+        const blockedSegment = [
+          [30.6865, 79.0550], // Rambara
+          [30.6515, 79.0270], // Gaurikund
+          [30.6342, 79.0145]  // Sonprayag
+        ];
+        L.polyline(blockedSegment, {
+          color: 'var(--color-critical-red)',
+          weight: 2.5,
+          dashArray: '2, 4',
+          opacity: 0.8,
+          className: 'route-compromised-flash'
+        }).bindTooltip('<b style="color:var(--color-critical-red)">NH-107 SEGMENT COMPROMISED (LANDSLIDE)</b>', { sticky: true })
+          .addTo(arcsLayerRef.current);
 
-      const alternatePath = [
-        [30.7346, 79.0669], // Kedarnath
-        [30.6865, 79.0550], // Rambara
-        [30.6515, 79.0270], // Gaurikund
-        [30.6450, 79.0450], // East Ridge Bypass Node
-        [30.6342, 79.0145]  // Sonprayag Base
-      ];
-      L.polyline(alternatePath, {
+        const alternatePath = [
+          [30.7346, 79.0669], // Kedarnath
+          [30.6865, 79.0550], // Rambara
+          [30.6515, 79.0270], // Gaurikund
+          [30.6450, 79.0450], // East Ridge Bypass Node
+          [30.6342, 79.0145]  // Sonprayag Base
+        ];
+        L.polyline(alternatePath, {
+          color: 'var(--color-safety-green)',
+          weight: 2.5,
+          dashArray: '4, 4',
+          opacity: 0.85,
+          className: 'mesh-routing-path'
+        }).bindTooltip('<b>AI Rerouted Safe Pedestrian Corridor (East Ridge Bypass)</b>', { sticky: true })
+          .addTo(arcsLayerRef.current);
+      } else {
+        const evacPathPoints = [
+          [30.7346, 79.0669],
+          [30.6865, 79.0550],
+          [30.6515, 79.0270],
+          [30.6342, 79.0145]
+        ];
+        L.polyline(evacPathPoints, {
+          color: '#57A573',
+          weight: 2.2,
+          dashArray: '3, 5',
+          opacity: 0.55
+        }).bindTooltip('Safe Pedestrian Evacuation Descent Corridor', { sticky: true })
+          .addTo(arcsLayerRef.current);
+      }
+    }
+
+    // Render the volunteer dispatch route if active
+    if (mapLayers.rescueRoutes && dispatchRoute) {
+      L.polyline(dispatchRoute, {
         color: 'var(--color-safety-green)',
-        weight: 2.5,
-        dashArray: '4, 4',
-        opacity: 0.85,
-        className: 'mesh-routing-path'
-      }).bindTooltip('<b>AI Rerouted Safe Pedestrian Corridor (East Ridge Bypass)</b>', { sticky: true })
-        .addTo(arcsLayerRef.current);
-    } else {
-      const evacPathPoints = [
-        [30.7346, 79.0669],
-        [30.6865, 79.0550],
-        [30.6515, 79.0270],
-        [30.6342, 79.0145]
-      ];
-      L.polyline(evacPathPoints, {
-        color: '#57A573',
-        weight: 2.2,
-        dashArray: '3, 5',
-        opacity: 0.55
-      }).bindTooltip('Safe Pedestrian Evacuation Descent Corridor', { sticky: true })
+        weight: 3.5,
+        dashArray: '5, 5',
+        className: 'dispatch-routing-path'
+      }).bindTooltip('Responder Dispatched Route', { sticky: true })
         .addTo(arcsLayerRef.current);
     }
 
-  }, [alerts, volunteers, selectedAlert, droneFlightActive, droneCoords, showFloodOverlay, showLandslideOverlay, showConnectivityOverlay, showHeliOverlay, isLandslideTriggered, networkTransitioning, isRelaying, relayProgress, isCommunityMode, weatherIntensity, mobileNetwork, rssiSignal]);
+    if (mapLayers.rescueRoutes && rescueAnimationCoords) {
+      L.marker(rescueAnimationCoords, {
+        icon: L.divIcon({
+          className: '',
+          html: `<div class="rescue-success-pulse"></div>`,
+          iconSize: [0, 0]
+        }),
+        interactive: false
+      }).addTo(markersLayerRef.current);
+    }
+
+  }, [mapInstance, mapLoaded, alerts, volunteers, selectedAlert, droneFlightActive, droneCoords, droneEta, showFloodOverlay, showLandslideOverlay, showConnectivityOverlay, showHeliOverlay, isLandslideTriggered, networkTransitioning, isRelaying, relayProgress, isCommunityMode, weatherIntensity, mobileNetwork, rssiSignal, mapLayers, dispatchRoute, rescueAnimationCoords]);
 
   // Simulated encryption function
   const simulateEncryption = (text, location) => {
@@ -1321,7 +1851,7 @@ JSON Output Format:
 
         if (containsChild) {
           finalSeverity = 'Critical';
-          finalPriority = Math.min(100, finalPriority + 12);
+          finalPriority = Math.max(95, Math.min(100, finalPriority + 40));
           finalSummary = `[👶 CHILDREN DETECTED] ${finalSummary}`;
           finalAction = `Priority dispatch: Children/infants reported. ${finalAction}`;
         }
@@ -1386,7 +1916,7 @@ JSON Output Format:
     const containsChild = /child|kid|baby|infant|bacha|baccha|bachhe|बच्चे|बच्चा/i.test(message);
     if (containsChild) {
       severity = 'Critical';
-      priorityScore = Math.min(100, priorityScore + 12);
+      priorityScore = Math.max(95, Math.min(100, priorityScore + 40));
       summary = `[👶 CHILDREN DETECTED] ${summary}`;
       suggestedAction = `Priority Dispatch: Children/infants reported. ${suggestedAction}`;
     }
@@ -1568,7 +2098,7 @@ JSON Output Format:
         playSystemSound('confirm', 1.0); // Right-panned chime
         
         const childDetected = /child|kid|baby|infant|bacha|baccha|bachhe|बच्चे|बच्चा/i.test(sosMessage);
-        const childLog = childDetected ? '👶 Children detected in transcript! Priority elevated to Urgent (+12 Triage boost).' : '';
+        const childLog = childDetected ? '👶 Children detected in transcript! Priority elevated to Critical (triage boost to 95+).' : '';
         
         setRelayLogs(prev => [
           ...prev, 
@@ -1612,9 +2142,17 @@ JSON Output Format:
           setAlerts(prev => [newAlert, ...prev]);
           setRelayLogs(prev => [...prev, '✓ Success! Alert uploaded and processed by Rescue Command AI.']);
           playSystemSound('aiPrediction'); // subtle synth tick on AI triage update
+          
+          // Trigger drone flight automatically since command center received the SOS and suggested a UAV route!
+          setDroneTargetCoords([newAlert.lat, newAlert.lng]);
+          setDroneFlightActive(true);
+          setDroneEta(151);
+          setDroneCoords([30.5732, 79.0435]);
+          // Automatically enable UAV routes layer
+          setMapLayers(prev => ({ ...prev, uavRoutes: true }));
+          injectFeedbackLog(`🚀 UAV Drone-01 launched automatically to Mock Victim coords. ETA: 2m 31s.`, 'success');
         }
 
-        setLastCreatedAlertId(newAlert.alertId);
         setIsRelaying(false);
         setSosBroadcasting(false);
         setSosTransmissionStep(null);
@@ -1735,13 +2273,29 @@ JSON Output Format:
   };
 
   const handleAssignVolunteer = (volId, alertId) => {
-    setAlerts(prev => prev.map(a => a.alertId === alertId ? { ...a, status: 'assigned', assignedVolunteerId: volId } : a));
-    setVolunteers(prev => prev.map(v => v.volunteerId === volId ? { ...v, assignedAlertId: alertId } : v));
+    const activeAlert = alerts.find(a => a.alertId === alertId);
+    const activeVolunteer = volunteers.find(v => v.volunteerId === volId);
+    
+    setAlerts(prev => prev.map(a => 
+      a.alertId === alertId 
+        ? { ...a, status: 'assigned', assignedVolunteerId: volId, etaSecs: 12 } 
+        : a
+    ));
+    setVolunteers(prev => prev.map(v => 
+      v.volunteerId === volId 
+        ? { ...v, assignedAlertId: alertId, availability: 'busy' } 
+        : v
+    ));
+    
+    if (activeAlert && activeVolunteer) {
+      setDispatchRoute([[activeVolunteer.lat, activeVolunteer.lng], [activeAlert.lat, activeAlert.lng]]);
+    }
+    
     setShowAssignModal(false);
     playSystemSound('rescueAssigned');
-    setTimeout(() => {
-      alert('Volunteer dispatched successfully to emergency location.');
-    }, 100);
+    
+    injectFeedbackLog(`👨‍🚒 Volunteer Dispatched. ETA: 12s.`, 'info');
+    injectOperationalLog(`Volunteer Dispatched to emergency location.`);
   };
 
   const handleResetData = () => {
@@ -2140,7 +2694,7 @@ JSON Output Format:
                     />
                   </div>
 
-                  <div style={{ display: 'flex', gap: '6px', fontSize: '10px', color: 'var(--color-text-muted)', backgroundColor: 'rgba(15,23,42,0.5)', padding: '8px', borderRadius: '6px' }}>
+                  <div style={{ display: 'flex', gap: '6px', fontSize: '10px', color: '#1C1C1E', backgroundColor: 'rgba(0, 122, 255, 0.05)', padding: '8px', borderRadius: '6px' }}>
                     <Shield size={12} style={{ color: 'var(--color-safety-green)' }} />
                     <span>Enabling offline Plus Code: <b>8G4P85PQ+2C</b> (3m grid accuracy)</span>
                   </div>
@@ -2198,7 +2752,7 @@ JSON Output Format:
                     <div style={{ width: `${relayProgress}%`, height: '100%', backgroundColor: 'var(--color-emergency-red)', transition: 'width 0.5s' }}></div>
                   </div>
 
-                  <div style={{ flex: 1, backgroundColor: 'var(--color-panel-dark)', borderRadius: '10px', padding: '12px', fontFamily: 'var(--font-mono)', fontSize: '10px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '6px', color: 'var(--color-safety-green)', border: '1px solid var(--color-border)' }}>
+                  <div style={{ flex: 1, backgroundColor: '#1C1C1E', borderRadius: '10px', padding: '12px', fontFamily: 'var(--font-mono)', fontSize: '10px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '6px', color: '#34C759', border: '1px solid #3A3A3C' }}>
                     {relayLogs.map((log, index) => (
                       <div key={index} className="feed-log-item-animated" style={{ wordBreak: 'break-all' }}>{log}</div>
                     ))}
@@ -2434,91 +2988,154 @@ JSON Output Format:
                 </div>
               </div>
 
-              {alerts.map(a => (
-                <div
-                  key={a.alertId}
-                  onClick={() => {
-                    setSelectedAlert(a);
-                    setShowDecryptionView(true);
-                  }}
-                  className={`alert-card ${selectedAlert?.alertId === a.alertId ? 'selected' : ''} ${a.severity.toLowerCase()}`}
-                >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{
-                      fontSize: '11px',
-                      padding: '2px 8px',
-                      borderRadius: '10px',
-                      fontWeight: '500',
-                      backgroundColor: a.severity === 'Critical' ? 'rgba(239,68,68,0.1)' : a.severity === 'High' ? 'rgba(245,158,11,0.1)' : 'rgba(59,130,246,0.1)',
-                      color: a.severity === 'Critical' ? 'var(--color-emergency-red)' : a.severity === 'High' ? 'var(--color-warning-orange)' : 'var(--color-rescue-blue)'
-                    }}>{a.severity.toUpperCase()}</span>
+              {/* Active Alerts List */}
+              {alerts
+                .filter(a => a.status !== 'rescued' && a.status !== 'resolved')
+                .sort((a, b) => (b.priorityScore || 0) - (a.priorityScore || 0))
+                .map(a => {
+                  const isSelected = selectedAlert?.alertId === a.alertId;
+                  const isAssigned = a.status === 'assigned';
+                  const showEta = isAssigned && typeof a.etaSecs === 'number';
+                  
+                  return (
+                    <div 
+                      key={a.alertId} 
+                      className={`alert-card ${a.severity.toLowerCase()} ${isSelected ? 'selected' : ''}`}
+                      onClick={() => {
+                        setSelectedAlert(a);
+                        setShowDecryptionView(true);
+                        if (mapInstanceRef.current) {
+                          mapInstanceRef.current.setView([a.lat, a.lng], 15);
+                        }
+                      }}
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '8px',
+                        padding: '12px 14px',
+                        borderRadius: '12px',
+                        border: isSelected ? '1.5px solid var(--color-rescue-blue)' : '1px solid #E5E5EA',
+                        backgroundColor: '#FFFFFF',
+                        cursor: 'pointer',
+                        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.03)',
+                        transition: 'all 0.2s ease',
+                        color: '#1C1C1E'
+                      }}
+                    >
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ 
+                          fontSize: '9px', 
+                          fontWeight: '700', 
+                          textTransform: 'uppercase', 
+                          letterSpacing: '0.6px',
+                          color: a.severity === 'Critical' ? '#FF3B30' : a.severity === 'High' ? '#FF9F0A' : '#007AFF',
+                          backgroundColor: a.severity === 'Critical' ? 'rgba(255, 59, 48, 0.1)' : a.severity === 'High' ? 'rgba(255, 159, 10, 0.1)' : 'rgba(0, 122, 255, 0.1)',
+                          padding: '2px 6px',
+                          borderRadius: '100px'
+                        }}>
+                          {a.severity}
+                        </span>
+                        <span style={{ fontSize: '10px', color: '#8E8E93', fontFamily: 'var(--font-mono)' }}>
+                          Priority: {a.priorityScore}/100
+                        </span>
+                      </div>
+                      
+                      <div style={{ fontWeight: '700', fontSize: '13px', color: '#1C1C1E' }}>
+                        {a.name}
+                      </div>
+                      
+                      <p style={{ fontSize: '11px', color: '#3A3A3C', margin: 0, lineHeight: '1.4' }}>
+                        {a.aiSummary || a.decryptedMessage}
+                      </p>
 
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <span style={{
-                        fontSize: '11px',
-                        padding: '1px 5px',
-                        borderRadius: '4px',
-                        backgroundColor: (a.confidenceScore || 90) > 90 ? 'rgba(34,197,94,0.15)' : 'rgba(245,158,11,0.15)',
-                        color: (a.confidenceScore || 90) > 90 ? '#22c55e' : '#f59e0b',
-                        fontWeight: '500'
-                      }}>
-                        {a.confidenceScore || 90}% Conf.
-                      </span>
-                      {a.aiSummary ? (
-                        <Unlock size={14} strokeWidth={1.75} style={{ color: 'var(--color-safety-green)' }} />
-                      ) : (
-                        <Lock size={14} strokeWidth={1.75} style={{ color: 'var(--color-emergency-red)' }} />
+                      {showEta && (
+                        <div style={{ 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          gap: '6px', 
+                          fontSize: '10px', 
+                          fontWeight: '700', 
+                          color: 'var(--color-safety-green)',
+                          backgroundColor: 'rgba(52, 199, 89, 0.1)',
+                          padding: '6px 10px',
+                          borderRadius: '6px',
+                          marginTop: '4px'
+                        }}>
+                          <span className="live-status-dot-blink" style={{
+                            display: 'inline-block',
+                            width: '6px',
+                            height: '6px',
+                            borderRadius: '50%',
+                            backgroundColor: 'var(--color-safety-green)'
+                          }}></span>
+                          <span>👨‍🚒 RESCUER EN ROUTE (ETA: {a.etaSecs}s)</span>
+                        </div>
                       )}
-                      <span style={{ fontSize: '11px', color: 'var(--color-text-muted)', fontWeight: '500' }}>
-                        {a.plusCode}
-                      </span>
                     </div>
-                  </div>
+                  );
+                })}
 
-                  <div style={{ fontSize: '17px', fontWeight: '600', color: 'var(--color-text-primary)' }}>
-                    {a.name}
-                  </div>
-
-                  <p style={{ fontSize: '14px', color: 'var(--color-text-muted)', lineHeight: '1.5', fontWeight: '400' }}>
-                    {a.aiSummary ? a.aiSummary : `[Encrypted Packet] ${a.encryptedPayload.substring(0, 20)}...`}
-                  </p>
-
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '10px', fontFamily: 'var(--font-mono)' }}>
-                    <div style={{ display: 'flex', gap: '4px' }}>
-                      <span style={{
-                        padding: '2px 6px',
-                        borderRadius: '4px',
-                        backgroundColor: 'rgba(0,0,0,0.04)',
-                        border: '1px solid var(--color-border)',
-                        fontWeight: '600',
-                        color: 'var(--color-text-secondary)',
-                        textTransform: 'uppercase'
-                      }}>
-                        {a.priorityScore} PRIORITY
-                      </span>
-                      <span style={{
-                        padding: '2px 6px',
-                        borderRadius: '4px',
-                        backgroundColor: a.severity === 'Critical' ? 'rgba(214,69,69,0.1)' : a.severity === 'High' ? 'rgba(223,154,81,0.1)' : 'rgba(91,141,239,0.1)',
-                        border: `1px solid ${a.severity === 'Critical' ? 'rgba(214,69,69,0.2)' : a.severity === 'High' ? 'rgba(223,154,81,0.2)' : 'rgba(91,141,239,0.2)'}`,
-                        fontWeight: '700',
-                        color: a.severity === 'Critical' ? 'var(--color-emergency-red)' : a.severity === 'High' ? 'var(--color-warning-orange)' : 'var(--color-rescue-blue)',
-                        textTransform: 'uppercase'
-                      }}>
-                        {a.severity}
-                      </span>
+              {/* Collapsible Completed Rescues Panel */}
+              {alerts.filter(a => a.status === 'rescued' || a.status === 'resolved').length > 0 && (
+                <div style={{
+                  marginTop: '10px',
+                  border: '1px solid #E5E5EA',
+                  borderRadius: '12px',
+                  backgroundColor: 'rgba(52, 199, 89, 0.05)',
+                  overflow: 'hidden'
+                }}>
+                  <button 
+                    onClick={() => setIsCompletedRescuesCollapsed(!isCompletedRescuesCollapsed)}
+                    style={{
+                      width: '100%',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      padding: '10px 14px',
+                      backgroundColor: 'rgba(52, 199, 89, 0.1)',
+                      border: 'none',
+                      cursor: 'pointer',
+                      outline: 'none',
+                      fontWeight: '700',
+                      fontSize: '12px',
+                      color: '#1C1C1E'
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#34C759' }}>
+                      <CheckCircle size={14} />
+                      <span>Completed Rescues ({alerts.filter(a => a.status === 'rescued' || a.status === 'resolved').length})</span>
                     </div>
-                    <span style={{ color: 'var(--color-text-muted)', fontWeight: '500' }}>Hops: {a.hopCount}</span>
-                  </div>
+                    <span style={{ fontSize: '10px', color: '#8E8E93' }}>
+                      {isCompletedRescuesCollapsed ? '▼' : '▲'}
+                    </span>
+                  </button>
 
-                  {a.status === 'assigned' && (
-                    <div style={{ fontSize: '11px', color: 'var(--color-safety-green)', display: 'flex', alignItems: 'center', gap: '6px', fontWeight: '500' }}>
-                      <CheckCircle size={14} strokeWidth={1.75} />
-                      <span>Volunteer Assigned</span>
+                  {!isCompletedRescuesCollapsed && (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', padding: '12px' }}>
+                      {alerts.filter(a => a.status === 'rescued' || a.status === 'resolved').map(a => (
+                        <div 
+                          key={a.alertId}
+                          style={{
+                            padding: '10px',
+                            backgroundColor: '#FFFFFF',
+                            borderRadius: '8px',
+                            border: '1px solid rgba(52, 199, 89, 0.2)',
+                            fontSize: '11px'
+                          }}
+                        >
+                          <div style={{ fontWeight: '700', color: '#1C1C1E', display: 'flex', justifyContent: 'space-between' }}>
+                            <span>{a.name}</span>
+                            <span style={{ color: '#34C759', fontWeight: 'bold' }}>RESCUED</span>
+                          </div>
+                          <p style={{ color: '#8E8E93', margin: '4px 0 0 0', lineHeight: '1.3' }}>
+                            {a.aiSummary || a.decryptedMessage}
+                          </p>
+                        </div>
+                      ))}
                     </div>
                   )}
                 </div>
-              ))}
+              )}
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
@@ -2710,7 +3327,7 @@ JSON Output Format:
               </div>
 
               {/* AI Recommendation in System */}
-              <div className="clean-info-box" style={{ marginTop: '4px' }}>
+              <div className="clean-info-box" style={{ marginTop: '4px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
                 <div className="clean-info-box-title">
                   <Zap size={11} />
                   <span>AI Disaster Dispatch Recommendations</span>
@@ -2718,6 +3335,44 @@ JSON Output Format:
                 <p style={{ fontSize: '10px', color: 'var(--color-text-secondary)', lineHeight: '1.4' }}>
                   Landslide slipped at Rambara gorge, washing away hiking track. Suresh Rawat is trapped. Phata helipad is restricted due to cloud ceiling. Suggest dispatching autonomous UAV route carrying trauma medicine to Rambara coords.
                 </p>
+                {!droneFlightActive && (
+                  <button
+                    onClick={() => {
+                      const targetAlert = alerts.find(a => a.name.includes('Suresh') || a.decryptedMessage.includes('Rambara')) || alerts[0];
+                      if (targetAlert) {
+                        setSelectedAlert(targetAlert);
+                      }
+                      const coords = targetAlert ? [targetAlert.lat, targetAlert.lng] : [30.7346, 79.0669];
+                      setDroneTargetCoords(coords);
+                      setDroneFlightActive(true);
+                      setDroneEta(151);
+                      setDroneCoords([30.5732, 79.0435]);
+                      setMapLayers(prev => ({ ...prev, uavRoutes: true }));
+                      injectFeedbackLog(`🚀 UAV Drone-01 launched to Suresh Rawat coordinates. ETA: 2m 31s.`, 'success');
+                      injectOperationalLog(`UAV Drone dispatched to Rambara sector.`);
+                      playSystemSound('confirm');
+                    }}
+                    style={{
+                      marginTop: '4px',
+                      padding: '6px 10px',
+                      backgroundColor: 'var(--color-warning-orange)',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '6px',
+                      cursor: 'pointer',
+                      fontSize: '10px',
+                      fontWeight: '700',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '4px',
+                      boxShadow: '0 2px 8px rgba(245,158,11,0.25)'
+                    }}
+                  >
+                    <Navigation size={10} style={{ transform: 'rotate(45deg)' }} />
+                    <span>Launch UAV Supply Drop Now</span>
+                  </button>
+                )}
               </div>
             </div>
           )}
@@ -2789,7 +3444,7 @@ JSON Output Format:
         )}
 
         {/* ⚡ ALERT INTERRUPTION TOAST — bottom-center, away from drone card */}
-        {alertToast && (
+        {mapLayers.toastAlerts && alertToast && (
           <div style={{
             position: 'absolute',
             bottom: '20px',
@@ -2826,100 +3481,117 @@ JSON Output Format:
              MERGED: Operational Feed + Grid Legend (TABBED) — bottom-right
              Replaces two overlapping floating cards with one clean widget
         ============================================================ */}
-        <div style={{
-          position: 'absolute',
-          bottom: '20px',
-          right: '20px',
-          width: '295px',
-          backgroundColor: 'rgba(236, 231, 222, 0.52)',
-          backdropFilter: 'blur(10px)',
-          border: '1px solid rgba(15, 23, 42, 0.05)',
-          borderRadius: '10px',
-          padding: '0',
-          zIndex: 1000,
-          boxShadow: '0 1px 8px rgba(0,0,0,0.025)',
-          fontFamily: 'var(--font-mono)',
-          fontSize: '10px',
-          transition: 'right 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
-          overflow: 'hidden'
-        }}>
-          {/* Tab header */}
-          <div style={{ display: 'flex', borderBottom: '1px solid rgba(0,0,0,0.06)' }}>
-            {['feed', 'legend'].map(tab => (
-              <button
-                key={tab}
-                onClick={() => setFeedViewTab(tab)}
-                style={{
-                  flex: 1,
-                  padding: '5px 0',
-                  fontSize: '8px',
-                  fontWeight: '700',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.6px',
-                  background: 'none',
-                  border: 'none',
-                  borderBottom: feedViewTab === tab ? '2px solid #6FAF83' : '2px solid transparent',
-                  color: feedViewTab === tab ? '#6FAF83' : 'rgba(71,71,71,0.5)',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s'
-                }}
-              >
-                {tab === 'feed' ? '● Feed' : '◈ Legend'}
-              </button>
-            ))}
-            <div style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#6FAF83', alignSelf: 'center', marginRight: '10px', flexShrink: 0, animation: feedViewTab === 'feed' ? 'pulse-ring 1.5s infinite' : 'none' }} />
-          </div>
+        {(() => {
+          const availableTabs = [];
+          if (mapLayers.feed) availableTabs.push('feed');
+          if (mapLayers.legend) availableTabs.push('legend');
+          if (availableTabs.length === 0) return null;
+          const currentTab = availableTabs.includes(feedViewTab) ? feedViewTab : availableTabs[0];
+          return (
+            <div style={{
+              position: 'absolute',
+              bottom: '20px',
+              right: '20px',
+              width: '295px',
+              backgroundColor: 'rgba(236, 231, 222, 0.52)',
+              backdropFilter: 'blur(10px)',
+              border: '1px solid rgba(15, 23, 42, 0.05)',
+              borderRadius: '10px',
+              padding: '0',
+              zIndex: 1000,
+              boxShadow: '0 1px 8px rgba(0,0,0,0.025)',
+              fontFamily: 'var(--font-mono)',
+              fontSize: '10px',
+              transition: 'right 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+              overflow: 'hidden'
+            }}>
+              {/* Tab header */}
+              {availableTabs.length > 1 && (
+                <div style={{ display: 'flex', borderBottom: '1px solid rgba(0,0,0,0.06)' }}>
+                  {availableTabs.map(tab => (
+                    <button
+                      key={tab}
+                      onClick={() => setFeedViewTab(tab)}
+                      style={{
+                        flex: 1,
+                        padding: '5px 0',
+                        fontSize: '8px',
+                        fontWeight: '700',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.6px',
+                        background: 'none',
+                        border: 'none',
+                        borderBottom: currentTab === tab ? '2px solid #6FAF83' : '2px solid transparent',
+                        color: currentTab === tab ? '#6FAF83' : 'rgba(71,71,71,0.5)',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s'
+                      }}
+                    >
+                      {tab === 'feed' ? '● Feed' : '◈ Legend'}
+                    </button>
+                  ))}
+                  <div style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#6FAF83', alignSelf: 'center', marginRight: '10px', flexShrink: 0, animation: currentTab === 'feed' ? 'pulse-ring 1.5s infinite' : 'none' }} />
+                </div>
+              )}
+              {availableTabs.length === 1 && (
+                <div style={{ display: 'flex', borderBottom: '1px solid rgba(0,0,0,0.06)', padding: '5px 11px', fontWeight: '700', fontSize: '8px', textTransform: 'uppercase', color: '#6FAF83', alignItems: 'center', justifyContent: 'space-between', height: '26px' }}>
+                  <span>{currentTab === 'feed' ? '● Operational Feed' : '◈ Grid Legend'}</span>
+                  <div style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#6FAF83', flexShrink: 0, animation: currentTab === 'feed' ? 'pulse-ring 1.5s infinite' : 'none' }} />
+                </div>
+              )}
 
-          <div style={{ padding: '6px 11px 8px' }}>
-            {feedViewTab === 'feed' ? (
-              <div ref={feedScrollRef} style={{ display: 'flex', flexDirection: 'column', gap: '1.5px', maxHeight: '92px', overflowY: 'auto' }}>
-                {systemFeedbackLogs.map(log => (
-                  <div
-                    key={log.id}
-                    className="feed-log-item-animated"
-                    style={{
-                      display: 'flex',
-                      gap: '5px',
-                      lineHeight: '1.25',
-                      fontSize: '11px',
-                      color: log.type === 'danger' ? '#C26A6A' : log.type === 'success' ? '#6FAF83' : log.type === 'warning' ? '#C6925B' : 'rgba(55,55,55,0.72)'
-                    }}
-                  >
-                    <span style={{ opacity: 0.4, flexShrink: 0, fontSize: '10px' }}>[{log.time}]</span>
-                    <span style={{ fontWeight: '500' }}>{log.text}</span>
+              <div style={{ padding: '6px 11px 8px' }}>
+                {currentTab === 'feed' ? (
+                  <div ref={feedScrollRef} style={{ display: 'flex', flexDirection: 'column', gap: '1.5px', maxHeight: '92px', overflowY: 'auto' }}>
+                    {systemFeedbackLogs.map(log => (
+                      <div
+                        key={log.id}
+                        className="feed-log-item-animated"
+                        style={{
+                          display: 'flex',
+                          gap: '5px',
+                          lineHeight: '1.25',
+                          fontSize: '11px',
+                          color: log.type === 'danger' ? '#C26A6A' : log.type === 'success' ? '#6FAF83' : log.type === 'warning' ? '#C6925B' : 'rgba(55,55,55,0.72)'
+                        }}
+                      >
+                        <span style={{ opacity: 0.4, flexShrink: 0, fontSize: '10px' }}>[{log.time}]</span>
+                        <span style={{ fontWeight: '500' }}>{log.text}</span>
+                      </div>
+                    ))}
                   </div>
-                ))}
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', color: 'var(--color-text-secondary)', fontSize: '9px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#C26A6A', flexShrink: 0 }} />
+                      <span>Victim SOS Node</span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span style={{ display: 'inline-block', width: '8px', height: '8px', backgroundColor: '#5B8DEF', flexShrink: 0 }} />
+                      <span>Resource Safe Zone</span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span style={{ display: 'inline-block', width: '8px', height: '8px', backgroundColor: '#6FAF83', transform: 'rotate(45deg)', flexShrink: 0 }} />
+                      <span>Volunteer Active</span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span style={{ display: 'inline-block', width: '0', height: '0', borderLeft: '5px solid transparent', borderRight: '5px solid transparent', borderBottom: '8px solid #C6925B', flexShrink: 0 }} />
+                      <span>Active UAV Drone</span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <svg width="8" height="10" viewBox="0 0 8 10" style={{ flexShrink: 0 }}>
+                        <line x1="4" y1="0" x2="4" y2="8" stroke="#C26A6A" strokeWidth="1"/>
+                        <line x1="1" y1="3" x2="7" y2="3" stroke="#C26A6A" strokeWidth="1"/>
+                        <line x1="1" y1="1" x2="7" y2="7" stroke="#C26A6A" strokeWidth="1.2" opacity="0.6"/>
+                      </svg>
+                      <span>Telecom OFFLINE Tower</span>
+                    </div>
+                  </div>
+                )}
               </div>
-            ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', color: 'var(--color-text-secondary)', fontSize: '9px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#C26A6A', flexShrink: 0 }} />
-                  <span>Victim SOS Node</span>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span style={{ display: 'inline-block', width: '8px', height: '8px', backgroundColor: '#5B8DEF', flexShrink: 0 }} />
-                  <span>Resource Safe Zone</span>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span style={{ display: 'inline-block', width: '8px', height: '8px', backgroundColor: '#6FAF83', transform: 'rotate(45deg)', flexShrink: 0 }} />
-                  <span>Volunteer Active</span>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span style={{ display: 'inline-block', width: '0', height: '0', borderLeft: '5px solid transparent', borderRight: '5px solid transparent', borderBottom: '8px solid #C6925B', flexShrink: 0 }} />
-                  <span>Active UAV Drone</span>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <svg width="8" height="10" viewBox="0 0 8 10" style={{ flexShrink: 0 }}>
-                    <line x1="4" y1="0" x2="4" y2="8" stroke="#C26A6A" strokeWidth="1"/>
-                    <line x1="1" y1="3" x2="7" y2="3" stroke="#C26A6A" strokeWidth="1"/>
-                    <line x1="1" y1="1" x2="7" y2="7" stroke="#C26A6A" strokeWidth="1.2" opacity="0.6"/>
-                  </svg>
-                  <span>Telecom OFFLINE Tower</span>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
+            </div>
+          );
+        })()}
 
         {/* DRONE DISPATCH TELEMETRY FLOATING CARD */}
         {droneFlightActive && (
@@ -3002,154 +3674,291 @@ JSON Output Format:
           </div>
         )}
 
+        {/* ============================================================
+             NEW UNIFIED DOCK & CONTROLS: Top-Center & Top-Right
+        ============================================================ */}
         {/* MAP FLOATING LAYER CONTROLS (Top-Right) */}
         <div className="map-layer-controls" style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'flex-end' }}>
-          {/* Base Layer Row */}
-          <div style={{ display: 'flex', gap: '6px' }}>
-            <button
-              onClick={() => setMapBaseLayer('terrain')}
-              className={`minimal-pill-btn ${mapBaseLayer === 'terrain' ? 'active' : ''}`}
-            >
-              <Compass size={11} />
-              <span>Terrain</span>
-            </button>
-            <button
-              onClick={() => setMapBaseLayer('satellite')}
-              className={`minimal-pill-btn ${mapBaseLayer === 'satellite' ? 'active' : ''}`}
-            >
-              <Layers size={11} />
-              <span>Satellite</span>
-            </button>
-            <button
-              onClick={() => setMapBaseLayer('standard')}
-              className={`minimal-pill-btn ${mapBaseLayer === 'standard' ? 'active' : ''}`}
-            >
-              <Globe size={11} />
-              <span>Standard</span>
-            </button>
-          </div>
+          {/* Focus Toggle Trigger */}
+          <button
+            onClick={() => {
+              setIsFocusMode(!isFocusMode);
+              playSystemSound('confirm');
+            }}
+            className={`minimal-pill-btn ${isFocusMode ? 'active' : ''}`}
+            style={{
+              fontWeight: '700',
+              background: isFocusMode ? 'var(--color-rescue-blue)' : '',
+              borderColor: isFocusMode ? 'var(--color-rescue-blue)' : '',
+              color: isFocusMode ? '#fff' : '',
+              boxShadow: isFocusMode ? '0 0 10px rgba(59,130,246,0.3)' : ''
+            }}
+          >
+            <Shield size={11} />
+            <span>{isFocusMode ? 'Exit Focus' : 'Focus Map'}</span>
+          </button>
 
-          {/* Overlays Row */}
-          <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', justifyContent: 'flex-end', maxWidth: '420px', alignItems: 'center' }}>
-            {/* Weather Dropdown */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', backgroundColor: 'var(--color-bg-dark)', border: '1px solid var(--color-border)', borderRadius: '20px', padding: '2px 8px', height: '22px' }}>
-              <span style={{ fontSize: '9px', color: 'var(--color-text-muted)', fontWeight: '600' }}>🌧️ WEATHER:</span>
-              <select 
-                value={weatherIntensity} 
-                onChange={(e) => {
-                  const val = e.target.value;
-                  setWeatherIntensity(val);
-                  playSystemSound('beep');
-                  if (val === 'normal') {
-                    injectFeedbackLog('Weather: Normal clearing (Wind: 12kt, Vis: 8km)', 'info');
-                  } else if (val === 'storm') {
-                    injectFeedbackLog('Weather Warning: Rainfall Intensity Rising (Wind: 24kt, Vis: 4.5km)', 'warning');
-                  } else if (val === 'cloudburst') {
-                    playSystemSound('landslideWarning');
-                    injectFeedbackLog('🚨 WEATHER CRITICAL: Cloudburst active! High flood risk (Wind: 38kt, Vis: 1.2km)', 'error');
-                  }
-                }}
-                style={{ 
-                  background: 'none', 
-                  border: 'none', 
-                  color: 'var(--color-text-primary)', 
-                  fontSize: '9px', 
-                  fontFamily: 'monospace', 
-                  fontWeight: '800',
-                  outline: 'none',
-                  cursor: 'pointer'
-                }}
-              >
-                <option value="normal" style={{background: 'var(--color-panel-dark)', color: '#fff'}}>NORMAL</option>
-                <option value="storm" style={{background: 'var(--color-panel-dark)', color: '#fff'}}>STORM</option>
-                <option value="cloudburst" style={{background: 'var(--color-panel-dark)', color: '#fff'}}>CLOUDBURST</option>
-              </select>
-            </div>
+          {/* Additional Layers - only shown if not in Focus Mode */}
+          {!isFocusMode && (
+            <>
+              {/* Base Layer Row */}
+              <div style={{ display: 'flex', gap: '6px' }}>
+                <button
+                  onClick={() => setMapBaseLayer('terrain')}
+                  className={`minimal-pill-btn ${mapBaseLayer === 'terrain' ? 'active' : ''}`}
+                >
+                  <Compass size={11} />
+                  <span>Terrain</span>
+                </button>
+                <button
+                  onClick={() => setMapBaseLayer('satellite')}
+                  className={`minimal-pill-btn ${mapBaseLayer === 'satellite' ? 'active' : ''}`}
+                >
+                  <Layers size={11} />
+                  <span>Satellite</span>
+                </button>
+                <button
+                  onClick={() => setMapBaseLayer('standard')}
+                  className={`minimal-pill-btn ${mapBaseLayer === 'standard' ? 'active' : ''}`}
+                >
+                  <Globe size={11} />
+                  <span>Standard</span>
+                </button>
+              </div>
 
-            <button
-              onClick={() => {
-                setIsCommunityMode(!isCommunityMode);
-                playSystemSound('ping');
-                injectFeedbackLog(
-                  !isCommunityMode 
-                    ? '👥 Community Mesh Active: Civilian relay nodes online (+3.2km range)' 
-                    : '👥 Community Mesh Disabled: Reverting to standard command beacons',
-                  'info'
-                );
-              }}
-              className={`minimal-pill-btn ${isCommunityMode ? 'active' : ''}`}
-              style={{
-                background: isCommunityMode ? '#3B82F6' : '',
-                borderColor: isCommunityMode ? '#3B82F6' : '',
-                color: isCommunityMode ? '#fff' : ''
-              }}
-              title="Activate civilian peer-to-peer relay nodes"
-            >
-              <User size={11} />
-              <span>Mesh Mode</span>
-            </button>
+              {/* Overlays Row */}
+              <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', justifyContent: 'flex-end', maxWidth: '520px', alignItems: 'center' }}>
+                {/* Weather Dropdown */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', backgroundColor: 'var(--color-bg-dark)', border: '1px solid var(--color-border)', borderRadius: '20px', padding: '2px 8px', height: '22px' }}>
+                  <span style={{ fontSize: '9px', color: 'var(--color-text-muted)', fontWeight: '600' }}>🌧️ WEATHER:</span>
+                  <select 
+                    value={weatherIntensity} 
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setWeatherIntensity(val);
+                      playSystemSound('beep');
+                      if (val === 'normal') {
+                        injectFeedbackLog('Weather: Normal clearing (Wind: 12kt, Vis: 8km)', 'info');
+                      } else if (val === 'storm') {
+                        injectFeedbackLog('Weather Warning: Rainfall Intensity Rising (Wind: 24kt, Vis: 4.5km)', 'warning');
+                      } else if (val === 'cloudburst') {
+                        playSystemSound('landslideWarning');
+                        injectFeedbackLog('🚨 WEATHER CRITICAL: Cloudburst active! High flood risk (Wind: 38kt, Vis: 1.2km)', 'error');
+                      }
+                    }}
+                    style={{ 
+                      background: 'none', 
+                      border: 'none', 
+                      color: 'var(--color-text-primary)', 
+                      fontSize: '9px', 
+                      fontFamily: 'monospace', 
+                      fontWeight: '800',
+                      outline: 'none',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    <option value="normal" style={{background: 'var(--color-panel-dark)', color: 'var(--color-text-primary)'}}>NORMAL</option>
+                    <option value="storm" style={{background: 'var(--color-panel-dark)', color: 'var(--color-text-primary)'}}>STORM</option>
+                    <option value="cloudburst" style={{background: 'var(--color-panel-dark)', color: 'var(--color-text-primary)'}}>CLOUDBURST</option>
+                  </select>
+                </div>
 
-            <button
-              onClick={() => setIs3dTiltedView(!is3dTiltedView)}
-              className={`minimal-pill-btn ${is3dTiltedView ? 'active' : ''}`}
-              title="Toggle 3D Perspective Tilt"
-            >
-              <Map size={11} />
-              <span>3D Tilt</span>
-            </button>
-            <button
-              onClick={() => setShowFloodOverlay(!showFloodOverlay)}
-              className={`minimal-pill-btn ${showFloodOverlay ? 'active glow-red' : ''}`}
-            >
-              <AlertTriangle size={11} />
-              <span>Flood Risk</span>
-            </button>
-            <button
-              onClick={() => setShowLandslideOverlay(!showLandslideOverlay)}
-              className={`minimal-pill-btn ${showLandslideOverlay ? 'active' : ''}`}
-              style={{
-                background: showLandslideOverlay ? 'var(--color-warning-orange)' : '',
-                borderColor: showLandslideOverlay ? 'var(--color-warning-orange)' : '',
-                color: showLandslideOverlay ? '#fff' : ''
-              }}
-            >
-              <AlertOctagon size={11} />
-              <span>Landslide</span>
-            </button>
-            <button
-              onClick={() => setShowConnectivityOverlay(!showConnectivityOverlay)}
-              className={`minimal-pill-btn ${showConnectivityOverlay ? 'active' : ''}`}
-              style={{
-                background: showConnectivityOverlay ? '#64748B' : '',
-                borderColor: showConnectivityOverlay ? '#64748B' : '',
-                color: showConnectivityOverlay ? '#fff' : ''
-              }}
-            >
-              <WifiOff size={11} />
-              <span>Blackouts</span>
-            </button>
-            <button
-              onClick={() => setShowHeliOverlay(!showHeliOverlay)}
-              className={`minimal-pill-btn ${showHeliOverlay ? 'active' : ''}`}
-              style={{
-                background: showHeliOverlay ? 'rgba(223,154,81,0.7)' : '',
-                borderColor: showHeliOverlay ? 'rgba(223,154,81,0.5)' : '',
-                color: showHeliOverlay ? '#fff' : '',
-                opacity: 0.85
-              }}
-            >
-              <Navigation size={10} />
-              <span style={{ fontSize: '9px' }}>Air Rescue</span>
-            </button>
-            <button
-              onClick={() => setDroneFlightActive(!droneFlightActive)}
-              className={`minimal-pill-btn ${droneFlightActive ? 'active glow-red' : ''}`}
-            >
-              <Zap size={11} />
-              <span>Drone Route</span>
-            </button>
-          </div>
+                <button
+                  onClick={() => {
+                    setIsCommunityMode(!isCommunityMode);
+                    playSystemSound('ping');
+                    injectFeedbackLog(
+                      !isCommunityMode 
+                        ? '👥 Community Mesh Active: Civilian relay nodes online (+3.2km range)' 
+                        : '👥 Community Mesh Disabled: Reverting to standard command beacons',
+                      'info'
+                    );
+                  }}
+                  className={`minimal-pill-btn ${isCommunityMode ? 'active' : ''}`}
+                  style={{
+                    background: isCommunityMode ? '#3B82F6' : '',
+                    borderColor: isCommunityMode ? '#3B82F6' : '',
+                    color: isCommunityMode ? '#fff' : ''
+                  }}
+                  title="Activate civilian peer-to-peer relay nodes"
+                >
+                  <User size={11} />
+                  <span>Mesh Mode</span>
+                </button>
+
+                <button
+                  onClick={() => setIs3dTiltedView(!is3dTiltedView)}
+                  className={`minimal-pill-btn ${is3dTiltedView ? 'active' : ''}`}
+                  title="Toggle 3D Perspective Tilt"
+                >
+                  <Map size={11} />
+                  <span>3D Tilt</span>
+                </button>
+
+                {/* Map Layers Dropdown Button */}
+                <div className="map-layers-container" style={{ position: 'relative' }}>
+                  <button
+                    onClick={() => {
+                      setIsLayersDropdownOpen(!isLayersDropdownOpen);
+                      playSystemSound('ping');
+                    }}
+                    className={`minimal-pill-btn ${isLayersDropdownOpen ? 'active' : ''}`}
+                    style={{
+                      fontWeight: '700',
+                      background: isLayersDropdownOpen ? 'rgba(59,130,246,0.2)' : 'rgba(30, 41, 59, 0.4)',
+                      borderColor: isLayersDropdownOpen ? 'var(--color-rescue-blue)' : 'rgba(148, 163, 184, 0.3)',
+                      color: isLayersDropdownOpen ? 'var(--color-rescue-blue)' : 'var(--color-text-primary)',
+                      boxShadow: isLayersDropdownOpen ? '0 0 10px rgba(59,130,246,0.3)' : '',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px'
+                    }}
+                  >
+                    <Layers size={11} />
+                    <span>Map Layers ({Object.values(mapLayers).filter(Boolean).length}/17)</span>
+                  </button>
+
+                  {isLayersDropdownOpen && (
+                    <div className="map-layers-dropdown" style={{ zIndex: 1100 }}>
+                      <div className="map-layers-presets-row">
+                        <button onClick={() => { applyFocusPreset(); playSystemSound('confirm'); }} className={`preset-btn focus ${isFocusMode ? 'active' : ''}`}>Focus</button>
+                        <button onClick={() => { applyCommandPreset(); playSystemSound('confirm'); }} className={`preset-btn command ${!isFocusMode && mapLayers.telemetry && mapLayers.uavRoutes ? 'active' : ''}`}>Command</button>
+                        <button onClick={() => { applyPublicPreset(); playSystemSound('confirm'); }} className={`preset-btn public ${!isFocusMode && !mapLayers.telemetry && !mapLayers.uavRoutes ? 'active' : ''}`}>Public</button>
+                      </div>
+
+                      <div className="map-layers-groups">
+                        <div className="map-layers-group">
+                          <span className="map-layers-group-title">Mission</span>
+                          <label className="toggle-switch">
+                            <input type="checkbox" checked={mapLayers.timeline} onChange={e => { setMapLayers(prev => ({ ...prev, timeline: e.target.checked })); playSystemSound('beep'); }} />
+                            <span className="slider toggle-green"></span>
+                            <span className="toggle-label">Mission Timeline</span>
+                          </label>
+                          <label className="toggle-switch">
+                            <input type="checkbox" checked={mapLayers.incidentCommander} onChange={e => { setMapLayers(prev => ({ ...prev, incidentCommander: e.target.checked })); playSystemSound('beep'); }} />
+                            <span className="slider toggle-green"></span>
+                            <span className="toggle-label">Incident AI</span>
+                          </label>
+                        </div>
+
+                        <div className="map-layers-group">
+                          <span className="map-layers-group-title">Network</span>
+                          <label className="toggle-switch">
+                            <input type="checkbox" checked={mapLayers.telemetry} onChange={e => { setMapLayers(prev => ({ ...prev, telemetry: e.target.checked })); playSystemSound('beep'); }} />
+                            <span className="slider toggle-blue"></span>
+                            <span className="toggle-label">Network Telemetry</span>
+                          </label>
+                          <label className="toggle-switch">
+                            <input type="checkbox" checked={mapLayers.meshRadius} onChange={e => { setMapLayers(prev => ({ ...prev, meshRadius: e.target.checked })); playSystemSound('beep'); }} />
+                            <span className="slider toggle-blue"></span>
+                            <span className="toggle-label">Mesh Radius</span>
+                          </label>
+                          <label className="toggle-switch">
+                            <input type="checkbox" checked={mapLayers.meshNodes} onChange={e => { setMapLayers(prev => ({ ...prev, meshNodes: e.target.checked })); playSystemSound('beep'); }} />
+                            <span className="slider toggle-blue"></span>
+                            <span className="toggle-label">Mesh Topology</span>
+                          </label>
+                        </div>
+
+                        <div className="map-layers-group">
+                          <span className="map-layers-group-title">Rescue</span>
+                          <label className="toggle-switch">
+                            <input type="checkbox" checked={mapLayers.rescueRoutes} onChange={e => { setMapLayers(prev => ({ ...prev, rescueRoutes: e.target.checked })); playSystemSound('beep'); }} />
+                            <span className="slider toggle-green"></span>
+                            <span className="toggle-label">Rescue Routes</span>
+                          </label>
+                          <label className="toggle-switch">
+                            <input type="checkbox" checked={mapLayers.uavRoutes} onChange={e => { setMapLayers(prev => ({ ...prev, uavRoutes: e.target.checked })); playSystemSound('beep'); }} />
+                            <span className="slider toggle-green"></span>
+                            <span className="toggle-label">UAV Routes</span>
+                          </label>
+                        </div>
+
+                        <div className="map-layers-group">
+                          <span className="map-layers-group-title">Hazards</span>
+                          <label className="toggle-switch">
+                            <input type="checkbox" checked={mapLayers.hazardZones} onChange={e => { setMapLayers(prev => ({ ...prev, hazardZones: e.target.checked })); playSystemSound('beep'); }} />
+                            <span className="slider toggle-red"></span>
+                            <span className="toggle-label">Hazards</span>
+                          </label>
+                        </div>
+
+                        <div className="map-layers-group">
+                          <span className="map-layers-group-title">Feed & Info</span>
+                          <label className="toggle-switch">
+                            <input type="checkbox" checked={mapLayers.feed} onChange={e => { setMapLayers(prev => ({ ...prev, feed: e.target.checked })); playSystemSound('beep'); }} />
+                            <span className="slider toggle-blue"></span>
+                            <span className="toggle-label">Operational Feed</span>
+                          </label>
+                          <label className="toggle-switch">
+                            <input type="checkbox" checked={mapLayers.legend} onChange={e => { setMapLayers(prev => ({ ...prev, legend: e.target.checked })); playSystemSound('beep'); }} />
+                            <span className="slider toggle-blue"></span>
+                            <span className="toggle-label">Map Symbols / Legend</span>
+                          </label>
+                          <label className="toggle-switch">
+                            <input type="checkbox" checked={mapLayers.toastAlerts} onChange={e => { setMapLayers(prev => ({ ...prev, toastAlerts: e.target.checked })); playSystemSound('beep'); }} />
+                            <span className="slider toggle-blue"></span>
+                            <span className="toggle-label">Toast Alerts</span>
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </>
+          )}
         </div>
+
+        {/* ============================================================
+             NEW UNIFIED NAVBAR: Top-Center View Layers
+        ============================================================ */}
+        {!isFocusMode && (
+          <div className="mission-control-dock" style={{
+            position: 'absolute',
+            top: '18px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            zIndex: 1000,
+            display: 'flex',
+            alignItems: 'center',
+            backgroundColor: 'rgba(255, 255, 255, 0.88)',
+            backdropFilter: 'blur(20px)',
+            border: '1.5px solid #E5E5EA',
+            borderRadius: '20px',
+            padding: '4px 8px',
+            boxShadow: '0 4px 16px rgba(0, 0, 0, 0.05)',
+            gap: '6px',
+            fontFamily: 'var(--font-mono)',
+            fontSize: '10px'
+          }}>
+            <span style={{ color: '#8E8E93', fontWeight: '800', paddingRight: '6px', borderRight: '1px solid #E5E5EA', marginRight: '4px', textTransform: 'uppercase', letterSpacing: '0.4px', fontSize: '9px' }}>View Layers</span>
+            <button onClick={toggleMissionLayerGroup} className="minimal-pill-btn" style={{ border: 'none', background: mapLayers.mission ? 'rgba(52,199,89,0.15)' : 'none', color: mapLayers.mission ? 'var(--color-safety-green)' : 'var(--color-text-secondary)', fontWeight: mapLayers.mission ? 'bold' : '500', display: 'flex', alignItems: 'center', gap: '3px' }}>
+              <span>{mapLayers.mission ? '✓' : '○'}</span>
+              <span>Mission</span>
+            </button>
+            <button onClick={toggleNetworkLayerGroup} className="minimal-pill-btn" style={{ border: 'none', background: mapLayers.network ? 'rgba(0,122,255,0.15)' : 'none', color: mapLayers.network ? 'var(--color-rescue-blue)' : 'var(--color-text-secondary)', fontWeight: mapLayers.network ? 'bold' : '500', display: 'flex', alignItems: 'center', gap: '3px' }}>
+              <span>{mapLayers.network ? '✓' : '○'}</span>
+              <span>Network</span>
+            </button>
+            <button onClick={toggleRescueLayerGroup} className="minimal-pill-btn" style={{ border: 'none', background: mapLayers.rescue ? 'rgba(52,199,89,0.15)' : 'none', color: mapLayers.rescue ? 'var(--color-safety-green)' : 'var(--color-text-secondary)', fontWeight: mapLayers.rescue ? 'bold' : '500', display: 'flex', alignItems: 'center', gap: '3px' }}>
+              <span>{mapLayers.rescue ? '✓' : '○'}</span>
+              <span>Rescue</span>
+            </button>
+            <button onClick={toggleHazardsLayerGroup} className="minimal-pill-btn" style={{ border: 'none', background: mapLayers.hazards ? 'rgba(255,59,48,0.15)' : 'none', color: mapLayers.hazards ? 'var(--color-emergency-red)' : 'var(--color-text-secondary)', fontWeight: mapLayers.hazards ? 'bold' : '500', display: 'flex', alignItems: 'center', gap: '3px' }}>
+              <span>{mapLayers.hazards ? '✓' : '○'}</span>
+              <span>Hazards</span>
+            </button>
+            <button onClick={toggleFeedLayerGroup} className="minimal-pill-btn" style={{ border: 'none', background: mapLayers.feed ? 'rgba(0,122,255,0.15)' : 'none', color: mapLayers.feed ? 'var(--color-rescue-blue)' : 'var(--color-text-secondary)', fontWeight: mapLayers.feed ? 'bold' : '500', display: 'flex', alignItems: 'center', gap: '3px' }}>
+              <span>{mapLayers.feed ? '✓' : '○'}</span>
+              <span>Feed</span>
+            </button>
+            <button onClick={toggleLegendLayerGroup} className="minimal-pill-btn" style={{ border: 'none', background: mapLayers.legend ? 'rgba(0,122,255,0.15)' : 'none', color: mapLayers.legend ? 'var(--color-rescue-blue)' : 'var(--color-text-secondary)', fontWeight: mapLayers.legend ? 'bold' : '500', display: 'flex', alignItems: 'center', gap: '3px' }}>
+              <span>{mapLayers.legend ? '✓' : '○'}</span>
+              <span>Legend</span>
+            </button>
+          </div>
+        )}
       </div>
 
       {showSettingsModal && (
@@ -3224,7 +4033,7 @@ JSON Output Format:
               <button onClick={() => setShowDecryptionView(false)} style={{ color: 'var(--color-text-muted)', background: 'none', border: 'none', cursor: 'pointer' }}>Close</button>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '20px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: mapLayers.incidentCommander ? '1fr 1fr' : '1fr', gap: '16px', marginBottom: '20px' }}>
               {/* E2EE Data Card */}
               <div style={{ backgroundColor: 'var(--color-bg-dark)', border: '1px solid var(--color-border)', borderRadius: '12px', padding: '16px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px', color: 'var(--color-safety-green)' }}>
@@ -3239,7 +4048,7 @@ JSON Output Format:
 
                 <div className="form-group">
                   <label className="form-label" style={{ fontSize: '9px' }}>Encrypted Ciphertext</label>
-                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', wordBreak: 'break-all', height: '60px', overflowY: 'auto', backgroundColor: 'var(--color-panel-dark)', padding: '6px', borderRadius: '6px', border: '1px solid var(--color-border)' }}>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', wordBreak: 'break-all', height: '60px', overflowY: 'auto', backgroundColor: '#F2F2F7', padding: '6px', borderRadius: '6px', border: '1px solid #E5E5EA', color: '#1C1C1E' }}>
                     {selectedAlert.encryptedPayload}
                   </div>
                 </div>
@@ -3269,54 +4078,56 @@ JSON Output Format:
               </div>
 
               {/* AI Triage Details */}
-              <div style={{ backgroundColor: 'var(--color-bg-dark)', border: '1px solid var(--color-border)', borderRadius: '12px', padding: '16px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px', color: 'var(--color-emergency-red)' }}>
-                  <Activity size={16} />
-                  <span style={{ fontSize: '12px', fontWeight: '600', textTransform: 'uppercase' }}>Gemini AI Triage Result</span>
-                </div>
-
-                <div style={{ display: 'flex', gap: '16px', marginBottom: '10px' }}>
-                  <div>
-                    <div style={{ fontSize: '9px', color: 'var(--color-text-muted)' }}>PRIORITY SCORE</div>
-                    <div style={{ fontSize: '18px', fontWeight: '700', color: 'var(--color-emergency-red)' }}>{selectedAlert.priorityScore}/100</div>
+              {mapLayers.incidentCommander && (
+                <div style={{ backgroundColor: 'var(--color-bg-dark)', border: '1px solid var(--color-border)', borderRadius: '12px', padding: '16px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px', color: 'var(--color-emergency-red)' }}>
+                    <Activity size={16} />
+                    <span style={{ fontSize: '12px', fontWeight: '600', textTransform: 'uppercase' }}>Gemini AI Triage Result</span>
                   </div>
-                  <div>
-                    <div style={{ fontSize: '9px', color: 'var(--color-text-muted)' }}>TRIPPED BATTERY</div>
-                    <div style={{ fontSize: '18px', fontWeight: '700' }}>{selectedAlert.batteryAtTrigger}%</div>
-                  </div>
-                </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '12px', backgroundColor: 'rgba(0,0,0,0.2)', padding: '8px', borderRadius: '8px' }}>
-                  <div>
-                    <div style={{ fontSize: '8px', color: 'var(--color-text-muted)', textTransform: 'uppercase' }}>Confidence Rating</div>
-                    <div style={{ fontSize: '11px', fontWeight: '700', color: (selectedAlert.confidenceScore || 90) > 90 ? 'var(--color-safety-green)' : 'var(--color-warning-orange)' }}>
-                      {displayedConfidence || selectedAlert.confidenceScore || 90}% (High)
+                  <div style={{ display: 'flex', gap: '16px', marginBottom: '10px' }}>
+                    <div>
+                      <div style={{ fontSize: '9px', color: 'var(--color-text-muted)' }}>PRIORITY SCORE</div>
+                      <div style={{ fontSize: '18px', fontWeight: '700', color: 'var(--color-emergency-red)' }}>{selectedAlert.priorityScore}/100</div>
+                    </div>
+                    <div>
+                      <div style={{ fontSize: '9px', color: 'var(--color-text-muted)' }}>TRIPPED BATTERY</div>
+                      <div style={{ fontSize: '18px', fontWeight: '700' }}>{selectedAlert.batteryAtTrigger}%</div>
                     </div>
                   </div>
-                  <div>
-                    <div style={{ fontSize: '8px', color: 'var(--color-text-muted)', textTransform: 'uppercase' }}>Spam/Fake Risk</div>
-                    <div style={{ fontSize: '11px', fontWeight: '700', color: (selectedAlert.fakeRiskScore || 8) > 20 ? 'var(--color-emergency-red)' : 'var(--color-safety-green)' }}>
-                      {selectedAlert.fakeRiskScore || 8}% (Low)
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '12px', backgroundColor: 'rgba(0,0,0,0.2)', padding: '8px', borderRadius: '8px' }}>
+                    <div>
+                      <div style={{ fontSize: '8px', color: 'var(--color-text-muted)', textTransform: 'uppercase' }}>Confidence Rating</div>
+                      <div style={{ fontSize: '11px', fontWeight: '700', color: (selectedAlert.confidenceScore || 90) > 90 ? 'var(--color-safety-green)' : 'var(--color-warning-orange)' }}>
+                        {displayedConfidence || selectedAlert.confidenceScore || 90}% (High)
+                      </div>
+                    </div>
+                    <div>
+                      <div style={{ fontSize: '8px', color: 'var(--color-text-muted)', textTransform: 'uppercase' }}>Spam/Fake Risk</div>
+                      <div style={{ fontSize: '11px', fontWeight: '700', color: (selectedAlert.fakeRiskScore || 8) > 20 ? 'var(--color-emergency-red)' : 'var(--color-safety-green)' }}>
+                        {selectedAlert.fakeRiskScore || 8}% (Low)
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label" style={{ fontSize: '9px' }}>AI Safety Action Suggestion</label>
+                    <div style={{ fontSize: '11px', color: 'var(--color-rescue-blue)', lineHeight: '1.4' }}>{selectedAlert.suggestedAction}</div>
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label" style={{ fontSize: '9px' }}>Required Resources</label>
+                    <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                      {selectedAlert.requiredResources?.map((res, index) => (
+                        <span key={index} style={{ fontSize: '9px', backgroundColor: 'rgba(245,158,11,0.12)', color: 'var(--color-warning-orange)', padding: '2px 6px', borderRadius: '10px' }}>
+                          {res.toUpperCase()}
+                        </span>
+                      ))}
                     </div>
                   </div>
                 </div>
-
-                <div className="form-group">
-                  <label className="form-label" style={{ fontSize: '9px' }}>AI Safety Action Suggestion</label>
-                  <div style={{ fontSize: '11px', color: 'var(--color-rescue-blue)', lineHeight: '1.4' }}>{selectedAlert.suggestedAction}</div>
-                </div>
-
-                <div className="form-group">
-                  <label className="form-label" style={{ fontSize: '9px' }}>Required Resources</label>
-                  <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-                    {selectedAlert.requiredResources?.map((res, index) => (
-                      <span key={index} style={{ fontSize: '9px', backgroundColor: 'rgba(245,158,11,0.12)', color: 'var(--color-warning-orange)', padding: '2px 6px', borderRadius: '10px' }}>
-                        {res.toUpperCase()}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </div>
+              )}
             </div>
 
             {/* Victim details decrypted */}
@@ -3332,67 +4143,104 @@ JSON Output Format:
             </div>
 
             {/* Routing Transit Timeline */}
-            <div style={{ backgroundColor: 'var(--color-panel-dark)', border: '1px solid var(--color-border)', padding: '16px', borderRadius: '12px', marginBottom: '20px' }}>
-              <div style={{ fontSize: '10px', color: 'var(--color-text-muted)', textTransform: 'uppercase', marginBottom: '8px' }}>Packet Transit & AI Verification Timeline</div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                {(selectedAlert.triageTimeline || [
-                  `10:02 AM - SOS Packet Generated`,
-                  `10:14 AM - Forwarded through 2 Relays`,
-                  `10:25 AM - Uploaded via Gateway`,
-                  `10:26 AM - AI Priority Classified: ${selectedAlert.severity}`
-                ]).map((stepText, idx) => (
-                  <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '11px' }}>
-                    <div style={{
-                      width: '6px',
-                      height: '6px',
-                      borderRadius: '50%',
-                      backgroundColor: idx === 3 ? 'var(--color-emergency-red)' : 'var(--color-safety-green)'
-                    }} />
-                    <span style={{ color: idx === 3 ? '#fff' : 'var(--color-text-muted)' }}>{stepText}</span>
-                  </div>
-                ))}
+            {mapLayers.timeline && (
+              <div style={{ backgroundColor: 'var(--color-panel-dark)', border: '1px solid var(--color-border)', padding: '16px', borderRadius: '12px', marginBottom: '20px' }}>
+                <div style={{ fontSize: '10px', color: 'var(--color-text-muted)', textTransform: 'uppercase', marginBottom: '8px' }}>Packet Transit & AI Verification Timeline</div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  {(selectedAlert.triageTimeline || [
+                    `10:02 AM - SOS Packet Generated`,
+                    `10:14 AM - Forwarded through 2 Relays`,
+                    `10:25 AM - Uploaded via Gateway`,
+                    `10:26 AM - AI Priority Classified: ${selectedAlert.severity}`
+                  ]).map((stepText, idx) => (
+                    <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '11px' }}>
+                      <div style={{
+                        width: '6px',
+                        height: '6px',
+                        borderRadius: '50%',
+                        backgroundColor: idx === 3 ? 'var(--color-emergency-red)' : 'var(--color-safety-green)'
+                      }} />
+                       <span style={{ color: idx === 3 ? 'var(--color-emergency-red)' : 'var(--color-text-secondary)' }}>{stepText}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Actions button */}
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
-              {selectedAlert.status !== 'assigned' ? (
-                <button
-                  onClick={() => setShowAssignModal(true)}
-                  style={{
-                    padding: '10px 18px',
-                    backgroundColor: 'var(--color-rescue-blue)',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '8px',
-                    cursor: 'pointer',
-                    fontWeight: '500',
-                    fontSize: '12px'
-                  }}
-                >
-                  Assign Volunteer Dispatch
-                </button>
-              ) : (
+            <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
+              {!droneFlightActive && (
                 <button
                   onClick={() => {
-                    setAlerts(prev => prev.map(a => a.alertId === selectedAlert.alertId ? { ...a, status: 'resolved' } : a));
+                    setDroneTargetCoords([selectedAlert.lat, selectedAlert.lng]);
+                    setDroneFlightActive(true);
+                    setDroneEta(151); // 2m 31s
+                    setDroneCoords([30.5732, 79.0435]); // start at Phata Gateway
                     setShowDecryptionView(false);
-                    alert('SOS Emergency resolved and cleared.');
+                    // Automatically turn on UAV Routes layer if it's off, so they see the drone path!
+                    setMapLayers(prev => ({ ...prev, uavRoutes: true }));
+                    injectFeedbackLog(`🚀 UAV Drone-01 launched to ${selectedAlert.name} coordinates. ETA: 2m 31s.`, 'success');
+                    injectOperationalLog(`UAV Drone dispatched to emergency location.`);
+                    playSystemSound('confirm');
                   }}
                   style={{
                     padding: '10px 18px',
-                    backgroundColor: 'var(--color-safety-green)',
+                    backgroundColor: 'var(--color-warning-orange)',
                     color: 'white',
                     border: 'none',
                     borderRadius: '8px',
                     cursor: 'pointer',
-                    fontWeight: '500',
-                    fontSize: '12px'
+                    fontWeight: '600',
+                    fontSize: '12px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px'
                   }}
                 >
-                  Mark Case Resolved
+                  <Navigation size={12} style={{ transform: 'rotate(45deg)' }} />
+                  <span>Launch UAV Supply Drop</span>
                 </button>
               )}
+              
+              <div style={{ display: 'flex', gap: '10px', marginLeft: 'auto' }}>
+                {selectedAlert.status !== 'assigned' ? (
+                  <button
+                    onClick={() => setShowAssignModal(true)}
+                    style={{
+                      padding: '10px 18px',
+                      backgroundColor: 'var(--color-rescue-blue)',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '8px',
+                      cursor: 'pointer',
+                      fontWeight: '500',
+                      fontSize: '12px'
+                    }}
+                  >
+                    Assign Volunteer Dispatch
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => {
+                      setAlerts(prev => prev.map(a => a.alertId === selectedAlert.alertId ? { ...a, status: 'resolved' } : a));
+                      setShowDecryptionView(false);
+                      alert('SOS Emergency resolved and cleared.');
+                    }}
+                    style={{
+                      padding: '10px 18px',
+                      backgroundColor: 'var(--color-safety-green)',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '8px',
+                      cursor: 'pointer',
+                      fontWeight: '500',
+                      fontSize: '12px'
+                    }}
+                  >
+                    Mark Case Resolved
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </div>
