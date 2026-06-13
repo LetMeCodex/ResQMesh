@@ -701,14 +701,6 @@ export default function App() {
     }
   }, [firebaseStatus]);
 
-  // Invalidate Leaflet map size on responsive view switch
-  useEffect(() => {
-    if (mapInstance) {
-      setTimeout(() => {
-        mapInstance.invalidateSize();
-      }, 200);
-    }
-  }, [mobileView, mapInstance]);
 
   // Winning Features states
   const [mapBaseLayer, setMapBaseLayer] = useState('standard');
@@ -753,6 +745,15 @@ export default function App() {
   const [isCompletedRescuesCollapsed, setIsCompletedRescuesCollapsed] = useState(false);
   const [completedMissionsCount, setCompletedMissionsCount] = useState(() => Number(localStorage.getItem('resqmesh_completed_count') || 0));
   
+  // Invalidate Leaflet map size on responsive view switch
+  useEffect(() => {
+    if (mapInstance) {
+      setTimeout(() => {
+        mapInstance.invalidateSize();
+      }, 200);
+    }
+  }, [mobileView, mapInstance]);
+
   // Presets
   const applyFocusPreset = () => {
     setMapLayers({
