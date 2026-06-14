@@ -1632,16 +1632,54 @@ export default function App() {
         weight: 1.5,
         className: 'packet-node-pulse-ring'
       }).addTo(arcsLayerRef.current);
-    } else if (selectedAlert && mapLayers.meshNodes) {
+    } else if (selectedAlert) {
       const p2pPoints = [
         [Number(selectedAlert.lat || 30.6515), Number(selectedAlert.lng || 79.0270)],
         [30.6865, 79.0550], // Hop 1: Rambara Guide Karan Thapa
         [30.6515, 79.0270], // Hop 2: Gaurikund Medical NDRF Node
         [30.5732, 79.0435]  // Hop 3: Phata Gateway Base
       ];
-      L.polyline(p2pPoints, { color: '#57A573', weight: 2, className: 'mesh-routing-path' })
-        .bindTooltip('LoRa P2P Store & Forward Hop Pathway', { sticky: true })
-        .addTo(arcsLayerRef.current);
+      
+      // Draw routing polyline path
+      L.polyline(p2pPoints, { 
+        color: '#34C759', 
+        weight: 3, 
+        dashArray: '5, 5', 
+        className: 'mesh-routing-path' 
+      })
+      .bindTooltip(`Mesh Hop Pathway for ${selectedAlert.name || 'Victim'}: 3 Hops to HQ`, { sticky: true })
+      .addTo(arcsLayerRef.current);
+
+      // Plot markers for the hop relays
+      L.marker([30.6865, 79.0550], {
+        icon: L.divIcon({
+          className: 'custom-beacon-leaflet-container',
+          html: `<div class="beacon-volunteer animate-pulse" style="transform: translate(-50%, -50%); border: 2px solid #34C759; background-color: var(--color-bg-dark); width: 14px; height: 14px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 8px; font-weight: 800;">1</div>`,
+          iconSize: [0, 0]
+        })
+      })
+      .bindTooltip('<b>Hop 1 of 3: Rambara Guide</b><br/>Relayed via Karan Thapa (RSSI: -71dBm)', { direction: 'top', offset: [0, -6] })
+      .addTo(arcsLayerRef.current);
+
+      L.marker([30.6515, 79.0270], {
+        icon: L.divIcon({
+          className: 'custom-beacon-leaflet-container',
+          html: `<div class="beacon-volunteer animate-pulse" style="transform: translate(-50%, -50%); border: 2px solid #34C759; background-color: var(--color-bg-dark); width: 14px; height: 14px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 8px; font-weight: 800;">2</div>`,
+          iconSize: [0, 0]
+        })
+      })
+      .bindTooltip('<b>Hop 2 of 3: Gaurikund Camp</b><br/>Relayed via NDRF Medical Node (RSSI: -66dBm)', { direction: 'top', offset: [0, -6] })
+      .addTo(arcsLayerRef.current);
+
+      L.marker([30.5732, 79.0435], {
+        icon: L.divIcon({
+          className: 'custom-beacon-leaflet-container',
+          html: `<div class="pulse-beacon-high" style="transform: translate(-50%, -50%); border: 2.5px solid var(--color-rescue-blue); background-color: var(--color-bg-dark); width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 8px; font-weight: 800; box-shadow: 0 0 10px var(--color-rescue-blue);">G</div>`,
+          iconSize: [0, 0]
+        })
+      })
+      .bindTooltip('<b>Gateway Hub: Phata HQ</b><br/>Uploaded to Central Cloud Database (Satellite Uplink)', { direction: 'top', offset: [0, -8] })
+      .addTo(arcsLayerRef.current);
     }
 
     // Drone flight path dashed corridor (curved bypass when landslide blocked or weather storm/cloudburst active)
@@ -4376,29 +4414,38 @@ JSON Output Format:
             </div>
 
             {/* Routing Transit Timeline */}
-            {mapLayers.timeline && (
-              <div style={{ backgroundColor: 'var(--color-panel-dark)', border: '1px solid var(--color-border)', padding: '16px', borderRadius: '12px', marginBottom: '20px' }}>
-                <div style={{ fontSize: '10px', color: 'var(--color-text-muted)', textTransform: 'uppercase', marginBottom: '8px' }}>Packet Transit & AI Verification Timeline</div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  {(Array.isArray(selectedAlert.triageTimeline) ? selectedAlert.triageTimeline : [
-                    `10:02 AM - SOS Packet Generated`,
-                    `10:14 AM - Forwarded through 2 Relays`,
-                    `10:25 AM - Uploaded via Gateway`,
-                    `10:26 AM - AI Priority Classified: ${selectedAlert.severity}`
-                  ]).map((stepText, idx) => (
-                    <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '11px' }}>
-                      <div style={{
-                        width: '6px',
-                        height: '6px',
-                        borderRadius: '50%',
-                        backgroundColor: idx === 3 ? 'var(--color-emergency-red)' : 'var(--color-safety-green)'
-                      }} />
-                       <span style={{ color: idx === 3 ? 'var(--color-emergency-red)' : 'var(--color-text-secondary)' }}>{stepText}</span>
-                    </div>
-                  ))}
-                </div>
+            <div style={{ backgroundColor: 'var(--color-panel-dark)', border: '1px solid var(--color-border)', padding: '16px', borderRadius: '12px', marginBottom: '20px' }}>
+              <div style={{ fontSize: '10px', color: 'var(--color-text-muted)', textTransform: 'uppercase', marginBottom: '8px' }}>Packet Transit & AI Verification Timeline</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                {(() => {
+                  const timeline = (Array.isArray(selectedAlert.triageTimeline) && selectedAlert.triageTimeline.length > 0)
+                    ? selectedAlert.triageTimeline
+                    : [
+                        `10:02 AM - SOS Packet Generated at Victim Node (${selectedAlert.name || 'Mock Victim'})`,
+                        `10:14 AM - Relayed via Hop 1: Rambara Guide Karan (RSSI: -71dBm)`,
+                        `10:20 AM - Relayed via Hop 2: Gaurikund Medical NDRF (RSSI: -66dBm)`,
+                        `10:25 AM - Uploaded via Gateway at Phata Command Base (RSSI: -58dBm)`,
+                        `10:26 AM - Received at HQ & AI Triage Classified: ${selectedAlert.severity || 'Critical'} (${selectedAlert.priorityScore || 95}/100)`
+                      ];
+                  
+                  return timeline.map((stepText, idx) => {
+                    const isLast = idx === timeline.length - 1;
+                    return (
+                      <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '11px' }}>
+                        <div style={{
+                          width: '6px',
+                          height: '6px',
+                          borderRadius: '50%',
+                          backgroundColor: isLast ? 'var(--color-emergency-red)' : 'var(--color-safety-green)',
+                          boxShadow: isLast ? '0 0 8px var(--color-emergency-red)' : 'none'
+                        }} />
+                        <span style={{ color: isLast ? 'var(--color-emergency-red)' : 'var(--color-text-secondary)', fontWeight: isLast ? 'bold' : 'normal' }}>{stepText}</span>
+                      </div>
+                    );
+                  });
+                })()}
               </div>
-            )}
+            </div>
 
             {/* Actions button */}
             <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
