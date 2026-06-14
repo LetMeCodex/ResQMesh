@@ -31,7 +31,7 @@ import {
   Zap
 } from 'lucide-react';
 import { initializeApp, getApps } from 'firebase/app';
-import { getFirestore, collection, addDoc, onSnapshot, query, orderBy } from 'firebase/firestore';
+import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, doc, updateDoc } from 'firebase/firestore';
 
 // Global Firebase handles
 let firebaseApp = null;
@@ -684,18 +684,24 @@ export default function App() {
           const data = doc.data();
           fbAlerts.push({
             ...data,
-            alertId: data.alertId || doc.id
+            alertId: data.alertId || doc.id,
+            _docId: doc.id
           });
         });
         
         setAlerts(prev => {
-          const merged = [...fbAlerts];
+          const merged = fbAlerts.map(remoteAlert => {
+            const local = prev.find(a => a.alertId === remoteAlert.alertId);
+            if (local && local.status === 'assigned' && remoteAlert.status === 'assigned') {
+              return { ...remoteAlert, etaSecs: local.etaSecs, _docId: remoteAlert._docId };
+            }
+            return remoteAlert;
+          });
           prev.forEach(localAlert => {
             if (!merged.some(a => a.alertId === localAlert.alertId)) {
               merged.push(localAlert);
             }
           });
-          // Sort by date desc
           merged.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
           return merged;
         });
@@ -933,6 +939,7 @@ export default function App() {
   const [volunteerModeActive, setVolunteerModeActive] = useState(false);
 
   const [criticalEventPopup, setCriticalEventPopup] = useState(null); // {title, detail} or null
+  const [rescueSuccessPopup, setRescueSuccessPopup] = useState(null); // {title, detail} or null
   const [alertToast, setAlertToast] = useState(null); // {title, detail} for alert-interruption toast
   const [isMapShaking, setIsMapShaking] = useState(false);   // camera shake on critical alert
   const [isMapFlashing, setIsMapFlashing] = useState(false); // red vignette flash
@@ -1112,12 +1119,23 @@ export default function App() {
         if (alertToComplete) {
           const volId = alertToComplete.assignedVolunteerId;
           
+          if (firestoreDb && alertToComplete._docId) {
+            updateDoc(doc(firestoreDb, 'alerts', alertToComplete._docId), { status: 'rescued' })
+              .catch(err => console.error('[Firebase] Failed to update status to rescued in Firestore:', err));
+          }
+          
           setTimeout(() => {
             setVolunteers(prev => prev.map(v => v.volunteerId === volId ? { ...v, assignedAlertId: null, availability: 'active' } : v));
             setCompletedMissionsCount(prev => prev + 1);
             setDispatchRoute(null);
             playSystemSound('confirm');
             
+            setRescueSuccessPopup({
+              title: "🎉 Rescue Mission Successful!",
+              detail: `${alertToComplete.name} has been safely evacuated to base camp.`
+            });
+            setTimeout(() => setRescueSuccessPopup(null), 4000);
+
             injectFeedbackLog(`✓ Rescue Complete: ${alertToComplete.name} safely evacuated.`, 'success');
             injectOperationalLog(`Rescue Complete: ${alertToComplete.name} safely evacuated.`);
           }, 0);
@@ -1130,7 +1148,7 @@ export default function App() {
 
   // Automatic SOS Spawner if active alerts drops below 10
   useEffect(() => {
-    const activeCount = alerts.filter(a => a.status !== 'rescued').length;
+    const activeCount = alerts.filter(a => a.status !== 'rescued' && a.status !== 'resolved').length;
     if (activeCount < 10) {
       const names = [
         'Anil Joshi (Bheembali)', 'Kavita Rawat (Rambara)', 'Sanjay Negi (Sonprayag)', 
@@ -1422,7 +1440,7 @@ export default function App() {
       });
     }
     // Stranded alerts (Always visible, but danger zones are toggled by hazards)
-    alerts.filter(a => a.status !== 'rescued').forEach(a => {
+    alerts.filter(a => a.status !== 'rescued' && a.status !== 'resolved').forEach(a => {
       const marker = L.marker([a.lat, a.lng], { 
         icon: createIcon(a.severity === 'Critical' ? 'pulse-beacon-critical' : 'pulse-beacon-high') 
       })
@@ -2413,6 +2431,13 @@ JSON Output Format:
         ? { ...a, status: 'assigned', assignedVolunteerId: volId, etaSecs: 12 } 
         : a
     ));
+    if (firestoreDb && activeAlert && activeAlert._docId) {
+      updateDoc(doc(firestoreDb, 'alerts', activeAlert._docId), {
+        status: 'assigned',
+        assignedVolunteerId: volId,
+        etaSecs: 12
+      }).catch(err => console.error('[Firebase] Failed to update status to assigned in Firestore:', err));
+    }
     setVolunteers(prev => prev.map(v => 
       v.volunteerId === volId 
         ? { ...v, assignedAlertId: alertId, availability: 'busy' } 
@@ -3575,6 +3600,37 @@ JSON Output Format:
           }} />
         )}
 
+        {/* 🎉 RESCUE SUCCESS POPUP — slides in from top, 4s auto-dismiss */}
+        {rescueSuccessPopup && (
+          <div style={{
+            position: 'absolute',
+            top: '20px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            zIndex: 2000,
+            backgroundColor: 'rgba(52, 199, 89, 0.95)',
+            backdropFilter: 'blur(12px)',
+            border: '1.5px solid #34C759',
+            borderRadius: '10px',
+            padding: '12px 20px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            color: '#fff',
+            boxShadow: '0 8px 32px rgba(52,199,89,0.35)',
+            animation: 'slide-down-popup 0.5s cubic-bezier(0.16,1,0.3,1)',
+            fontFamily: 'var(--font-mono)',
+            minWidth: '320px'
+          }}>
+            <CheckCircle size={22} style={{ flexShrink: 0, animation: 'pulse-ring 1s infinite' }} />
+            <div>
+              <div style={{ fontSize: '13px', fontWeight: '800', letterSpacing: '0.3px' }}>{rescueSuccessPopup.title}</div>
+              <div style={{ fontSize: '11px', opacity: 0.9, marginTop: '2px' }}>{rescueSuccessPopup.detail}</div>
+            </div>
+            <button onClick={() => setRescueSuccessPopup(null)} style={{ marginLeft: 'auto', background: 'none', border: 'none', color: '#fff', cursor: 'pointer', opacity: 0.7, fontSize: '16px' }}>✕</button>
+          </div>
+        )}
+
         {/* ⚠ CRITICAL EVENT POPUP — slides in from top, 6s auto-dismiss */}
         {criticalEventPopup && (
           <div style={{
@@ -4400,8 +4456,16 @@ JSON Output Format:
                   <button
                     onClick={() => {
                       setAlerts(prev => prev.map(a => a.alertId === selectedAlert.alertId ? { ...a, status: 'resolved' } : a));
+                      if (firestoreDb && selectedAlert._docId) {
+                        updateDoc(doc(firestoreDb, 'alerts', selectedAlert._docId), { status: 'resolved' })
+                          .catch(err => console.error('[Firebase] Failed to update status to resolved in Firestore:', err));
+                      }
                       setShowDecryptionView(false);
-                      alert('SOS Emergency resolved and cleared.');
+                      setRescueSuccessPopup({
+                        title: "✅ SOS Emergency Resolved",
+                        detail: `Case for ${selectedAlert.name} has been marked resolved and closed.`
+                      });
+                      setTimeout(() => setRescueSuccessPopup(null), 4000);
                     }}
                     style={{
                       padding: '10px 18px',
