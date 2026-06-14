@@ -38,14 +38,14 @@ const initFirebase = (configStr) => {
   }
 };
 const DEFAULT_FIREBASE_CONFIG = {
-  projectId: "directionless-beauty",
-  appId: "1:485571902380:web:a3a36461958398ed93d809",
-  storageBucket: "directionless-beauty.firebasestorage.app",
-  apiKey: "AIzaSyD8vJJNF3OWGJgGaaRG55BxecVxDO9hhSE",
-  authDomain: "directionless-beauty.firebaseapp.com",
-  messagingSenderId: "485571902380",
-  measurementId: "G-CH6RPYYJ3S",
-  projectNumber: "485571902380",
+  projectId: "resqmesh-f37b7",
+  appId: "1:758653027008:web:6b2ec3324e20dfae866325",
+  storageBucket: "resqmesh-f37b7.firebasestorage.app",
+  apiKey: "AIzaSyDKJTpMDRz9ldXe3TJaaoXEbF9o8D-UmHM",
+  authDomain: "resqmesh-f37b7.firebaseapp.com",
+  messagingSenderId: "758653027008",
+  measurementId: "G-J6D9QKTNG4",
+  projectNumber: "758653027008",
   version: "2"
 };
 
