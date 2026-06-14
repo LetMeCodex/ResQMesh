@@ -605,7 +605,7 @@ export default function App() {
     try {
       const parsed = JSON.parse(cached);
       let configText = parsed.firebaseConfigText;
-      if (!configText || configText.includes("directionless-beauty")) {
+      if (!configText || !configText.includes("resqmesh-f37b7")) {
         configText = defaultFirebaseConfigStr;
       }
       return {
