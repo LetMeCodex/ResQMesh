@@ -650,6 +650,8 @@ export default function App() {
   const [showDecryptionView, setShowDecryptionView] = useState(false);
   const [decryptingAnimation, setDecryptingAnimation] = useState(false);
   const [syncQueue, setSyncQueue] = useState([]);
+  const [localWsStatus, setLocalWsStatus] = useState('Disconnected');
+  const localWsRef = useRef(null);
   
   const [firebaseStatus, setFirebaseStatus] = useState('Disconnected');
   const [mobileView, setMobileView] = useState('victim'); // 'victim' | 'map' | 'command' (mobile responsiveness state)
@@ -712,6 +714,87 @@ export default function App() {
     }
   }, [firebaseStatus]);
 
+  // Connect and manage Local P2P WebSocket Mesh Connection
+  useEffect(() => {
+    let socket = null;
+    let reconnectTimeout = null;
+
+    const connect = () => {
+      const host = window.location.hostname || 'localhost';
+      const wsUrl = `ws://${host}:8080`;
+      setLocalWsStatus('Connecting');
+      console.log(`[Local Mesh] Connecting to ${wsUrl}...`);
+
+      socket = new WebSocket(wsUrl);
+
+      socket.onopen = () => {
+        console.log('[Local Mesh] Connected to local mesh server.');
+        setLocalWsStatus('Connected');
+      };
+
+      socket.onmessage = (event) => {
+        try {
+          const packet = JSON.parse(event.data);
+          console.log('[Local Mesh] Received packet:', packet);
+
+          if (packet.type === 'sos_alert') {
+            const newAlert = packet.payload;
+            setAlerts(prev => {
+              if (prev.some(a => a.alertId === newAlert.alertId)) return prev;
+              playSystemSound('confirm');
+              injectFeedbackLog(`📡 [Mesh P2P] New SOS packet received from ${newAlert.name}!`, 'info');
+              injectOperationalLog(`New P2P SOS alert: ${newAlert.name}.`);
+              return [newAlert, ...prev];
+            });
+          } else if (packet.type === 'alert_status_update') {
+            const { alertId, status, assignedVolunteerId, etaSecs } = packet;
+            setAlerts(prev => prev.map(a => {
+              if (a.alertId === alertId) {
+                if (status === 'assigned') {
+                  const activeVolunteer = volunteers.find(v => v.volunteerId === assignedVolunteerId);
+                  if (activeVolunteer) {
+                    setDispatchRoute([[activeVolunteer.lat, activeVolunteer.lng], [a.lat, a.lng]]);
+                  }
+                  injectFeedbackLog(`📡 [Mesh P2P] Volunteer assigned to ${a.name}.`, 'info');
+                  return { ...a, status, assignedVolunteerId, etaSecs: etaSecs || 12 };
+                } else if (status === 'resolved') {
+                  injectFeedbackLog(`📡 [Mesh P2P] Case ${a.name} marked resolved by commander.`, 'success');
+                  return { ...a, status };
+                } else if (status === 'rescued') {
+                  injectFeedbackLog(`📡 [Mesh P2P] Case ${a.name} safely rescued!`, 'success');
+                  return { ...a, status };
+                }
+              }
+              return a;
+            }));
+          }
+        } catch (e) {
+          console.error('[Local Mesh] Failed to process message:', e);
+        }
+      };
+
+      socket.onclose = () => {
+        console.log('[Local Mesh] Disconnected. Reconnecting in 5s...');
+        setLocalWsStatus('Disconnected');
+        reconnectTimeout = setTimeout(connect, 5000);
+      };
+
+      socket.onerror = (err) => {
+        console.error('[Local Mesh] WebSocket error:', err);
+        setLocalWsStatus('Error');
+        socket.close();
+      };
+
+      localWsRef.current = socket;
+    };
+
+    connect();
+
+    return () => {
+      if (socket) socket.close();
+      if (reconnectTimeout) clearTimeout(reconnectTimeout);
+    };
+  }, [volunteers]);
 
   // Winning Features states
   const [mapBaseLayer, setMapBaseLayer] = useState('standard');
@@ -1122,6 +1205,13 @@ export default function App() {
           if (firestoreDb && alertToComplete._docId) {
             updateDoc(doc(firestoreDb, 'alerts', alertToComplete._docId), { status: 'rescued' })
               .catch(err => console.error('[Firebase] Failed to update status to rescued in Firestore:', err));
+          }
+          if (localWsRef.current && localWsRef.current.readyState === WebSocket.OPEN) {
+            localWsRef.current.send(JSON.stringify({
+              type: 'alert_status_update',
+              alertId: alertToComplete.alertId,
+              status: 'rescued'
+            }));
           }
           
           setTimeout(() => {
@@ -2309,6 +2399,14 @@ JSON Output Format:
           ...aiResult
         };
 
+        // Broadcast via Local WebSocket Mesh
+        if (localWsRef.current && localWsRef.current.readyState === WebSocket.OPEN) {
+          localWsRef.current.send(JSON.stringify({
+            type: 'sos_alert',
+            payload: newAlert
+          }));
+        }
+
         if (dashboardOfflineMode) {
           setSyncQueue(prev => [newAlert, ...prev]);
           setRelayLogs(prev => [...prev, '⚡ Dashboard is Offline. Packet cached on server gateway waiting for network sync!']);
@@ -2475,6 +2573,15 @@ JSON Output Format:
         assignedVolunteerId: volId,
         etaSecs: 12
       }).catch(err => console.error('[Firebase] Failed to update status to assigned in Firestore:', err));
+    }
+    if (localWsRef.current && localWsRef.current.readyState === WebSocket.OPEN) {
+      localWsRef.current.send(JSON.stringify({
+        type: 'alert_status_update',
+        alertId: alertId,
+        status: 'assigned',
+        assignedVolunteerId: volId,
+        etaSecs: 12
+      }));
     }
     setVolunteers(prev => prev.map(v => 
       v.volunteerId === volId 
@@ -3129,7 +3236,7 @@ JSON Output Format:
                 <span>•</span>
                 <span>Relay Stability: 89%</span>
                 <span>•</span>
-                <span>Last Sync: 1s ago</span>
+                <span>Local Mesh: <span style={{ color: localWsStatus === 'Connected' ? 'var(--color-safety-green)' : 'var(--color-emergency-red)', fontWeight: 'bold' }}>{localWsStatus}</span></span>
               </div>
             </div>
             
@@ -4506,6 +4613,13 @@ JSON Output Format:
                       if (firestoreDb && selectedAlert._docId) {
                         updateDoc(doc(firestoreDb, 'alerts', selectedAlert._docId), { status: 'resolved' })
                           .catch(err => console.error('[Firebase] Failed to update status to resolved in Firestore:', err));
+                      }
+                      if (localWsRef.current && localWsRef.current.readyState === WebSocket.OPEN) {
+                        localWsRef.current.send(JSON.stringify({
+                          type: 'alert_status_update',
+                          alertId: selectedAlert.alertId,
+                          status: 'resolved'
+                        }));
                       }
                       setShowDecryptionView(false);
                       setRescueSuccessPopup({
