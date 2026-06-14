@@ -648,6 +648,7 @@ export default function App() {
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [showAssignModal, setShowAssignModal] = useState(false);
   const [showDecryptionView, setShowDecryptionView] = useState(false);
+  const [decryptingAnimation, setDecryptingAnimation] = useState(false);
   const [syncQueue, setSyncQueue] = useState([]);
   
   const [firebaseStatus, setFirebaseStatus] = useState('Disconnected');
@@ -1615,7 +1616,7 @@ export default function App() {
       }).addTo(arcsLayerRef.current);
     } else if (selectedAlert && mapLayers.meshNodes) {
       const p2pPoints = [
-        [selectedAlert.lat, selectedAlert.lng],
+        [Number(selectedAlert.lat || 30.6515), Number(selectedAlert.lng || 79.0270)],
         [30.6865, 79.0550], // Hop 1: Rambara Guide Karan Thapa
         [30.6515, 79.0270], // Hop 2: Gaurikund Medical NDRF Node
         [30.5732, 79.0435]  // Hop 3: Phata Gateway Base
@@ -1628,7 +1629,9 @@ export default function App() {
     // Drone flight path dashed corridor (curved bypass when landslide blocked or weather storm/cloudburst active)
     if (mapLayers.uavRoutes) {
       const targetAlert = selectedAlert || alerts.find(a => a.severity === 'Critical') || alerts[0];
-      const end = targetAlert ? [targetAlert.lat, targetAlert.lng] : [30.7346, 79.0669];
+      const end = (targetAlert && targetAlert.lat !== undefined && targetAlert.lng !== undefined)
+        ? [Number(targetAlert.lat), Number(targetAlert.lng)]
+        : [30.7346, 79.0669];
       const isRerouted = isLandslideTriggered || weatherIntensity !== 'normal';
       
       if (isRerouted) {
@@ -4295,7 +4298,7 @@ JSON Output Format:
                     <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
                       {selectedAlert.requiredResources?.map((res, index) => (
                         <span key={index} style={{ fontSize: '9px', backgroundColor: 'rgba(245,158,11,0.12)', color: 'var(--color-warning-orange)', padding: '2px 6px', borderRadius: '10px' }}>
-                          {res.toUpperCase()}
+                          {res ? String(res).toUpperCase() : ''}
                         </span>
                       ))}
                     </div>
@@ -4310,7 +4313,7 @@ JSON Output Format:
               <p style={{ fontSize: '13px', lineHeight: '1.5', fontWeight: '500' }}>"{selectedAlert.decryptedMessage}"</p>
               
               <div style={{ display: 'flex', gap: '20px', marginTop: '10px', fontSize: '11px', color: 'var(--color-text-muted)' }}>
-                <span>Coordinates: {selectedAlert.lat.toFixed(5)}, {selectedAlert.lng.toFixed(5)}</span>
+                <span>Coordinates: {typeof selectedAlert.lat === 'number' ? selectedAlert.lat.toFixed(5) : Number(selectedAlert.lat || 0).toFixed(5)}, {typeof selectedAlert.lng === 'number' ? selectedAlert.lng.toFixed(5) : Number(selectedAlert.lng || 0).toFixed(5)}</span>
                 <span>Offline Plus Code: <b>{selectedAlert.plusCode}</b></span>
                 <span>Hops: {selectedAlert.hopCount}</span>
               </div>
@@ -4321,7 +4324,7 @@ JSON Output Format:
               <div style={{ backgroundColor: 'var(--color-panel-dark)', border: '1px solid var(--color-border)', padding: '16px', borderRadius: '12px', marginBottom: '20px' }}>
                 <div style={{ fontSize: '10px', color: 'var(--color-text-muted)', textTransform: 'uppercase', marginBottom: '8px' }}>Packet Transit & AI Verification Timeline</div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  {(selectedAlert.triageTimeline || [
+                  {(Array.isArray(selectedAlert.triageTimeline) ? selectedAlert.triageTimeline : [
                     `10:02 AM - SOS Packet Generated`,
                     `10:14 AM - Forwarded through 2 Relays`,
                     `10:25 AM - Uploaded via Gateway`,
