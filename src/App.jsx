@@ -725,7 +725,19 @@ export default function App() {
       setLocalWsStatus('Connecting');
       console.log(`[Local Mesh] Connecting to ${wsUrl}...`);
 
-      socket = new WebSocket(wsUrl);
+      try {
+        const isHttps = window.location.protocol === 'https:';
+        const finalWsUrl = isHttps ? `wss://${host}:8080` : wsUrl;
+        socket = new WebSocket(finalWsUrl);
+      } catch (err) {
+        console.warn('[Local Mesh] WebSocket initialization failed (likely blocked on HTTPS):', err.message);
+        setLocalWsStatus('Error');
+        // Do not retry connection loops indefinitely on production HTTPS
+        if (window.location.protocol !== 'https:') {
+          reconnectTimeout = setTimeout(connect, 10000);
+        }
+        return;
+      }
 
       socket.onopen = () => {
         console.log('[Local Mesh] Connected to local mesh server.');
