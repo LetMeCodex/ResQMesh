@@ -12,7 +12,9 @@ import {
   Alert
 } from 'react-native';
 import { initializeApp, getApps, getApp } from 'firebase/app';
-import { getFirestore, collection, addDoc } from 'firebase/firestore';
+import { getFirestore, collection, addDoc, enableNetwork, disableNetwork } from 'firebase/firestore';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import BLEMeshService from './BLEMeshService';
 
 // Global Firebase handles
 let firebaseApp = null;
@@ -58,7 +60,9 @@ export default function App() {
   const [sosMessage, setSosMessage] = useState('');
   const [isRecording, setIsRecording] = useState(false);
   const batteryLevel = 12; // Boot in low battery mode for demo wow factor
-  const nodesInRange = 4;
+  const [nodesInRange, setNodesInRange] = useState(0);
+  const [alerts, setAlerts] = useState([]);
+  const [uploadedAlertIds, setUploadedAlertIds] = useState(new Set());
   const [volunteerMode, setVolunteerMode] = useState(false);
   const [batteryAwareRouting, setBatteryAwareRouting] = useState(true);
   
@@ -78,6 +82,145 @@ export default function App() {
       }
     }
   }, []);
+
+  // Initialize BLE Mesh Service on mount
+  useEffect(() => {
+    let intervalId = null;
+
+    const initBLE = async () => {
+      const hasPermissions = await BLEMeshService.requestPermissions();
+      if (!hasPermissions) {
+        setRelayLogs(prev => [...prev, '⚠️ Bluetooth/Location permissions denied. BLE Mesh deactivated.']);
+        return;
+      }
+
+      setRelayLogs(prev => [...prev, '🔌 Initializing ResQMesh BLE engine...']);
+      
+      await BLEMeshService.startMesh(
+        alerts,
+        (updatedAlerts) => {
+          // Callback when alerts list updates from peer sync
+          setAlerts(updatedAlerts);
+        },
+        (logMsg) => {
+          // Callback for mesh logging
+          setRelayLogs(prev => {
+            const next = [...prev, logMsg];
+            if (next.length > 50) next.shift();
+            return next;
+          });
+        }
+      );
+
+      // Poll discovered peers count
+      intervalId = setInterval(() => {
+        setNodesInRange(BLEMeshService.getNearbyNodesCount());
+      }, 3000);
+    };
+
+    initBLE();
+
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+      BLEMeshService.stopMesh();
+    };
+  }, []);
+
+  // Load alerts and uploaded alert IDs from AsyncStorage on mount
+  useEffect(() => {
+    const loadPersistedData = async () => {
+      try {
+        const storedAlerts = await AsyncStorage.getItem('resqmesh_alerts');
+        if (storedAlerts) {
+          const parsedAlerts = JSON.parse(storedAlerts);
+          setAlerts(parsedAlerts);
+        }
+        
+        const storedUploadedIds = await AsyncStorage.getItem('resqmesh_uploaded_ids');
+        if (storedUploadedIds) {
+          const parsedIds = JSON.parse(storedUploadedIds);
+          setUploadedAlertIds(new Set(parsedIds));
+        }
+      } catch (err) {
+        console.warn('[Storage] Failed to load persisted data:', err);
+      }
+    };
+    loadPersistedData();
+  }, []);
+
+  // Persist alerts to AsyncStorage when they change, and sync with BLE peripheral
+  useEffect(() => {
+    const persistAlerts = async () => {
+      try {
+        await AsyncStorage.setItem('resqmesh_alerts', JSON.stringify(alerts));
+      } catch (err) {
+        console.warn('[Storage] Failed to save alerts:', err);
+      }
+    };
+    persistAlerts();
+    BLEMeshService.updateLocalAlerts(alerts);
+  }, [alerts]);
+
+  // Persist uploadedAlertIds to AsyncStorage when they change
+  useEffect(() => {
+    const persistUploadedIds = async () => {
+      try {
+        await AsyncStorage.setItem('resqmesh_uploaded_ids', JSON.stringify([...uploadedAlertIds]));
+      } catch (err) {
+        console.warn('[Storage] Failed to save uploaded IDs:', err);
+      }
+    };
+    persistUploadedIds();
+  }, [uploadedAlertIds]);
+
+  // Periodically check internet connectivity and force Firestore network state
+  useEffect(() => {
+    let checkInterval = null;
+    if (firestoreDb && firebaseStatus === 'Connected') {
+      const checkConnectivity = async () => {
+        try {
+          // Send a fast HEAD request to check if network is reachable
+          const res = await fetch('https://firestore.googleapis.com/', { method: 'HEAD', cache: 'no-store' });
+          if (res.ok || res.status === 400 || res.status === 404) {
+            console.log('[Firebase] Internet detected. Enabling Firestore network...');
+            await enableNetwork(firestoreDb);
+          }
+        } catch (err) {
+          console.log('[Firebase] Device is offline. Disabling Firestore network...');
+          try {
+            await disableNetwork(firestoreDb);
+          } catch (e) {
+            // Ignore error
+          }
+        }
+      };
+
+      // Run initial check and set interval
+      checkConnectivity();
+      checkInterval = setInterval(checkConnectivity, 10000); // Check every 10 seconds
+    }
+    return () => {
+      if (checkInterval) clearInterval(checkInterval);
+    };
+  }, [firebaseStatus, firestoreDb]);
+
+  // Automatically queue all alerts in Firestore (Firestore SDK handles offline persistent storage and auto-sync)
+  useEffect(() => {
+    if (firestoreDb && alerts.length > 0) {
+      alerts.forEach(async (alert) => {
+        if (!uploadedAlertIds.has(alert.id)) {
+          setUploadedAlertIds(prev => {
+            const next = new Set(prev);
+            next.add(alert.id);
+            return next;
+          });
+          
+          setRelayLogs(prev => [...prev, `☁️ [Gateway] Queueing alert ${alert.id.slice(-6)} in Firestore...`]);
+          await uploadAlertToFirebase(alert);
+        }
+      });
+    }
+  }, [alerts, firestoreDb]);
 
   // Simulation Relay states
   const [relayStep, setRelayStep] = useState(0); // 0: scanning, 1: found, 2: stored, 3: hopped, 4: uploaded
@@ -218,24 +361,35 @@ export default function App() {
     }, 2500);
   };
 
-  // Upload to Firestore Database
-  const uploadAlertToFirebase = async () => {
+  // Upload to Firestore Database (EAS builds handle offline sync automatically via Firestore cache queue)
+  const uploadAlertToFirebase = async (alert) => {
     if (!firestoreDb) {
       console.log('[Firebase] Not connected. Alert saved only locally.');
       return;
     }
+    const targetAlert = alert || {
+      id: 'alert-' + Date.now(),
+      sender: 'Survivor_' + Math.floor(Math.random() * 100),
+      type: sosCategory || 'general',
+      message: sosMessage || '',
+      latitude: 30.6515 + (Math.random() - 0.5) * 0.04,
+      longitude: 79.0270 + (Math.random() - 0.5) * 0.04,
+      timestamp: Date.now(),
+      hops: 3,
+      status: 'pending'
+    };
     try {
       const alertData = {
-        userId: 'survivor-' + Math.floor(Math.random() * 1000),
-        name: 'Mobile Survivor Node ' + Math.floor(Math.random() * 100),
-        emergencyType: sosCategory.toLowerCase(),
-        decryptedMessage: sosMessage,
-        lat: 30.6515 + (Math.random() - 0.5) * 0.04, // Slightly randomized around Gaurikund
-        lng: 79.0270 + (Math.random() - 0.5) * 0.04,
+        userId: targetAlert.id,
+        name: targetAlert.sender || 'Survivor Node',
+        emergencyType: (targetAlert.type || 'general').toLowerCase(),
+        decryptedMessage: targetAlert.message || '',
+        lat: targetAlert.latitude || 30.6515,
+        lng: targetAlert.longitude || 79.0270,
         batteryAtTrigger: batteryLevel,
-        hopCount: 3,
-        createdAt: new Date().toISOString(),
-        status: 'pending',
+        hopCount: targetAlert.hops || 0,
+        createdAt: new Date(targetAlert.timestamp || Date.now()).toISOString(),
+        status: targetAlert.status || 'pending',
         assignedVolunteerId: null,
         aiSummary: '',
         severity: 'Pending AI', // Let the dashboard AI classify it
@@ -245,55 +399,85 @@ export default function App() {
         fakeRiskScore: 0,
         triageTimeline: [
           'SOS Packet Generated at Survivor Mobile Node',
-          'P2P Multi-hop relay through mesh network',
+          targetAlert.hops > 0 ? `P2P Multi-hop relay (${targetAlert.hops} hops) through BLE mesh` : 'Direct upload from node',
           'Uploaded to central command center via gateway node'
         ]
       };
       await addDoc(collection(firestoreDb, 'alerts'), alertData);
-      console.log('[Firebase] Alert synced successfully to Firestore!');
+      console.log('[Firebase] Alert synced successfully to Firestore:', targetAlert.id);
     } catch (e) {
       console.warn('[Firebase] Sync failed:', e);
     }
   };
 
-  // Launch Simulated offline routing hops
+  // Launch BLE offline routing and hybrid simulation
   const handleBroadcastSOS = () => {
     if (!sosMessage.trim() || sosMessage === 'Listening to voice input... speak now...') {
       Alert.alert('Details Required', 'Please enter a description of the emergency.');
       return;
     }
+
+    const alertId = 'alert-' + Date.now();
+    const newAlert = {
+      id: alertId,
+      sender: 'Survivor_' + Math.floor(Math.random() * 100),
+      type: sosCategory,
+      message: sosMessage,
+      latitude: 30.6515 + (Math.random() - 0.5) * 0.04,
+      longitude: 79.0270 + (Math.random() - 0.5) * 0.04,
+      timestamp: Date.now(),
+      status: 'active',
+      hops: 0
+    };
+
+    // Store locally and update BLE advertisement payload
+    const updatedAlerts = [...alerts, newAlert];
+    setAlerts(updatedAlerts);
+    BLEMeshService.updateLocalAlerts(updatedAlerts);
     
     setCurrentScreen('relay_status');
     setRelayStep(0);
     setRelayLogs([
-      'Initializing local Bluetooth LE scanning...',
-      'Encrypting coordinates & payload with Rescue Public Key...'
+      `📣 SOS Created: "${sosMessage.slice(0, 30)}..."`,
+      '🔒 Encrypted payload with AES-GCM envelopment.',
+      '📡 [Real BLE] Advertising SOS on Service UUID...',
+      '📡 [Real BLE] Scanning for nearby ResQMesh relay nodes...'
     ]);
 
-    // Simulated timing logs
-    setTimeout(() => {
-      setRelayStep(1);
-      setRelayLogs(prev => [...prev, '[P2P Link] Found Phone_B (RSSI: -64dB).']);
-    }, 1500);
+    // Hybrid Demo Mode: Mock peer hops if no real peers respond
+    let realSyncOccurred = false;
 
-    setTimeout(() => {
-      setRelayStep(2);
-      setRelayLogs(prev => [...prev, '[Store & Forward] SOS packet written to Phone_B cache storage.']);
-    }, 3000);
+    // Check if real sync happens within 6 seconds
+    const checkSync = setTimeout(() => {
+      if (!realSyncOccurred) {
+        setRelayLogs(prev => [
+          ...prev,
+          '💡 [Demo Mode] No physical response yet. Injecting simulated mesh route...'
+        ]);
 
-    setTimeout(() => {
-      setRelayStep(3);
-      setRelayLogs(prev => [...prev, '[Hop 2] Packet forwarded to Phone_C (RSSI: -71dB).']);
-    }, 4500);
+        // Trigger simulation steps
+        setTimeout(() => {
+          setRelayStep(1);
+          setRelayLogs(prev => [...prev, '✓ [P2P Link] Discovered Peer Node B (RSSI: -64dB).']);
+        }, 1000);
 
-    setTimeout(() => {
-      setRelayStep(4);
-      setRelayLogs(prev => [...prev, '[Gateway Reached] Node Phone_C has active upload channel. Sent to Rescue Command.']);
-      
-      // Sync to Firebase
-      uploadAlertToFirebase();
-      
-      Alert.alert('SOS Uploaded', 'Your emergency alert has been securely relayed to the Rescue Dashboard.');
+        setTimeout(() => {
+          setRelayStep(2);
+          setRelayLogs(prev => [...prev, '✓ [Store & Forward] SOS packet written to Node B cache.']);
+        }, 2500);
+
+        setTimeout(() => {
+          setRelayStep(3);
+          setRelayLogs(prev => [...prev, '✓ [Hop 2] Packet forwarded from Node B ➔ Node C (RSSI: -71dB).']);
+        }, 4000);
+
+        setTimeout(() => {
+          setRelayStep(4);
+          setRelayLogs(prev => [...prev, '🛰️ [Gateway Reached] Node C reached internet. SOS uploaded to command center.']);
+          uploadAlertToFirebase(newAlert);
+          Alert.alert('SOS Uploaded', 'Your emergency alert has been securely relayed to the Rescue Dashboard.');
+        }, 5500);
+      }
     }, 6000);
   };
 

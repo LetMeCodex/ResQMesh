@@ -28,10 +28,24 @@ import {
   TrendingDown,
   Cpu,
   Compass,
-  Zap
+  Zap,
+  ChevronDown,
+  ChevronUp,
+  HelpCircle
 } from 'lucide-react';
 import { initializeApp, getApps } from 'firebase/app';
 import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, doc, updateDoc } from 'firebase/firestore';
+import {
+  triageEmergency,
+  getCommanderSituation,
+  matchVolunteer,
+  getDisasterSummary,
+  generateOperationalLogs
+} from '../lib/asi/client';
+
+import { useResizablePanels } from './hooks/useResizablePanels';
+import { ResizableDivider } from './components/layout/ResizableDivider';
+import { ResizableDashboardLayout } from './components/layout/ResizableDashboardLayout';
 
 // Global Firebase handles
 let firebaseApp = null;
@@ -544,6 +558,131 @@ const INITIAL_RESOURCES = [
   { resourceId: 'res-3', type: 'food_water', quantity: 300, isAvailable: false, lat: 30.7346, lng: 79.0669, description: 'Critical dry rations depletion reported for isolated Kedarnath pilgrims.', reportedGap: true }
 ];
 
+const TUTORIAL_STEPS = [
+  {
+    title: 'Send SOS, even when networks fail',
+    text: 'Victims open the ResQMesh mobile app and press SOS. The app creates an emergency alert with location, status, and basic rescue needs.',
+    svg: (
+      <svg viewBox="0 0 400 180" width="100%" height="180" style={{ display: 'block', margin: '0 auto' }}>
+        <path d="M 50 150 L 120 70 L 190 150 M 130 150 L 220 50 L 310 150" fill="none" stroke="#64748B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        <rect x="250" y="30" width="80" height="130" rx="12" fill="#FFFFFF" stroke="#0F172A" strokeWidth="2.5" />
+        <circle cx="290" cy="95" r="22" fill="#FEF2F2" stroke="#EF4444" strokeWidth="2.5" />
+        <path d="M 290 85 L 290 105 M 280 95 L 300 95" stroke="#EF4444" strokeWidth="2.5" strokeLinecap="round" />
+        <text x="290" y="132" textAnchor="middle" fill="#EF4444" style={{ fontSize: '9px', fontWeight: '800', fontFamily: 'var(--font-mono)' }}>SOS</text>
+        <circle cx="90" cy="115" r="10" fill="none" stroke="#0F172A" strokeWidth="2.5" />
+        <path d="M 90 125 L 90 150 M 80 135 L 100 135 M 90 150 L 80 165 M 90 150 L 100 165" stroke="#0F172A" strokeWidth="2.5" strokeLinecap="round" />
+        <path d="M 340 70 A 30 30 0 0 1 340 120" fill="none" stroke="#EF4444" strokeWidth="2" strokeLinecap="round" strokeDasharray="3,3" />
+        <path d="M 350 60 A 45 45 0 0 1 350 130" fill="none" stroke="#EF4444" strokeWidth="2.5" strokeLinecap="round" />
+      </svg>
+    )
+  },
+  {
+    title: 'Nearby phones become relay nodes',
+    text: 'If internet is weak or unavailable, nearby devices pass the alert through an offline peer-to-peer mesh network.',
+    svg: (
+      <svg viewBox="0 0 400 180" width="100%" height="180" style={{ display: 'block', margin: '0 auto' }}>
+        <rect x="70" y="55" width="56" height="96" rx="8" fill="#FFFFFF" stroke="#0F172A" strokeWidth="2.5" />
+        <circle cx="98" cy="103" r="12" fill="#EFF6FF" stroke="#3B82F6" strokeWidth="2" />
+        <path d="M 94 103 L 98 107 L 104 99" stroke="#3B82F6" strokeWidth="2" fill="none" strokeLinecap="round" />
+        
+        <rect x="274" y="55" width="56" height="96" rx="8" fill="#FFFFFF" stroke="#0F172A" strokeWidth="2.5" />
+        <circle cx="302" cy="103" r="12" fill="#EFF6FF" stroke="#3B82F6" strokeWidth="2" />
+        
+        <rect x="172" y="30" width="56" height="96" rx="8" fill="#FFFFFF" stroke="#0F172A" strokeWidth="2.5" />
+        <circle cx="200" cy="78" r="12" fill="#EFF6FF" stroke="#3B82F6" strokeWidth="2" />
+        
+        <path d="M 126 90 Q 150 70 172 70" fill="none" stroke="#3B82F6" strokeWidth="2.5" strokeLinecap="round" strokeDasharray="4,4" />
+        <path d="M 228 70 Q 250 70 274 90" fill="none" stroke="#3B82F6" strokeWidth="2.5" strokeLinecap="round" strokeDasharray="4,4" />
+        <path d="M 126 115 Q 200 140 274 115" fill="none" stroke="#3B82F6" strokeWidth="2.5" strokeLinecap="round" strokeDasharray="4,4" />
+        
+        <path d="M 152 75 A 15 15 0 0 1 156 95" fill="none" stroke="#3B82F6" strokeWidth="1.5" strokeLinecap="round" />
+        <path d="M 244 75 A 15 15 0 0 0 240 95" fill="none" stroke="#3B82F6" strokeWidth="1.5" strokeLinecap="round" />
+      </svg>
+    )
+  },
+  {
+    title: 'Alerts reach the emergency grid',
+    text: 'The alert moves through local mesh nodes, gateway links, and rescue relays until it reaches the ResQMesh command center.',
+    svg: (
+      <svg viewBox="0 0 400 180" width="100%" height="180" style={{ display: 'block', margin: '0 auto' }}>
+        <path d="M 30 150 L 150 80 L 250 120 L 370 50" fill="none" stroke="#64748B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        <circle cx="80" cy="120" r="7" fill="#F0FDF4" stroke="#22C55E" strokeWidth="2.5" />
+        <circle cx="160" cy="95" r="7" fill="#F0FDF4" stroke="#22C55E" strokeWidth="2.5" />
+        <circle cx="230" cy="115" r="7" fill="#F0FDF4" stroke="#22C55E" strokeWidth="2.5" />
+        <path d="M 87 116 L 153 99 L 223 111 L 333 75" fill="none" stroke="#22C55E" strokeWidth="2" strokeDasharray="4,4" strokeLinecap="round" />
+        <line x1="340" y1="130" x2="340" y2="70" stroke="#0F172A" strokeWidth="3" strokeLinecap="round" />
+        <line x1="330" y1="130" x2="340" y2="70" stroke="#0F172A" strokeWidth="2" strokeLinecap="round" />
+        <line x1="350" y1="130" x2="340" y2="70" stroke="#0F172A" strokeWidth="2" strokeLinecap="round" />
+        <circle cx="340" cy="65" r="4" fill="#3B82F6" />
+        <path d="M 325 60 A 15 15 0 0 1 355 60" fill="none" stroke="#3B82F6" strokeWidth="2" strokeLinecap="round" />
+        <path d="M 315 50 A 25 25 0 0 1 365 50" fill="none" stroke="#3B82F6" strokeWidth="2.5" strokeLinecap="round" />
+      </svg>
+    )
+  },
+  {
+    title: 'Command center ranks severity',
+    text: 'The dashboard groups alerts by urgency, battery risk, road blockage, medical need, and rescue priority.',
+    svg: (
+      <svg viewBox="0 0 400 180" width="100%" height="180" style={{ display: 'block', margin: '0 auto' }}>
+        <rect x="70" y="20" width="260" height="140" rx="16" fill="#FFFFFF" stroke="#E2E8F0" strokeWidth="2.5" />
+        <rect x="70" y="20" width="260" height="140" rx="16" fill="none" stroke="#0F172A" strokeWidth="1" strokeDasharray="3,3" />
+        <line x1="86" y1="45" x2="314" y2="45" stroke="#E2E8F0" strokeWidth="1.5" />
+        <circle cx="96" cy="33" r="5" fill="#3B82F6" />
+        <rect x="110" y="28" width="80" height="10" rx="4" fill="#F1F5F9" />
+        <rect x="86" y="58" width="228" height="28" rx="8" fill="#FEF2F2" stroke="#FECACA" strokeWidth="1.5" />
+        <circle cx="102" cy="72" r="5" fill="#EF4444" />
+        <rect x="118" y="67" width="100" height="10" rx="4" fill="#0F172A" opacity="0.8" />
+        <rect x="238" y="64" width="64" height="16" rx="8" fill="#EF4444" />
+        <rect x="86" y="96" width="228" height="28" rx="8" fill="#FFFBEB" stroke="#FDE68A" strokeWidth="1.5" />
+        <circle cx="102" cy="110" r="5" fill="#F59E0B" />
+        <rect x="118" y="105" width="100" height="10" rx="4" fill="#0F172A" opacity="0.8" />
+        <rect x="238" y="102" width="64" height="16" rx="8" fill="#F59E0B" />
+        <rect x="86" y="134" width="228" height="12" rx="4" fill="#F0FDF4" stroke="#BBF7D0" strokeWidth="1" />
+      </svg>
+    )
+  },
+  {
+    title: 'AI helps coordinate rescue response',
+    text: 'Incident Commander AI suggests the next best action, such as dispatching volunteers, routing ITBP units, or requesting supply support.',
+    svg: (
+      <svg viewBox="0 0 400 180" width="100%" height="180" style={{ display: 'block', margin: '0 auto' }}>
+        <rect x="165" y="55" width="70" height="70" rx="14" fill="#EFF6FF" stroke="#3B82F6" strokeWidth="3" />
+        <rect x="180" y="70" width="40" height="40" rx="8" fill="#FFFFFF" stroke="#0F172A" strokeWidth="2.5" />
+        <line x1="165" y1="75" x2="150" y2="75" stroke="#3B82F6" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="165" y1="90" x2="150" y2="90" stroke="#3B82F6" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="165" y1="105" x2="150" y2="105" stroke="#3B82F6" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="235" y1="75" x2="250" y2="75" stroke="#3B82F6" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="235" y1="90" x2="250" y2="90" stroke="#3B82F6" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="235" y1="105" x2="250" y2="105" stroke="#3B82F6" strokeWidth="2.5" strokeLinecap="round" />
+        <path d="M 150 90 L 100 90 L 100 115" fill="none" stroke="#64748B" strokeWidth="2" strokeDasharray="3,3" strokeLinecap="round" />
+        <rect x="75" y="115" width="50" height="30" rx="6" fill="#FFFFFF" stroke="#EF4444" strokeWidth="2" />
+        <path d="M 250 90 L 300 90 L 300 115" fill="none" stroke="#64748B" strokeWidth="2" strokeDasharray="3,3" strokeLinecap="round" />
+        <circle cx="300" cy="130" r="12" fill="#FFFFFF" stroke="#0F172A" strokeWidth="2" />
+        <path d="M 296 132 Q 300 126 304 132" fill="none" stroke="#0F172A" strokeWidth="2" />
+        <path d="M 200 55 L 200 20 L 260 20" fill="none" stroke="#3B82F6" strokeWidth="2" strokeLinecap="round" />
+        <circle cx="265" cy="20" r="4" fill="#22C55E" />
+      </svg>
+    )
+  },
+  {
+    title: 'Real people complete the rescue',
+    text: 'Volunteers, responders, and local guides use the system to find stranded groups faster and coordinate help safely.',
+    svg: (
+      <svg viewBox="0 0 400 180" width="100%" height="180" style={{ display: 'block', margin: '0 auto' }}>
+        <path d="M 40 150 L 150 70 L 240 150" fill="none" stroke="#64748B" strokeWidth="2" strokeLinecap="round" />
+        <line x1="280" y1="150" x2="280" y2="40" stroke="#0F172A" strokeWidth="3" strokeLinecap="round" />
+        <path d="M 280 40 L 330 55 L 280 70 Z" fill="#F0FDF4" stroke="#22C55E" strokeWidth="2.5" strokeLinejoin="round" />
+        <text x="290" y="60" fill="#22C55E" style={{ fontSize: '9px', fontWeight: '800', fontFamily: 'var(--font-heading)' }}>SAFE ZONE</text>
+        <circle cx="150" cy="100" r="8" fill="none" stroke="#0F172A" strokeWidth="2" />
+        <path d="M 150 108 L 150 130 M 138 116 L 150 112 L 162 116 M 150 130 L 140 148 M 150 130 L 160 148" stroke="#0F172A" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+        <circle cx="180" cy="110" r="8" fill="none" stroke="#0F172A" strokeWidth="2" />
+        <path d="M 180 118 L 180 135 M 168 122 Q 175 116 180 122 M 180 135 L 174 148 M 180 135 L 186 148" stroke="#0F172A" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+        <line x1="162" y1="116" x2="168" y2="122" stroke="#22C55E" strokeWidth="3" strokeLinecap="round" />
+      </svg>
+    )
+  }
+];
+
 export default function App() {
   // --- Global State ---
   const [alerts, setAlerts] = useState(() => {
@@ -825,6 +964,40 @@ export default function App() {
   const [showPhoneSimulator, setShowPhoneSimulator] = useState(true);
   const [activeTab, setActiveTab] = useState('alerts');
 
+  const [isMobileStacked, setIsMobileStacked] = useState(false);
+
+  useEffect(() => {
+    const handleMediaQuery = () => {
+      setIsMobileStacked(window.innerWidth < 1024);
+    };
+    handleMediaQuery();
+    window.addEventListener('resize', handleMediaQuery);
+    return () => window.removeEventListener('resize', handleMediaQuery);
+  }, []);
+
+  const {
+    width: sidebarWidth,
+    isDragging: isSidebarDragging,
+    sidebarRef,
+    phoneRef,
+    startDrag: startSidebarDrag,
+    handleKeyDown: handleSidebarKeyDown,
+    minWidth: sidebarMinWidth,
+    maxWidth: sidebarMaxWidth
+  } = useResizablePanels({
+    initialWidth: 460,
+    minWidth: 340,
+    maxWidth: 720,
+    mapMinWidth: 480,
+    localStorageKey: 'resqmesh-command-panel-width',
+    phoneVisible: showPhoneSimulator,
+    onResize: () => {
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.invalidateSize();
+      }
+    }
+  });
+
   // Focus mode & Map Layer options (Mission Control / layers dropdown navbar)
   const [isFocusMode, setIsFocusMode] = useState(true);
   const [mapLayers, setMapLayers] = useState({
@@ -832,17 +1005,17 @@ export default function App() {
     hazards: true, // category
     rescue: true, // category
     network: false, // category
-    feed: false, // category
-    legend: false, // category
+    feed: true,
+    legend: true,
     
     timeline: false,
     incidentCommander: false,
     telemetry: false,
-    meshRadius: false,
-    meshNodes: false,
+    meshRadius: true,
+    meshNodes: true,
     rescueRoutes: true,
     uavRoutes: false,
-    hazardZones: false,
+    hazardZones: true,
     toastAlerts: false
   });
   const [isLayersDropdownOpen, setIsLayersDropdownOpen] = useState(false);
@@ -1039,13 +1212,13 @@ export default function App() {
   const [isMapShaking, setIsMapShaking] = useState(false);   // camera shake on critical alert
   const [isMapFlashing, setIsMapFlashing] = useState(false); // red vignette flash
   const [feedViewTab, setFeedViewTab] = useState('feed');    // 'feed' | 'legend'
-  const [isLandslideTriggered, setIsLandslideTriggered] = useState(false);
+  const [isLandslideTriggered, setIsLandslideTriggered] = useState(true);
   const [displayedConfidence, setDisplayedConfidence] = useState(0);
   const [isButtonTransmitting, setIsButtonTransmitting] = useState(false);
   const [isIslandExpanded, setIsIslandExpanded] = useState(false);
   const [islandTilt, setIslandTilt] = useState({ x: 0, y: 0 });
 
-  const [isCommunityMode, setIsCommunityMode] = useState(false);
+  const [isCommunityMode, setIsCommunityMode] = useState(true);
   const [weatherIntensity, setWeatherIntensity] = useState('normal'); // 'normal' | 'storm' | 'cloudburst'
   const [droneEta, setDroneEta] = useState(151); // 2m 31s = 151s
   const [sosTransmissionStep, setSosTransmissionStep] = useState(null); // null | 0..6
@@ -1102,6 +1275,137 @@ export default function App() {
     { id: 3, time: '02:40:12', text: 'Heltec-V3 Relay Mesh Sync Active', type: 'info' }
   ]);
 
+  // --- ASI:ONE Integration States ---
+  const [commanderData, setCommanderData] = useState(null);
+  const [commanderLoading, setCommanderLoading] = useState(false);
+  const [commanderOffline, setCommanderOffline] = useState(false);
+  const [isAiCardExpanded, setIsAiCardExpanded] = useState(false);
+  const lastAiCallTimeRef = useRef(0);
+
+  // Onboarding Tutorial states
+  const [showTutorial, setShowTutorial] = useState(() => {
+    return !localStorage.getItem('resqmesh_onboarding_completed');
+  });
+  const [tutorialStep, setTutorialStep] = useState(0);
+  const [dontShowAgain, setDontShowAgain] = useState(() => {
+    return !!localStorage.getItem('resqmesh_onboarding_completed');
+  });
+
+  const completeOnboarding = () => {
+    localStorage.setItem('resqmesh_onboarding_completed', 'true');
+    setShowTutorial(false);
+  };
+
+  // Onboarding Escape Key Handler
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        setShowTutorial(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  const [disasterSummaryData, setDisasterSummaryData] = useState(null);
+  const [disasterSummaryLoading, setDisasterSummaryLoading] = useState(false);
+
+  const [matchRecommendation, setMatchRecommendation] = useState(null);
+  const [matchLoading, setMatchLoading] = useState(false);
+
+  const injectAIFeedbackLog = async (eventType, eventDetails = '') => {
+    try {
+      const logItem = await generateOperationalLogs({ eventType, eventDetails });
+      const now = new Date();
+      const timeStr = now.toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      setSystemFeedbackLogs(prev => {
+        const updated = [...prev, {
+          id: Date.now() + Math.random(),
+          time: logItem.timestamp || timeStr,
+          text: `${logItem.title}: ${logItem.message}`,
+          type: logItem.type
+        }];
+        return updated.slice(-4);
+      });
+    } catch (err) {
+      console.warn('Failed to inject AI operational log, falling back:', err);
+      injectFeedbackLog(`Log: ${eventType} ${eventDetails}`, 'info');
+    }
+  };
+
+  // Trigger update of Incident Commander and Disaster Summary when variables change
+  useEffect(() => {
+    const updateAIStatus = async () => {
+      const now = Date.now();
+      // Rate-limit check: only request every 20 seconds to prevent API 429 rate limit issues
+      if (now - lastAiCallTimeRef.current < 20000) {
+        return;
+      }
+      lastAiCallTimeRef.current = now;
+
+      setCommanderLoading(true);
+      try {
+        const activeAlerts = alerts.filter(a => a.status !== 'rescued' && a.status !== 'resolved');
+        const activeVolunteers = volunteers.filter(v => v.availability === 'active');
+        const result = await getCommanderSituation({
+          alerts: activeAlerts,
+          volunteers: activeVolunteers,
+          weather: weatherIntensity,
+          networkStatus: mobileNetwork === 'online' ? 'Cellular Active' : 'Cellular Outage',
+          hazards: isLandslideTriggered ? 'Sonprayag landslide' : 'None',
+          completedRescuesCount: completedMissionsCount
+        });
+        setCommanderData(result);
+        setCommanderOffline(!!result.isFallback);
+      } catch (err) {
+        console.warn('Failed to update Incident Commander via API:', err);
+      } finally {
+        setCommanderLoading(false);
+      }
+
+      setDisasterSummaryLoading(true);
+      try {
+        const activeCount = alerts.filter(a => a.status !== 'rescued' && a.status !== 'resolved').length;
+        const result = await getDisasterSummary({
+          activeCount,
+          weather: weatherIntensity,
+          networkStatus: mobileNetwork === 'online' ? 'Cellular Active' : 'Cellular Outage',
+          nodesCount: 5
+        });
+        setDisasterSummaryData(result);
+      } catch (err) {
+        console.warn('Failed to update Disaster Summary via API:', err);
+      } finally {
+        setDisasterSummaryLoading(false);
+      }
+    };
+
+    updateAIStatus();
+  }, [alerts, volunteers, weatherIntensity, mobileNetwork, isLandslideTriggered, completedMissionsCount]);
+
+  // Trigger volunteer matching recommendation on Modal open
+  useEffect(() => {
+    if (showAssignModal && selectedAlert) {
+      const runMatching = async () => {
+        setMatchLoading(true);
+        try {
+          const result = await matchVolunteer({
+            alert: selectedAlert,
+            volunteers: volunteers.filter(v => v.availability === 'active')
+          });
+          setMatchRecommendation(result);
+        } catch (err) {
+          console.warn('Match volunteer failed:', err);
+        } finally {
+          setMatchLoading(false);
+        }
+      };
+      runMatching();
+    } else {
+      setMatchRecommendation(null);
+    }
+  }, [showAssignModal, selectedAlert, volunteers]);
+
   // Live Auto-updating feed ticker list and effect
   const upcomingLogsRef = useRef([
     { text: 'UAV rerouted due to wind conditions', type: 'warning' },
@@ -1136,6 +1440,7 @@ export default function App() {
 
   // Critical event popup — fires once 18s: SIREN + SHAKE + FLASH + feed injection
   useEffect(() => {
+    if (isLandslideTriggered) return;
     const t = setTimeout(() => {
       // 1. Landslide warning alarm (low alarm sweep) & tactical siren
       playSystemSound('landslideWarning');
@@ -1150,19 +1455,12 @@ export default function App() {
       setIsLandslideTriggered(true);
       // 5. Show popup
       setCriticalEventPopup({ title: '⚠ LANDSLIDE DETECTED', detail: 'NH-107 Route Compromised — Sonprayag Sector' });
-      // 6. Inject burst of operational feed logs
-      const now = new Date();
-      const ts = (offset) => new Date(now.getTime() + offset).toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
-      setSystemFeedbackLogs(prev => [
-        ...prev,
-        { id: Date.now() + Math.random(), time: ts(0),    text: 'LANDSLIDE DETECTED — Sonprayag sector', type: 'danger' },
-        { id: Date.now() + 1 + Math.random(), time: ts(2000),  text: 'NH-107 marked unstable — route compromised', type: 'danger' },
-        { id: Date.now() + 2 + Math.random(), time: ts(4000),  text: 'UAV rerouted via alternate Gaurikund corridor', type: 'warning' }
-      ].slice(-4));
+      // 6. Inject dynamic operational feed logs
+      injectAIFeedbackLog('landslide');
       setTimeout(() => setCriticalEventPopup(null), 6000);
     }, 18000);
     return () => clearTimeout(t);
-  }, []);
+  }, [isLandslideTriggered]);
 
   // Alert interruption toast — fires once 30s after mount
   useEffect(() => {
@@ -1238,8 +1536,7 @@ export default function App() {
             });
             setTimeout(() => setRescueSuccessPopup(null), 4000);
 
-            injectFeedbackLog(`✓ Rescue Complete: ${alertToComplete.name} safely evacuated.`, 'success');
-            injectOperationalLog(`Rescue Complete: ${alertToComplete.name} safely evacuated.`);
+            injectAIFeedbackLog('rescue_complete', alertToComplete.name);
           }, 0);
         }
         return updated;
@@ -2084,127 +2381,54 @@ export default function App() {
 
   // Simulated AI Engine triage
   const triageAlertWithAI = async (message, category, battery, location) => {
-    if (settings.geminiApiKey) {
-      try {
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${settings.geminiApiKey}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{
-              parts: [{
-                text: `You are an AI Triage Coordinator for ResQMesh, an emergency response network.
-Analyze this emergency SOS alert. Return ONLY a valid JSON string matching the output format exactly. Do not wrap in markdown code blocks.
+    try {
+      const result = await triageEmergency({
+        message,
+        category,
+        battery,
+        lat: location.lat,
+        lng: location.lng,
+        hopCount: 2,
+        weather: weatherIntensity,
+        hazards: isLandslideTriggered ? 'Sonprayag landslide' : 'None'
+      });
 
-Message: "${message}"
-Location: lat:${location.lat}, lng:${location.lng}
-Battery: ${battery}%
-Emergency Type: ${category}
+      const timeline = [
+        `${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} - SOS Packet Generated`,
+        `${new Date(Date.now() + 1000).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} - Relayed through Mesh Nodes`,
+        `${new Date(Date.now() + 2000).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} - Uploaded via Gateway`,
+        `${new Date(Date.now() + 3000).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} - AI Triage Classified: ${result.severity} (${result.priorityScore}/100)`
+      ];
 
-JSON Output Format:
-{
-  "category": "emergency type string",
-  "severity": "Low" | "Medium" | "High" | "Critical",
-  "priorityScore": 0-100,
-  "summary": "Brief 1-sentence English translation/rescue summary of what is happening",
-  "suggestedAction": "Immediate recommended dispatch command",
-  "requiredResources": ["list", "of", "needed", "resources"],
-  "fakeRiskScore": 0-100,
-  "confidenceScore": 0-100
-}`
-              }]
-            }]
-          })
-        });
-
-        const data = await response.json();
-        const rawJsonText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-        const parsed = JSON.parse(rawJsonText.trim().replace(/^```json/, '').replace(/```$/, ''));
-        const containsChild = /child|kid|baby|infant|bacha|baccha|bachhe|बच्चे|बच्चा/i.test(message);
-        let finalSeverity = parsed.severity || 'Medium';
-        let finalPriority = parsed.priorityScore || 50;
-        let finalSummary = parsed.summary || 'Summary unavailable';
-        let finalAction = parsed.suggestedAction || 'Check site for emergency safety status.';
-
-        if (containsChild) {
-          finalSeverity = 'Critical';
-          finalPriority = Math.max(95, Math.min(100, finalPriority + 40));
-          finalSummary = `[👶 CHILDREN DETECTED] ${finalSummary}`;
-          finalAction = `Priority dispatch: Children/infants reported. ${finalAction}`;
-        }
-
-        return {
-          aiSummary: finalSummary,
-          severity: finalSeverity,
-          priorityScore: finalPriority,
-          suggestedAction: finalAction,
-          requiredResources: parsed.requiredResources || ['first_aid'],
-          fakeRiskScore: parsed.fakeRiskScore || 10,
-          confidenceScore: parsed.confidenceScore || 90,
-          triageTimeline: [
-            `${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} - SOS Packet Generated`,
-            `${new Date(Date.now() + 1000).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} - Relayed through Mesh Nodes`,
-            `${new Date(Date.now() + 2000).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} - Uploaded via Gateway`,
-            `${new Date(Date.now() + 3000).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} - AI Priority Classified: ${finalSeverity}`
-          ]
-        };
-      } catch (err) {
-        console.error('Gemini Live API Triage Error, falling back to local model:', err);
+      if (result.isFallback) {
+        timeline.push(`Offline AI Fallback Protocol engaged`);
       }
+
+      return {
+        aiSummary: result.summary,
+        severity: result.severity,
+        priorityScore: result.priorityScore,
+        suggestedAction: result.recommendedAction,
+        requiredResources: result.requiredResources,
+        fakeRiskScore: 100 - result.confidence,
+        confidenceScore: result.confidence,
+        triageTimeline: timeline,
+        isFallback: !!result.isFallback
+      };
+    } catch (err) {
+      console.error('ASI triage call failed, using mock local logic:', err);
+      return {
+        aiSummary: message,
+        severity: 'High',
+        priorityScore: 85,
+        suggestedAction: 'Dispatch immediate volunteer responder.',
+        requiredResources: ['first_aid'],
+        fakeRiskScore: 10,
+        confidenceScore: 90,
+        triageTimeline: ['Triage completed with errors. Local fallback active.'],
+        isFallback: true
+      };
     }
-
-    // Local heuristic processor fallback if no API key is specified
-    let severity = 'Medium';
-    let priorityScore = 55;
-    let summary = message;
-    let suggestedAction = 'Dispatch nearby assessment volunteers.';
-    let requiredResources = ['first_aid'];
-    let fakeRiskScore = 8;
-    let confidenceScore = 92;
-
-    const msgLower = message.toLowerCase();
-
-    if (msgLower.includes('landslide') || msgLower.includes('slip') || msgLower.includes('flood') || msgLower.includes('water rising') || msgLower.includes('trapped') || msgLower.includes('gorge') || msgLower.includes('फंसे') || msgLower.includes('भूस्खलन') || msgLower.includes('बाढ़')) {
-      severity = 'Critical';
-      priorityScore = 95;
-      summary = 'Landslide or flash floods isolated victims in deep valley zone requiring helicopter/drone evacuation.';
-      suggestedAction = 'Active landslide blocked NH-107 near Sonprayag. Alternate pedestrian track or heavy drone supply drop recommended.';
-      requiredResources = ['rescue_boat', 'swimming'];
-      fakeRiskScore = 5;
-      confidenceScore = 95;
-    } else if (msgLower.includes('fracture') || msgLower.includes('tibia') || msgLower.includes('hypothermia') || msgLower.includes('asthma') || msgLower.includes('medical') || msgLower.includes('dewa') || msgLower.includes('दवा') || msgLower.includes('चोट')) {
-      severity = 'High';
-      priorityScore = 88;
-      summary = 'High-altitude medical distress or physical trauma. Patient needs stabilizing meds and evacuation.';
-      suggestedAction = 'Kedarnath base reports heavy fog. Air rescue visibility low. Send ground guides or dispatch heavy UAV with medicine.';
-      requiredResources = ['medicine', 'first_aid'];
-      fakeRiskScore = 10;
-      confidenceScore = 90;
-    } else if (msgLower.includes('food') || msgLower.includes('water') || msgLower.includes('hungry') || msgLower.includes('rations') || msgLower.includes('राशन') || msgLower.includes('भोजन')) {
-      severity = 'Medium';
-      priorityScore = 65;
-      summary = 'Evacuation base camp reporting ration shortages and drinking water exhaustion.';
-      suggestedAction = 'Redirect ITBP volunteer pack-mule teams or drone drops to supply stranded groups.';
-      requiredResources = ['food_water'];
-      fakeRiskScore = 12;
-      confidenceScore = 88;
-    }
-
-    const containsChild = /child|kid|baby|infant|bacha|baccha|bachhe|बच्चे|बच्चा/i.test(message);
-    if (containsChild) {
-      severity = 'Critical';
-      priorityScore = Math.max(95, Math.min(100, priorityScore + 40));
-      summary = `[👶 CHILDREN DETECTED] ${summary}`;
-      suggestedAction = `Priority Dispatch: Children/infants reported. ${suggestedAction}`;
-    }
-
-    const triageTimeline = [
-      `${new Date(Date.now() - 4000).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} - SOS Packet Generated`,
-      `${new Date(Date.now() - 3000).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} - Relayed through Mesh Nodes`,
-      `${new Date(Date.now() - 1000).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} - Uploaded via Gateway`,
-      `${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} - AI Priority Classified: ${severity}`
-    ];
-
-    return { severity, priorityScore, aiSummary: summary, suggestedAction, requiredResources, fakeRiskScore, confidenceScore, triageTimeline };
   };
 
   // Cinematic 4-phase network-failure toggle handler with custom logs & audio triggers
@@ -2219,8 +2443,7 @@ JSON Output Format:
       setIsMapShaking(true);
       setTimeout(() => setIsMapShaking(false), 500);
 
-      injectFeedbackLog('🚨 CELLULAR OUTAGE DETECTED! Ground cell backhaul compromised.', 'error');
-      injectFeedbackLog('🔄 Switching to ResQMesh Emergency P2P Protocol...', 'warning');
+      injectAIFeedbackLog('cellular_outage');
       
       // Phase 2: Relay path established...
       setTimeout(() => {
@@ -2429,6 +2652,7 @@ JSON Output Format:
           });
           setRelayLogs(prev => [...prev, '✓ Success! Alert uploaded and processed by Rescue Command AI.']);
           playSystemSound('aiPrediction'); // subtle synth tick on AI triage update
+          injectAIFeedbackLog('sos_received', newAlert.name);
           
           // Trigger drone flight automatically since command center received the SOS and suggested a UAV route!
           setDroneTargetCoords([newAlert.lat, newAlert.lng]);
@@ -2437,7 +2661,7 @@ JSON Output Format:
           setDroneCoords([30.5732, 79.0435]);
           // Automatically enable UAV routes layer
           setMapLayers(prev => ({ ...prev, uavRoutes: true }));
-          injectFeedbackLog(`🚀 UAV Drone-01 launched automatically to Mock Victim coords. ETA: 2m 31s.`, 'success');
+          injectAIFeedbackLog('uav_standby');
 
           // Sync to Firebase!
           if (firestoreDb) {
@@ -2608,8 +2832,7 @@ JSON Output Format:
     setShowAssignModal(false);
     playSystemSound('rescueAssigned');
     
-    injectFeedbackLog(`👨‍🚒 Volunteer Dispatched. ETA: 12s.`, 'info');
-    injectOperationalLog(`Volunteer Dispatched to emergency location.`);
+    injectAIFeedbackLog('volunteer_assigned', activeAlert ? activeAlert.name : '');
   };
 
   const handleResetData = () => {
@@ -2624,7 +2847,10 @@ JSON Output Format:
   };
 
   return (
-    <div className={`app-container mobile-view-${mobileView}`}>
+    <ResizableDashboardLayout 
+      isMobileStacked={isMobileStacked} 
+      className={`mobile-view-${mobileView}`}
+    >
       {/* Mobile view navigation top bar */}
       <div className="mobile-view-toggle">
         <button 
@@ -2657,7 +2883,7 @@ JSON Output Format:
       </div>
 
       {/* =================================LEFT PANE: MOBILE PHONE SIMULATOR =================================*/}
-      <div className={`phone-pane ${showPhoneSimulator ? '' : 'collapsed'} ${mobileView === 'victim' ? 'mobile-visible' : 'mobile-hidden'}`}>
+      <div ref={phoneRef} className={`phone-pane ${showPhoneSimulator ? '' : 'collapsed'} ${mobileView === 'victim' ? 'mobile-visible' : 'mobile-hidden'}`}>
         <div className="phone-mockup">
           {/* Futuristic iPhone 17 Pro Max Dynamic Island with 3D Tilt, Click Expansion, and Blackout Morph */}
           <div 
@@ -2820,9 +3046,18 @@ JSON Output Format:
             <div className="phone-content" style={{ paddingTop: '28px' }}>
               {mobileTab === 'home' && (
                 <div style={{ display: 'flex', flexDirection: 'column', flex: 1, gap: '16px' }}>
-                  <div style={{ textAlign: 'center', marginTop: '10px' }}>
-                    <h2 style={{ fontSize: '20px', fontWeight: '800', color: 'var(--color-emergency-red)', letterSpacing: '-0.02em', marginBottom: '10px' }}>ResQMesh</h2>
-                    <p style={{ fontSize: '11px', color: 'var(--color-text-muted)', fontWeight: '600' }}>Disaster Offline P2P Relay</p>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', marginTop: '10px' }}>
+                    <img 
+                      src="/brand/resqmesh-icon.png" 
+                      alt="ResQMesh" 
+                      style={{ width: '56px', height: '56px', objectFit: 'contain', marginBottom: '8px' }}
+                    />
+                    <h2 style={{ fontSize: '20px', fontWeight: '800', letterSpacing: '-0.02em', marginBottom: '4px', marginTop: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <span style={{ color: '#000000' }}>Res</span>
+                      <span style={{ color: 'var(--color-emergency-red)' }}>Q</span>
+                      <span style={{ color: '#000000' }}>Mesh</span>
+                    </h2>
+                    <p style={{ fontSize: '11px', color: 'var(--color-text-muted)', fontWeight: '600', margin: 0 }}>Disaster Offline P2P Relay</p>
                   </div>
 
                   {/* DYNAMIC NETWORK TOGGLE FOR INTERACTIVE DEMO */}
@@ -3231,13 +3466,27 @@ JSON Output Format:
 
       {/* =================================RIGHT PANE: FULL-SCREEN MAP & COMMAND INTERFACE =================================*/}
       {/* =================================CENTER COLUMN: CONSOLIDATED LEFT SIDEBAR =================================*/}
-      <div className={`left-sidebar-pane ${mobileView === 'command' ? 'mobile-visible' : 'mobile-hidden'}`}>
+      <div 
+        ref={sidebarRef} 
+        className={`left-sidebar-pane ${mobileView === 'command' ? 'mobile-visible' : 'mobile-hidden'}`}
+        style={{
+          width: isMobileStacked ? '100%' : `${sidebarWidth}px`
+        }}
+      >
         {/* Sidebar Header */}
         <div className="sidebar-header">
           <div className="sidebar-title-container">
             <div>
-              <h2 className="sidebar-title">ResQMesh Command</h2>
-              <p className="sidebar-subtitle">Uttarakhand Emergency Grid</p>
+              <div style={{ marginBottom: '8px' }}>
+                <img 
+                  src="/brand/resqmesh-logo-horizontal.png" 
+                  alt="ResQMesh Logo" 
+                  style={{ height: '48px', width: 'auto', objectFit: 'contain', display: 'block' }}
+                />
+                <p className="sidebar-subtitle" style={{ margin: '6px 0 0 0', textTransform: 'uppercase', letterSpacing: '1.2px', fontSize: '9px', color: 'var(--color-text-muted)', fontFamily: 'var(--font-mono)', fontWeight: '600' }}>
+                  Uttarakhand Emergency Grid
+                </p>
+              </div>
               {/* STATUS: DISASTER RESPONSE ACTIVE badge */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '5px', marginTop: '5px' }}>
                 <span style={{ display: 'inline-block', width: '5px', height: '5px', borderRadius: '50%', backgroundColor: '#6FAF83', boxShadow: '0 0 5px #6FAF83', animation: 'live-status-pulse 1.5s infinite' }} />
@@ -3301,36 +3550,338 @@ JSON Output Format:
         <div className="sidebar-scrollable-content">
           {activeTab === 'alerts' ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              {/* DISASTER SUMMARY BANNER CARD */}
+              <div style={{
+                background: 'linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 0.98) 100%)',
+                border: '1.5px solid rgba(225, 29, 72, 0.35)',
+                boxShadow: '0 6px 16px rgba(225, 29, 72, 0.15)',
+                borderRadius: '12px',
+                padding: '12px 14px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '4px',
+                color: '#F8FAFC'
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.06)', paddingBottom: '4px', marginBottom: '2px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                    <span className="live-status-dot-blink" style={{
+                      width: '6px',
+                      height: '6px',
+                      borderRadius: '50%',
+                      backgroundColor: disasterSummaryData?.riskLevel === 'Critical' ? 'var(--color-emergency-red)' : 'var(--color-warning-orange)',
+                      boxShadow: `0 0 8px ${disasterSummaryData?.riskLevel === 'Critical' ? 'var(--color-emergency-red)' : 'var(--color-warning-orange)'}`
+                    }}></span>
+                    <span style={{ fontSize: '9px', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.5px', color: disasterSummaryData?.riskLevel === 'Critical' ? 'var(--color-emergency-red)' : 'var(--color-warning-orange)' }}>
+                      Risk Level: {disasterSummaryData?.riskLevel || 'High'}
+                    </span>
+                  </div>
+                  <span style={{ fontSize: '7px', color: 'rgba(255,255,255,0.4)', fontFamily: 'var(--font-mono)' }}>Powered by ASI:ONE</span>
+                </div>
+                
+                <div style={{ fontSize: '12px', fontWeight: '800', color: '#FFFFFF' }}>
+                  {disasterSummaryData?.headline || 'Cellular blackout active. Hops routing emergency packet.'}
+                </div>
+                
+                <p style={{ fontSize: '10px', color: '#E2E8F0', margin: '2px 0 4px 0', lineHeight: '1.3' }}>
+                  {disasterSummaryData?.summary || 'Active mesh coordinates connecting rescues. Weather threats monitored.'}
+                </p>
+
+                {disasterSummaryData?.urgentAction && (
+                  <div style={{ 
+                    fontSize: '9.5px', 
+                    fontWeight: '700', 
+                    backgroundColor: 'rgba(244, 63, 94, 0.1)', 
+                    border: '1px solid rgba(244, 63, 94, 0.2)', 
+                    padding: '4px 8px', 
+                    borderRadius: '6px',
+                    color: '#FDA4AF',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px'
+                  }}>
+                    <span>🚨</span>
+                    <span>ACTION REQUIRED: {disasterSummaryData.urgentAction}</span>
+                  </div>
+                )}
+              </div>
+
               <div className="sidebar-sec-title" style={{ fontSize: '11px', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <ShieldAlert size={16} strokeWidth={1.75} style={{ color: 'var(--color-emergency-red)' }} />
                 <span>Severity Ranked Feeds</span>
               </div>
 
-              {/* DRAMATIC AI PREDICTION INSIGHT */}
-              <div style={{ 
-                backgroundColor: 'rgba(220, 38, 38, 0.06)', 
-                border: '1.5px solid var(--color-emergency-red)', 
-                borderRadius: '8px', 
-                padding: '12px 14px',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '6px',
-                boxShadow: '0 4px 12px rgba(220, 38, 38, 0.08)'
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--color-emergency-red)' }}>
-                  <AlertTriangle size={14} className="animate-pulse" />
-                  <span style={{ fontSize: '9px', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.8px' }}>AI Predictive Insight</span>
+              {/* INCIDENT COMMANDER AI CARD */}
+              <div 
+                className="ai-commander-card"
+                style={{ 
+                  background: '#FFFFFF', 
+                  border: '1px solid #D8E3F0', 
+                  borderLeft: '4px solid #3B82F6',
+                  borderRadius: '16px', 
+                  padding: '12px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '10px',
+                  boxShadow: '0 4px 12px rgba(15, 23, 42, 0.05)',
+                  color: '#0F172A',
+                  fontFamily: 'var(--font-body)'
+                }}
+              >
+                {/* Header Row */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#0F172A' }}>
+                    <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <Cpu size={16} className={commanderLoading ? "animate-spin" : ""} style={{ color: '#3B82F6' }} />
+                      <span className="absolute inline-flex h-2 w-2 rounded-full bg-blue-400 opacity-75 animate-ping" style={{ top: '-2px', right: '-2px' }} />
+                    </div>
+                    <span style={{ fontSize: '11px', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.8px', color: '#0F172A' }}>Incident Commander AI</span>
+                  </div>
+                  <span style={{ 
+                    fontSize: '8px', 
+                    fontWeight: '700', 
+                    color: '#2563EB', 
+                    backgroundColor: '#EFF6FF', 
+                    border: '1px solid #BFDBFE',
+                    padding: '2px 8px',
+                    borderRadius: '9999px',
+                    fontFamily: 'var(--font-mono)',
+                    letterSpacing: '0.5px'
+                  }}>
+                    Powered by ASI:ONE
+                  </span>
                 </div>
-                <div style={{ fontSize: '13px', fontWeight: '700', color: 'var(--color-text-primary)' }}>
-                  Mandakini Trail Slip Advisory
+
+                {/* Sub-header */}
+                <div style={{ fontSize: '10px', color: '#64748B', fontWeight: '500', marginTop: '-4px', textTransform: 'uppercase', letterSpacing: '0.5px', flexShrink: 0 }}>
+                  Autonomous rescue coordination recommendation
                 </div>
-                <p style={{ fontSize: '11px', color: 'var(--color-text-secondary)', lineHeight: '1.4' }}>
-                  <b>AI Prediction:</b> Trail collapse probability increasing near Rambara sector. Recommend immediate evacuation.
-                </p>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '9px', color: 'var(--color-text-muted)', fontFamily: 'var(--font-mono)', borderTop: '1px solid rgba(0,0,0,0.06)', paddingTop: '4px' }}>
-                  <span>CONFIDENCE: 96%</span>
-                  <span>UPDATED: JUST NOW</span>
-                </div>
+
+                {commanderLoading ? (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '16px 0', fontSize: '12px', color: '#64748B', flex: 1 }}>
+                    <RefreshCw size={14} className="animate-spin" style={{ color: '#3B82F6' }} />
+                    <span>Analyzing live telemetry grid...</span>
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', flex: 1, overflow: 'hidden' }}>
+                    
+                    {/* Decision Block (Amber/Orange Recommendation Box) */}
+                    <div style={{ 
+                      backgroundColor: '#FFFBEB', 
+                      border: '1px solid #FDE68A', 
+                      borderRadius: '10px', 
+                      padding: '8px 10px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '3px',
+                      flexShrink: 0
+                    }}>
+                      <div style={{ fontSize: '9px', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.8px', color: '#D97706' }}>
+                        ★ Recommended Action
+                      </div>
+                      <div style={{ 
+                        fontSize: '11.5px', 
+                        fontWeight: '600', 
+                        color: '#92400E', 
+                        lineHeight: '1.35',
+                        display: '-webkit-box',
+                        WebkitLineClamp: 3,
+                        WebkitBoxOrient: 'vertical',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis'
+                      }}>
+                        {commanderData?.commanderDecision || 'Standby for telemetry sync.'}
+                      </div>
+                    </div>
+
+                    {/* Meta Chips Row */}
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px', flexShrink: 0 }}>
+                      {/* Chip 1: Priority */}
+                      <span style={{ 
+                        fontSize: '7.5px', 
+                        fontWeight: '700', 
+                        padding: '2px 5px', 
+                        borderRadius: '4px', 
+                        backgroundColor: '#FEF2F2', 
+                        color: '#DC2626', 
+                        border: '1px solid #FECACA' 
+                      }}>
+                        CRITICAL PRIORITY
+                      </span>
+
+                      {/* Chip 2: Mesh / Network status */}
+                      {mobileNetwork === 'offline' ? (
+                        <span style={{ 
+                          fontSize: '7.5px', 
+                          fontWeight: '700', 
+                          padding: '2px 5px', 
+                          borderRadius: '4px', 
+                          backgroundColor: '#FFFBEB', 
+                          color: '#D97706', 
+                          border: '1px solid #FDE68A' 
+                        }}>
+                          MESH FALLBACK ACTIVE
+                        </span>
+                      ) : (
+                        <span style={{ 
+                          fontSize: '7.5px', 
+                          fontWeight: '700', 
+                          padding: '2px 5px', 
+                          borderRadius: '4px', 
+                          backgroundColor: '#F0FDF4', 
+                          color: '#16A34A', 
+                          border: '1px solid #BBF7D0' 
+                        }}>
+                          CELLULAR SECURE
+                        </span>
+                      )}
+
+                      {/* Chip 3: Landslide */}
+                      {isLandslideTriggered && (
+                        <span style={{ 
+                          fontSize: '7.5px', 
+                          fontWeight: '700', 
+                          padding: '2px 5px', 
+                          borderRadius: '4px', 
+                          backgroundColor: '#FEF2F2', 
+                          color: '#B91C1C', 
+                          border: '1px solid #FECACA' 
+                        }}>
+                          NH-107 BLOCKED
+                        </span>
+                      )}
+
+                      {/* Chip 4: Human Review Advised */}
+                      <span style={{ 
+                        fontSize: '7.5px', 
+                        fontWeight: '700', 
+                        padding: '2px 5px', 
+                        borderRadius: '4px', 
+                        backgroundColor: '#F1F5F9', 
+                        color: '#475569', 
+                        border: '1px solid #CBD5E1' 
+                      }}>
+                        HUMAN REVIEW ADVISED
+                      </span>
+                    </div>
+
+                    {/* Situation & Details Scrollable Area */}
+                    <div className="ai-commander-details" style={{
+                      flex: 1,
+                      overflowY: 'auto',
+                      paddingRight: '4px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '6px',
+                      marginTop: '2px'
+                    }}>
+                      {!isAiCardExpanded ? (
+                        /* Collapsed view: 2 short bullets */
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', fontSize: '10px', color: '#334155', lineHeight: '1.35' }}>
+                          <div style={{ display: 'flex', gap: '6px', alignItems: 'flex-start' }}>
+                            <span style={{ color: '#3B82F6', fontWeight: 'bold' }}>•</span>
+                            <span>Multiple high-severity alerts detected near Sonprayag route.</span>
+                          </div>
+                          <div style={{ display: 'flex', gap: '6px', alignItems: 'flex-start' }}>
+                            <span style={{ color: '#3B82F6', fontWeight: 'bold' }}>•</span>
+                            <span>Battery risk and supply delay may affect stranded groups.</span>
+                          </div>
+                        </div>
+                      ) : (
+                        /* Expanded view: Situation, Risks, and Next Action */
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '10px', color: '#334155', lineHeight: '1.35' }}>
+                          <div style={{ display: 'flex', gap: '6px', alignItems: 'flex-start' }}>
+                            <span style={{ color: '#3B82F6', fontWeight: 'bold' }}>•</span>
+                            <div>
+                              <span style={{ color: '#0F172A', fontWeight: '700' }}>Situation:</span>{' '}
+                              {commanderData?.situationSummary || 'Gathering live coordinates.'}
+                            </div>
+                          </div>
+                          <div style={{ display: 'flex', gap: '6px', alignItems: 'flex-start' }}>
+                            <span style={{ color: '#3B82F6', fontWeight: 'bold' }}>•</span>
+                            <div>
+                              <span style={{ color: '#0F172A', fontWeight: '700' }}>Risks:</span>{' '}
+                              {commanderData?.topRisks?.[0] || 'Monitoring landslide threats.'}
+                            </div>
+                          </div>
+                          <div style={{ display: 'flex', gap: '6px', alignItems: 'flex-start' }}>
+                            <span style={{ color: '#3B82F6', fontWeight: 'bold' }}>•</span>
+                            <div>
+                              <span style={{ color: '#0F172A', fontWeight: '700' }}>Next Action:</span>{' '}
+                              {commanderData?.recommendedNextActions?.[0] || 'Standby for dispatch authorization.'}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Expand/Collapse Toggle Button */}
+                    <button 
+                      onClick={() => {
+                        setIsAiCardExpanded(!isAiCardExpanded);
+                        playSystemSound('tick');
+                      }}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '4px',
+                        backgroundColor: '#EFF6FF',
+                        border: '1px solid #BFDBFE',
+                        borderRadius: '6px',
+                        padding: '4px 8px',
+                        fontSize: '9.5px',
+                        fontWeight: '700',
+                        color: '#2563EB',
+                        cursor: 'pointer',
+                        width: '100%',
+                        transition: 'all 0.2s ease',
+                        marginTop: '2px',
+                        outline: 'none',
+                        flexShrink: 0
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = '#DBEAFE';
+                        e.currentTarget.style.borderColor = '#93C5FD';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = '#EFF6FF';
+                        e.currentTarget.style.borderColor = '#BFDBFE';
+                      }}
+                    >
+                      {isAiCardExpanded ? (
+                        <>
+                          <span>Collapse Details</span>
+                          <ChevronUp size={11} />
+                        </>
+                      ) : (
+                        <>
+                          <span>Expand Analysis</span>
+                          <ChevronDown size={11} />
+                        </>
+                      )}
+                    </button>
+
+                    {/* Footer */}
+                    <div style={{ 
+                      display: 'flex', 
+                      justifyContent: 'space-between', 
+                      alignItems: 'center', 
+                      fontSize: '8.5px', 
+                      color: '#64748B', 
+                      fontFamily: 'var(--font-mono)', 
+                      borderTop: '1px solid #E2E8F0', 
+                      paddingTop: '6px',
+                      marginTop: '2px',
+                      flexShrink: 0
+                    }}>
+                      <span>CONFIDENCE: {commanderOffline ? '85% (LOCAL)' : '92% (ASI:ONE)'}</span>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <span style={{ width: '4px', height: '4px', borderRadius: '50%', backgroundColor: '#22C55E', display: 'inline-block' }} />
+                        UPDATED: LIVE TELEMETRY
+                      </span>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Active Alerts List */}
@@ -3724,17 +4275,82 @@ JSON Output Format:
         </div>
       </div>
 
+      {!isMobileStacked && (
+        <ResizableDivider
+          isDragging={isSidebarDragging}
+          onPointerDown={startSidebarDrag}
+          onKeyDown={handleSidebarKeyDown}
+          ariaValuemin={sidebarMinWidth}
+          ariaValuemax={sidebarMaxWidth}
+          ariaValuenow={sidebarWidth}
+        />
+      )}
+
       {/* =================================RIGHT COLUMN: HERO MAP PANE (Unobstructed) =================================*/}
       <div className={`map-pane ${is3dTiltedView ? 'tilted-view' : ''} ${isMapShaking ? 'map-shake' : ''} ${mobileView === 'map' ? 'mobile-visible' : 'mobile-hidden'}`}>
         
-        {/* Floating Toggle Button for Mobile Simulator */}
-        <button
-          onClick={() => setShowPhoneSimulator(!showPhoneSimulator)}
-          className="phone-toggle-btn"
-        >
-          <Radio size={14} className={showPhoneSimulator ? 'animate-pulse' : ''} />
-          <span>{showPhoneSimulator ? 'Hide Victim Simulator' : 'Show Victim Simulator'}</span>
-        </button>
+        {/* Floating Controls Row */}
+        <div style={{
+          position: 'absolute',
+          top: '18px',
+          left: '18px',
+          zIndex: 100,
+          display: 'flex',
+          gap: '8px'
+        }}>
+          {/* Floating Toggle Button for Mobile Simulator */}
+          <button
+            onClick={() => setShowPhoneSimulator(!showPhoneSimulator)}
+            style={{
+              position: 'relative',
+              top: 'auto',
+              left: 'auto',
+              margin: 0
+            }}
+            className="phone-toggle-btn"
+          >
+            <Radio size={14} className={showPhoneSimulator ? 'animate-pulse' : ''} />
+            <span>{showPhoneSimulator ? 'Hide Victim Simulator' : 'Show Victim Simulator'}</span>
+          </button>
+
+          {/* Onboarding Tutorial Button */}
+          <button
+            onClick={() => {
+              setShowTutorial(true);
+              setTutorialStep(0);
+              playSystemSound('confirm');
+            }}
+            style={{
+              height: '32px',
+              backgroundColor: '#FFFFFF',
+              border: '1px solid rgba(15, 23, 42, 0.12)',
+              color: '#0F172A',
+              padding: '0 10px',
+              borderRadius: '12px',
+              fontFamily: 'var(--font-body)',
+              fontSize: '11px',
+              fontWeight: '500',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              boxShadow: '0 2px 8px rgba(15, 23, 42, 0.05)',
+              transition: 'all 0.2s ease',
+              outline: 'none'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = '#F8FAFC';
+              e.currentTarget.style.borderColor = '#BFDBFE';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = '#FFFFFF';
+              e.currentTarget.style.borderColor = 'rgba(15, 23, 42, 0.12)';
+            }}
+          >
+            <HelpCircle size={14} style={{ color: '#3B82F6' }} />
+            <span>How it works</span>
+          </button>
+        </div>
 
         {/* Full-screen Leaflet container */}
         <div ref={mapRef} className={`map-container ${isTransitioningLayer ? 'layer-swap-transition' : ''} ${networkTransitioning ? 'map-pulse-network-offline' : ''} ${weatherIntensity !== 'normal' ? `weather-${weatherIntensity}` : ''}`}></div>
@@ -4470,9 +5086,22 @@ JSON Output Format:
               {/* AI Triage Details */}
               {mapLayers.incidentCommander && (
                 <div style={{ backgroundColor: 'var(--color-bg-dark)', border: '1px solid var(--color-border)', borderRadius: '12px', padding: '16px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px', color: 'var(--color-emergency-red)' }}>
-                    <Activity size={16} />
-                    <span style={{ fontSize: '12px', fontWeight: '600', textTransform: 'uppercase' }}>Gemini AI Triage Result</span>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--color-emergency-red)' }}>
+                      <Activity size={16} />
+                      <span style={{ fontSize: '12px', fontWeight: '600', textTransform: 'uppercase' }}>ASI:ONE Triage Result</span>
+                    </div>
+                    <span style={{ 
+                      fontSize: '7px', 
+                      fontWeight: '800', 
+                      color: 'var(--color-emergency-red)', 
+                      backgroundColor: 'rgba(255, 59, 48, 0.1)', 
+                      padding: '2px 6px',
+                      borderRadius: '4px',
+                      fontFamily: 'var(--font-mono)'
+                    }}>
+                      Powered by ASI:ONE
+                    </span>
                   </div>
 
                   <div style={{ display: 'flex', gap: '16px', marginBottom: '10px' }}>
@@ -4673,6 +5302,58 @@ JSON Output Format:
               Assign volunteer team located closest to victim <b>{selectedAlert.name}</b>.
             </p>
 
+            {matchLoading ? (
+              <div style={{
+                backgroundColor: 'rgba(59, 130, 246, 0.05)',
+                border: '1px dashed rgba(59, 130, 246, 0.3)',
+                borderRadius: '10px',
+                padding: '10px 14px',
+                marginBottom: '16px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                fontSize: '11px',
+                color: '#4B5563'
+              }}>
+                <RefreshCw size={12} className="animate-spin text-blue-500" />
+                <span>Running ASI:ONE Volunteer Matching AI...</span>
+              </div>
+            ) : matchRecommendation ? (
+              <div style={{
+                backgroundColor: 'rgba(52, 199, 89, 0.05)',
+                border: '1.5px solid rgba(52, 199, 89, 0.3)',
+                borderRadius: '10px',
+                padding: '12px 14px',
+                marginBottom: '16px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '4px',
+                boxShadow: '0 2px 8px rgba(52, 199, 89, 0.05)'
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '5px', color: '#22C55E' }}>
+                    <Shield size={14} className="animate-pulse" />
+                    <span style={{ fontSize: '10px', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                      ASI:ONE Match Recommend ({matchRecommendation.matchScore}%)
+                    </span>
+                  </div>
+                  <span style={{ fontSize: '7px', color: '#8E8E93', fontFamily: 'var(--font-mono)' }}>Powered by ASI:ONE</span>
+                </div>
+                <div style={{ fontSize: '11px', fontWeight: '700', color: '#1C1C1E', marginTop: '2px' }}>
+                  Recommended: {volunteers.find(v => v.volunteerId === matchRecommendation.bestVolunteerId)?.name || 'Nearest Available Responder'} (ETA: {matchRecommendation.eta || '12s'})
+                </div>
+                <p style={{ fontSize: '10px', color: '#48484A', margin: '2px 0 0 0', lineHeight: '1.4' }}>
+                  <b>Matching Rationale:</b> {matchRecommendation.reason}
+                </p>
+                {matchRecommendation.routeAdvice && (
+                  <div style={{ fontSize: '9px', color: '#007AFF', fontWeight: '600', marginTop: '2px', display: 'flex', alignItems: 'center', gap: '3px' }}>
+                    <span>🗺️</span>
+                    <span>Route advice: {matchRecommendation.routeAdvice}</span>
+                  </div>
+                )}
+              </div>
+            ) : null}
+
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               {volunteers.map(v => (
                 <div key={v.volunteerId} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'var(--color-card-bg)', border: '1px solid var(--color-border)', padding: '12px', borderRadius: '10px' }}>
@@ -4849,6 +5530,227 @@ JSON Output Format:
           </filter>
         </defs>
       </svg>
-    </div>
+
+      {/* Onboarding Tutorial Modal */}
+      {showTutorial && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          backgroundColor: 'rgba(15, 23, 42, 0.4)',
+          backdropFilter: 'blur(4px)',
+          WebkitBackdropFilter: 'blur(4px)',
+          zIndex: 99999,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '20px',
+          animation: 'fadeIn 0.25s ease-out'
+        }}>
+          {/* Modal Card */}
+          <div style={{
+            backgroundColor: '#F8FAFC',
+            border: '1.5px solid #CBD5E1',
+            borderRadius: '24px',
+            width: '100%',
+            maxWidth: '540px',
+            boxShadow: '0 20px 40px rgba(15, 23, 42, 0.15)',
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'hidden',
+            position: 'relative',
+            animation: 'scaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
+            color: '#0F172A',
+            fontFamily: 'var(--font-body)'
+          }}>
+            {/* Skip button in top right */}
+            <button 
+              onClick={() => {
+                setShowTutorial(false);
+                playSystemSound('tick');
+              }}
+              style={{
+                position: 'absolute',
+                top: '16px',
+                right: '16px',
+                background: 'transparent',
+                border: 'none',
+                fontSize: '11px',
+                fontWeight: '700',
+                color: '#64748B',
+                cursor: 'pointer',
+                padding: '4px 8px',
+                borderRadius: '6px',
+                zIndex: 10,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
+                outline: 'none'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#F1F5F9'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+            >
+              Skip
+            </button>
+
+            {/* Modal Header */}
+            <div style={{ padding: '24px 24px 16px 24px', borderBottom: '1px solid #E2E8F0', backgroundColor: '#FFFFFF' }}>
+              <h2 style={{ fontSize: '20px', fontWeight: '800', color: '#0F172A', margin: 0, letterSpacing: '-0.02em' }}>How ResQMesh Works</h2>
+              <p style={{ fontSize: '12px', color: '#64748B', margin: '4px 0 0 0', fontWeight: '500' }}>Offline rescue coordination when networks fail.</p>
+            </div>
+
+            {/* Illustration Area */}
+            <div style={{ 
+              backgroundColor: '#F5F1EA',
+              padding: '20px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderBottom: '1px solid #E2E8F0',
+              position: 'relative',
+              height: '220px',
+              overflow: 'hidden'
+            }}>
+              {TUTORIAL_STEPS[tutorialStep].svg}
+            </div>
+
+            {/* Content Area */}
+            <div style={{ padding: '24px', flex: 1, backgroundColor: '#FFFFFF' }}>
+              <h3 style={{ fontSize: '16px', fontWeight: '800', color: '#0F172A', margin: '0 0 8px 0' }}>
+                {TUTORIAL_STEPS[tutorialStep].title}
+              </h3>
+              <p style={{ fontSize: '13px', color: '#334155', margin: 0, lineHeight: '1.5', minHeight: '60px' }}>
+                {TUTORIAL_STEPS[tutorialStep].text}
+              </p>
+            </div>
+
+            {/* Footer Area */}
+            <div style={{ 
+              padding: '16px 24px', 
+              borderTop: '1px solid #E2E8F0', 
+              backgroundColor: '#F8FAFC',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between'
+            }}>
+              {/* Checkbox (Don't show again) */}
+              <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', color: '#64748B', cursor: 'pointer', userSelect: 'none' }}>
+                <input 
+                  type="checkbox" 
+                  checked={dontShowAgain}
+                  onChange={(e) => {
+                    setDontShowAgain(e.target.checked);
+                    if (e.target.checked) {
+                      localStorage.setItem('resqmesh_onboarding_completed', 'true');
+                    } else {
+                      localStorage.removeItem('resqmesh_onboarding_completed');
+                    }
+                  }}
+                  style={{ cursor: 'pointer' }}
+                />
+                <span>Don't show again</span>
+              </label>
+
+              {/* Dots Indicator */}
+              <div style={{ display: 'flex', gap: '6px' }}>
+                {TUTORIAL_STEPS.map((_, idx) => (
+                  <span 
+                    key={idx}
+                    style={{
+                      display: 'inline-block',
+                      width: idx === tutorialStep ? '16px' : '6px',
+                      height: '6px',
+                      borderRadius: '3px',
+                      backgroundColor: idx === tutorialStep ? '#3B82F6' : '#CBD5E1',
+                      transition: 'all 0.25s ease'
+                    }}
+                  />
+                ))}
+              </div>
+
+              {/* Buttons Navigation */}
+              <div style={{ display: 'flex', gap: '8px' }}>
+                {tutorialStep > 0 && (
+                  <button
+                    onClick={() => {
+                      setTutorialStep(prev => prev - 1);
+                      playSystemSound('tick');
+                    }}
+                    style={{
+                      backgroundColor: '#FFFFFF',
+                      border: '1px solid #CBD5E1',
+                      borderRadius: '8px',
+                      color: '#475569',
+                      padding: '6px 12px',
+                      fontSize: '12px',
+                      fontWeight: '700',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease',
+                      outline: 'none'
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#F1F5F9'}
+                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#FFFFFF'}
+                  >
+                    Back
+                  </button>
+                )}
+
+                {tutorialStep < TUTORIAL_STEPS.length - 1 ? (
+                  <button
+                    onClick={() => {
+                      setTutorialStep(prev => prev + 1);
+                      playSystemSound('confirm');
+                    }}
+                    style={{
+                      backgroundColor: '#3B82F6',
+                      border: 'none',
+                      borderRadius: '8px',
+                      color: '#FFFFFF',
+                      padding: '6px 16px',
+                      fontSize: '12px',
+                      fontWeight: '700',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease',
+                      boxShadow: '0 2px 4px rgba(59, 130, 246, 0.2)',
+                      outline: 'none'
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#2563EB'}
+                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#3B82F6'}
+                  >
+                    Next
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => {
+                      completeOnboarding();
+                      playSystemSound('confirm');
+                    }}
+                    style={{
+                      backgroundColor: '#22C55E',
+                      border: 'none',
+                      borderRadius: '8px',
+                      color: '#FFFFFF',
+                      padding: '6px 16px',
+                      fontSize: '12px',
+                      fontWeight: '700',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease',
+                      boxShadow: '0 2px 4px rgba(34, 197, 94, 0.2)',
+                      outline: 'none'
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#16A34A'}
+                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#22C55E'}
+                  >
+                    Start Using ResQMesh
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </ResizableDashboardLayout>
   );
 }

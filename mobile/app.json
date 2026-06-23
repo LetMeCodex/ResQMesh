@@ -7,18 +7,49 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.anishhcreates.resqmesh",
+      "infoPlist": {
+        "NSBluetoothAlwaysUsageDescription": "ResQMesh uses Bluetooth to discover and communicate with nearby emergency nodes without internet access."
+      }
     },
     "android": {
+      "package": "com.anishhcreates.resqmesh",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
-      }
+      },
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION",
+        "BLUETOOTH",
+        "BLUETOOTH_ADMIN",
+        "BLUETOOTH_SCAN",
+        "BLUETOOTH_ADVERTISE",
+        "BLUETOOTH_CONNECT",
+        "android.permission.BLUETOOTH",
+        "android.permission.BLUETOOTH_ADMIN",
+        "android.permission.BLUETOOTH_CONNECT"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      [
+        "react-native-ble-manager",
+        {
+          "neverForLocation": true
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "32f7f868-adef-434a-b28f-2565c25ba208"
+      }
+    },
+    "owner": "anishhcreates"
   }
 }

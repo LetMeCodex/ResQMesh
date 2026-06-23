@@ -52,3 +52,9 @@ yarn-error.*
 *.njsproj
 *.sln
 *.sw?
+
+# Local logs and config
+eslint_errors.txt
+eslint_errors_utf8.txt
+.clangd
+
