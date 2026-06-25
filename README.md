@@ -1,5 +1,7 @@
 # ResQMesh
 
+**[🔗 Open Interactive System Blueprint Viewer](resqmesh-blueprint.html)**
+
 ![ResQMesh System Blueprint](resqmesh-system-blueprint.svg)
 
 > **“When networks fail, people become the network.”**
