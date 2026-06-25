@@ -1,0 +1,272 @@
+<svg width="100%" height="100%" viewBox="0 0 1800 1150" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap');
+      
+      .font-sans { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+      
+      .title-main { font-family: 'Inter', sans-serif; font-weight: 800; font-size: 36px; fill: #0F172A; }
+      .subtitle-main { font-family: 'Inter', sans-serif; font-weight: 500; font-size: 18px; fill: #64748B; }
+      .tagline-main { font-family: 'Inter', sans-serif; font-weight: 700; font-size: 14px; fill: #EF4444; font-style: italic; }
+      
+      .card-title { font-family: 'Inter', sans-serif; font-weight: 700; font-size: 18px; fill: #0F172A; }
+      .card-body { font-family: 'Inter', sans-serif; font-weight: 400; font-size: 13px; fill: #475569; line-height: 1.6; }
+      
+      .bg-canvas { fill: #FBFAF7; }
+      .card-bg { fill: #FFFFFF; stroke: #CBD5E1; stroke-width: 2; }
+      
+      /* Grid Patterns */
+      .grid-major { fill: url(#gridPatternMajor); }
+      .grid-minor { fill: url(#gridPatternMinor); }
+      
+      .shadow { filter: url(#dropShadow); }
+    </style>
+
+    <filter id="dropShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="3" dy="6" stdDeviation="6" flood-color="#0F172A" flood-opacity="0.08" />
+    </filter>
+
+    <pattern id="gridPatternMinor" width="10" height="10" patternUnits="userSpaceOnUse">
+      <path d="M 10 0 L 0 0 0 10" fill="none" stroke="#E2E8F0" stroke-width="0.5" opacity="0.35"/>
+    </pattern>
+    <pattern id="gridPatternMajor" width="50" height="50" patternUnits="userSpaceOnUse">
+      <path d="M 50 0 L 0 0 0 50" fill="none" stroke="#E2E8F0" stroke-width="1.2" opacity="0.6"/>
+    </pattern>
+
+    <marker id="arrow-red" viewBox="0 0 10 10" refX="4" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse">
+      <path d="M 0 1 L 9 5 L 0 9 z" fill="#EF4444"/>
+    </marker>
+    <marker id="arrow-blue" viewBox="0 0 10 10" refX="4" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse">
+      <path d="M 0 1 L 9 5 L 0 9 z" fill="#2563EB"/>
+    </marker>
+    <marker id="arrow-green" viewBox="0 0 10 10" refX="4" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse">
+      <path d="M 0 1 L 9 5 L 0 9 z" fill="#16A34A"/>
+    </marker>
+  </defs>
+
+  <!-- CANVAS BACKGROUND -->
+  <rect width="1800" height="1150" class="bg-canvas" />
+  <rect width="1800" height="1150" class="grid-minor" />
+  <rect width="1800" height="1150" class="grid-major" />
+
+  <!-- ==================== HEADER ==================== -->
+  <g transform="translate(100, 80)">
+    <g transform="translate(0, 0)">
+      <!-- Shield Outer -->
+      <path d="M 0 5 L 25 0 L 50 5 C 50 25 35 45 25 50 C 15 45 0 25 0 5 Z" fill="none" stroke="#0F172A" stroke-width="3.5" stroke-linejoin="round" />
+      <polygon points="12,38 25,18 38,38" fill="none" stroke="#0F172A" stroke-width="3" />
+      <polygon points="20,38 27,27 34,38" fill="#EF4444" opacity="0.3" stroke="#EF4444" stroke-width="1" />
+      <path d="M 12 10 A 18 18 0 0 1 38 10" fill="none" stroke="#EF4444" stroke-width="3" stroke-linecap="round" />
+    </g>
+    
+    <!-- Title block -->
+    <g transform="translate(70, 8)">
+      <text x="0" y="0" class="title-main">ResQMesh System Blueprint</text>
+      <text x="0" y="26" class="subtitle-main">Core Offline Triage and Volunteer Rescue Cycle</text>
+      <text x="0" y="44" class="tagline-main">“When networks fail, people become the network.”</text>
+    </g>
+  </g>
+
+  <!-- ==================== CORE 6-STEP HORIZONTAL FLOW ==================== -->
+
+  <!-- STEP 1: Victim App -->
+  <g transform="translate(100, 320)" class="shadow">
+    <rect width="240" height="420" rx="16" class="card-bg" />
+    <!-- Step Badge -->
+    <circle cx="120" cy="-20" r="22" fill="#EF4444" stroke="#FFFFFF" stroke-width="2.5"/>
+    <text x="120" y="-14" class="font-sans" font-weight="800" font-size="16" fill="#FFFFFF" text-anchor="middle">1</text>
+    
+    <g transform="translate(20, 30)">
+      <text x="0" y="20" class="card-title">Victim App</text>
+      <line x1="0" y1="35" x2="200" y2="35" stroke="#E2E8F0" stroke-width="1.5" />
+      
+      <!-- Phone graphic outline -->
+      <g transform="translate(35, 55)">
+        <rect width="130" height="200" rx="14" fill="#F8FAFC" stroke="#0F172A" stroke-width="3" />
+        <rect x="5" y="5" width="120" height="190" rx="10" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1" />
+        <circle cx="65" cy="150" r="18" fill="#EF4444" />
+        <text x="65" y="154" class="font-sans" font-weight="800" font-size="10" fill="#FFFFFF" text-anchor="middle">SOS</text>
+        <rect x="15" y="25" width="100" height="20" rx="3" fill="#EF4444" />
+        <text x="65" y="37" class="font-sans" font-weight="700" font-size="6" fill="#FFFFFF" text-anchor="middle">CELL OUTAGE</text>
+      </g>
+      
+      <text x="0" y="290" class="card-body">
+        <tspan x="0" dy="0" font-weight="700">SOS Origin:</tspan>
+        <tspan x="0" dy="18">Detects cellular blackout</tspan>
+        <tspan x="0" dy="18">and broadcasts encrypted</tspan>
+        <tspan x="0" dy="18">P2P emergency packet.</tspan>
+      </text>
+    </g>
+  </g>
+
+  <!-- STEP 2: Mesh Relay -->
+  <g transform="translate(380, 320)" class="shadow">
+    <rect width="240" height="420" rx="16" class="card-bg" />
+    <circle cx="120" cy="-20" r="22" fill="#EF4444" stroke="#FFFFFF" stroke-width="2.5"/>
+    <text x="120" y="-14" class="font-sans" font-weight="800" font-size="16" fill="#FFFFFF" text-anchor="middle">2</text>
+    
+    <g transform="translate(20, 30)">
+      <text x="0" y="20" class="card-title">Mesh Relay</text>
+      <line x1="0" y1="35" x2="200" y2="35" stroke="#E2E8F0" stroke-width="1.5" />
+      
+      <!-- Mesh Hop visual -->
+      <g transform="translate(20, 60)">
+        <circle cx="20" cy="120" r="10" fill="#FFFFFF" stroke="#EF4444" stroke-width="2"/>
+        <path d="M 30 110 L 80 50" stroke="#EF4444" stroke-width="2" stroke-dasharray="2 3"/>
+        
+        <circle cx="85" cy="45" r="8" fill="#FFFFFF" stroke="#2563EB" stroke-width="1.8"/>
+        <path d="M 95 55 L 140 120" stroke="#EF4444" stroke-width="2" stroke-dasharray="2 3"/>
+        
+        <circle cx="145" cy="125" r="8" fill="#FFFFFF" stroke="#16A34A" stroke-width="1.8"/>
+      </g>
+      
+      <text x="0" y="290" class="card-body">
+        <tspan x="0" dy="0" font-weight="700">Offline Hopping:</tspan>
+        <tspan x="0" dy="18">Packets hop securely</tspan>
+        <tspan x="0" dy="18">from peer-to-peer</tspan>
+        <tspan x="0" dy="18">without internet access.</tspan>
+      </text>
+    </g>
+  </g>
+
+  <!-- STEP 3: Gateway Nodes -->
+  <g transform="translate(660, 320)" class="shadow">
+    <rect width="240" height="420" rx="16" class="card-bg" />
+    <circle cx="120" cy="-20" r="22" fill="#EF4444" stroke="#FFFFFF" stroke-width="2.5"/>
+    <text x="120" y="-14" class="font-sans" font-weight="800" font-size="16" fill="#FFFFFF" text-anchor="middle">3</text>
+    
+    <g transform="translate(20, 30)">
+      <text x="0" y="20" class="card-title">Gateway Nodes</text>
+      <line x1="0" y1="35" x2="200" y2="35" stroke="#E2E8F0" stroke-width="1.5" />
+      
+      <!-- Gateway Dish / Camp Visual -->
+      <g transform="translate(50, 60)">
+        <polygon points="20,80 50,20 80,80" fill="none" stroke="#0F172A" stroke-width="2"/>
+        <polygon points="35,80 50,50 65,80" fill="#16A34A"/>
+        <path d="M 70 30 A 10 10 0 0 1 90 30" fill="none" stroke="#2563EB" stroke-width="1.5"/>
+        <line x1="80" y1="30" x2="80" y2="45" stroke="#EF4444" stroke-width="1.5" />
+      </g>
+      
+      <text x="0" y="290" class="card-body">
+        <tspan x="0" dy="0" font-weight="700">Cloud Sync Point:</tspan>
+        <tspan x="0" dy="18">Any connected gateway</tspan>
+        <tspan x="0" dy="18">node automatically syncs</tspan>
+        <tspan x="0" dy="18">cached packets to cloud.</tspan>
+      </text>
+    </g>
+  </g>
+
+  <!-- STEP 4: ASI:ONE AI -->
+  <g transform="translate(940, 320)" class="shadow">
+    <rect width="240" height="420" rx="16" class="card-bg" />
+    <circle cx="120" cy="-20" r="22" fill="#2563EB" stroke="#FFFFFF" stroke-width="2.5"/>
+    <text x="120" y="-14" class="font-sans" font-weight="800" font-size="16" fill="#FFFFFF" text-anchor="middle">4</text>
+    
+    <g transform="translate(20, 30)">
+      <text x="0" y="20" class="card-title">ASI:ONE AI</text>
+      <line x1="0" y1="35" x2="200" y2="35" stroke="#E2E8F0" stroke-width="1.5" />
+      
+      <!-- Brain / AI sphere visual -->
+      <g transform="translate(50, 60)">
+        <circle cx="50" cy="50" r="45" fill="none" stroke="#2563EB" stroke-width="1.5" stroke-dasharray="3 3" />
+        <circle cx="50" cy="50" r="30" fill="#2563EB" opacity="0.1" />
+        <!-- Badge inside -->
+        <polygon points="35,38 65,38 72,55 50,70 28,55" fill="#0F172A" />
+        <text x="50" y="52" class="font-sans" font-weight="800" font-size="8" fill="#FFFFFF" text-anchor="middle">ASI:ONE</text>
+      </g>
+      
+      <text x="0" y="290" class="card-body">
+        <tspan x="0" dy="0" font-weight="700">Triage Engine:</tspan>
+        <tspan x="0" dy="18">Evaluates emergency text,</tspan>
+        <tspan x="0" dy="18">prioritizes severity, and</tspan>
+        <tspan x="0" dy="18">matches responders.</tspan>
+      </text>
+    </g>
+  </g>
+
+  <!-- STEP 5: Command Dashboard -->
+  <g transform="translate(1220, 320)" class="shadow">
+    <rect width="240" height="420" rx="16" class="card-bg" />
+    <circle cx="120" cy="-20" r="22" fill="#2563EB" stroke="#FFFFFF" stroke-width="2.5"/>
+    <text x="120" y="-14" class="font-sans" font-weight="800" font-size="16" fill="#FFFFFF" text-anchor="middle">5</text>
+    
+    <g transform="translate(20, 30)">
+      <text x="0" y="20" class="card-title">Command Panel</text>
+      <line x1="0" y1="35" x2="200" y2="35" stroke="#E2E8F0" stroke-width="1.5" />
+      
+      <!-- Dashboard UI mockup -->
+      <g transform="translate(25, 55)">
+        <rect width="150" height="110" rx="6" fill="#F8FAFC" stroke="#94A3B8" stroke-width="1.5" />
+        <rect width="150" height="15" fill="#E2E8F0" rx="2" />
+        <circle cx="6" cy="7" r="2" fill="#EF4444" />
+        <circle cx="11" cy="7" r="2" fill="#16A34A" />
+        <!-- Metrics boxes -->
+        <rect x="10" y="25" width="60" height="24" rx="3" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1" />
+        <text x="15" y="40" class="font-sans" font-weight="700" font-size="10" fill="#EF4444">10 SOS</text>
+        <rect x="80" y="25" width="60" height="24" rx="3" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1" />
+        <text x="85" y="40" class="font-sans" font-weight="700" font-size="10" fill="#16A34A">4 Active</text>
+      </g>
+      
+      <text x="0" y="290" class="card-body">
+        <tspan x="0" dy="0" font-weight="700">Dispatcher Console:</tspan>
+        <tspan x="0" dy="18">Consolidated operations</tspan>
+        <tspan x="0" dy="18">screen for dispatching</tspan>
+        <tspan x="0" dy="18">and tracking responders.</tspan>
+      </text>
+    </g>
+  </g>
+
+  <!-- STEP 6: Volunteer Rescue -->
+  <g transform="translate(1500, 320)" class="shadow">
+    <rect width="200" height="420" rx="16" class="card-bg" />
+    <circle cx="100" cy="-20" r="22" fill="#16A34A" stroke="#FFFFFF" stroke-width="2.5"/>
+    <text x="100" y="-14" class="font-sans" font-weight="800" font-size="16" fill="#FFFFFF" text-anchor="middle">6</text>
+    
+    <g transform="translate(20, 30)">
+      <text x="0" y="20" class="card-title">Volunteer Rescue</text>
+      <line x1="0" y1="35" x2="160" y2="35" stroke="#E2E8F0" stroke-width="1.5" />
+      
+      <!-- Checked Rescue badge visual -->
+      <g transform="translate(45, 65)">
+        <circle cx="35" cy="35" r="30" fill="#F0FDF4" stroke="#16A34A" stroke-width="2" />
+        <path d="M 23 35 L 31 43 L 47 25" fill="none" stroke="#16A34A" stroke-width="4" stroke-linecap="round" />
+      </g>
+      
+      <text x="0" y="290" class="card-body">
+        <tspan x="0" dy="0" font-weight="700">Mission Complete:</tspan>
+        <tspan x="0" dy="18">Responders navigate</tspan>
+        <tspan x="0" dy="18">offline, extract survivor,</tspan>
+        <tspan x="0" dy="18">and resolve status.</tspan>
+      </text>
+    </g>
+  </g>
+
+  <!-- ==================== FLOW CONNECTIONS ==================== -->
+  
+  <!-- C1 -> C2 (Red) -->
+  <path d="M 340 530 L 380 530" fill="none" stroke="#EF4444" stroke-width="8" stroke-linecap="round" marker-end="url(#arrow-red)" />
+  
+  <!-- C2 -> C3 (Red) -->
+  <path d="M 620 530 L 660 530" fill="none" stroke="#EF4444" stroke-width="8" stroke-linecap="round" marker-end="url(#arrow-red)" />
+  
+  <!-- C3 -> C4 (Blue) -->
+  <path d="M 900 530 L 940 530" fill="none" stroke="#2563EB" stroke-width="8" stroke-linecap="round" marker-end="url(#arrow-blue)" />
+  
+  <!-- C4 -> C5 (Blue) -->
+  <path d="M 1180 530 L 1220 530" fill="none" stroke="#2563EB" stroke-width="8" stroke-linecap="round" marker-end="url(#arrow-blue)" />
+  
+  <!-- C5 -> C6 (Green) -->
+  <path d="M 1460 530 L 1500 530" fill="none" stroke="#16A34A" stroke-width="8" stroke-linecap="round" marker-end="url(#arrow-green)" />
+
+  <!-- Annotation Note -->
+  <g transform="translate(900, 800) rotate(-1)" class="sticky-shadow">
+    <rect x="-150" width="300" height="60" rx="4" class="sticky-bg" />
+    <circle cx="0" cy="5" r="3.5" fill="#EF4444" />
+    <text x="0" y="32" class="sticky-text" text-anchor="middle">Every offline hop is tracked and recorded for complete auditing.</text>
+  </g>
+
+  <!-- ==================== FINAL SYSTEM FOOTER ==================== -->
+  <g transform="translate(900, 1080)">
+    <text x="0" y="0" class="font-sans" font-weight="700" font-size="14" fill="#64748B" text-anchor="middle">ResQMesh keeps emergency communication alive when infrastructure fails.</text>
+  </g>
+</svg>

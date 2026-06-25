@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ResQMesh - System Architecture Blueprint</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: #F1F1EB;
+      color: #0F172A;
+      overflow: hidden;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    header {
+      background-color: #FFFFFF;
+      border-bottom: 1px solid #E2E8F0;
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 10;
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+    }
+    
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .brand-logo {
+      width: 32px;
+      height: 32px;
+    }
+    
+    .brand-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: #0F172A;
+      letter-spacing: -0.025em;
+    }
+    
+    .brand-subtitle {
+      font-size: 12px;
+      color: #64748B;
+      font-weight: 500;
+      margin-left: 8px;
+      padding-left: 8px;
+      border-left: 1px solid #E2E8F0;
+    }
+    
+    .controls-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    
+    .toggle-container {
+      display: flex;
+      background-color: #F1F5F9;
+      padding: 4px;
+      border-radius: 8px;
+      border: 1px solid #E2E8F0;
+    }
+    
+    .btn-toggle {
+      background: none;
+      border: none;
+      padding: 6px 16px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #475569;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      user-select: none;
+    }
+    
+    .btn-toggle:hover {
+      color: #0F172A;
+    }
+    
+    .btn-toggle.active {
+      background-color: #FFFFFF;
+      color: #0F172A;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+    }
+    
+    .controls {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    
+    button.btn-action {
+      background-color: #FFFFFF;
+      border: 1px solid #CBD5E1;
+      color: #334155;
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+      user-select: none;
+    }
+    
+    button.btn-action:hover {
+      background-color: #F8FAFC;
+      border-color: #94A3B8;
+      color: #0F172A;
+    }
+    
+    button.btn-action:active {
+      transform: translateY(1px);
+    }
+    
+    .btn-primary {
+      background-color: #EF4444;
+      border-color: #DC2626;
+      color: #FFFFFF !important;
+    }
+    
+    .btn-primary:hover {
+      background-color: #DC2626;
+      border-color: #B91C1C;
+    }
+    
+    .viewport {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      cursor: grab;
+    }
+    
+    .viewport:active {
+      cursor: grabbing;
+    }
+    
+    .canvas-container {
+      position: absolute;
+      transform-origin: 0 0;
+      width: 1800px;
+      height: 1150px;
+      user-select: none;
+      box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.1), 0 8px 10px -6px rgba(15, 23, 42, 0.1);
+      background-color: #FBFAF7;
+      border-radius: 12px;
+      border: 1px solid #E2E8F0;
+    }
+    
+    .canvas-container svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    
+    /* Help overlay */
+    .help-overlay {
+      position: absolute;
+      bottom: 24px;
+      left: 24px;
+      background-color: rgba(15, 23, 42, 0.9);
+      color: #FFFFFF;
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 11px;
+      pointer-events: none;
+      z-index: 10;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      line-height: 1.5;
+      font-family: monospace;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <!-- Shield Logo inline -->
+      <svg class="brand-logo" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M 0 5 L 25 0 L 50 5 C 50 25 35 45 25 50 C 15 45 0 25 0 5 Z" fill="none" stroke="#0F172A" stroke-width="4" stroke-linejoin="round" />
+        <polygon points="12,38 25,18 38,38" fill="none" stroke="#0F172A" stroke-width="3" />
+        <polygon points="20,38 27,27 34,38" fill="#EF4444" opacity="0.4" />
+        <path d="M 12 10 A 18 18 0 0 1 38 10" fill="none" stroke="#EF4444" stroke-width="3" stroke-linecap="round" />
+      </svg>
+      <div class="brand-title">ResQMesh</div>
+      <div class="brand-subtitle">System Architecture Blueprint</div>
+    </div>
+    
+    <div class="controls-wrapper">
+      <!-- View mode switch -->
+      <div class="toggle-container">
+        <button id="btn-view-detailed" class="btn-toggle active">Detailed Blueprint</button>
+        <button id="btn-view-simplified" class="btn-toggle">Simplified Pitch</button>
+      </div>
+
+      <!-- Canvas zoom/pan controls -->
+      <div class="controls">
+        <button id="btn-zoom-in" class="btn-action" title="Zoom In">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          Zoom In
+        </button>
+        <button id="btn-zoom-out" class="btn-action" title="Zoom Out">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          Zoom Out
+        </button>
+        <button id="btn-reset" class="btn-action" title="Reset View">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path><path d="M16 3h5v5"></path><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path><path d="M8 21H3v-5"></path></svg>
+          Fit Screen
+        </button>
+        <button id="btn-download" class="btn-action btn-primary" title="Download SVG">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          Download SVG
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="viewport" id="viewport">
+    <div class="canvas-container" id="canvas-container">
+      <object type="image/svg+xml" data="resqmesh-system-blueprint.svg" id="svg-object" style="width: 100%; height: 100%; pointer-events: none;"></object>
+    </div>
+  </div>
+
+  <div class="help-overlay">
+    MOUSE WHEEL : Zoom In/Out<br>
+    CLICK + DRAG : Pan / Navigation<br>
+    DOUBLE CLICK : Center View
+  </div>
+
+  <script>
+    const viewport = document.getElementById('viewport');
+    const container = document.getElementById('canvas-container');
+    const svgObject = document.getElementById('svg-object');
+    
+    const btnDetailed = document.getElementById('btn-view-detailed');
+    const btnSimplified = document.getElementById('btn-view-simplified');
+    
+    let currentMode = 'detailed'; // 'detailed' | 'simplified'
+    let scale = 1;
+    let panX = 0;
+    let panY = 0;
+    let isDragging = false;
+    let startX = 0;
+    let startY = 0;
+    
+    // Initial centering/fitting
+    function initView() {
+      const vw = viewport.clientWidth;
+      const vh = viewport.clientHeight;
+      const cw = 1800; // Original SVG Width
+      const ch = 1150; // Original SVG Height
+      
+      // Calculate fit scale
+      const scaleX = (vw - 48) / cw;
+      const scaleY = (vh - 48) / ch;
+      scale = Math.min(scaleX, scaleY, 1);
+      
+      // Center the container
+      panX = (vw - cw * scale) / 2;
+      panY = (vh - ch * scale) / 2;
+      
+      updateTransform();
+    }
+    
+    function updateTransform() {
+      container.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
+    }
+    
+    // Switch between Detailed and Simplified models
+    function switchMode(mode) {
+      if (mode === currentMode) return;
+      currentMode = mode;
+      
+      if (mode === 'detailed') {
+        btnDetailed.classList.add('active');
+        btnSimplified.classList.remove('active');
+        svgObject.data = 'resqmesh-system-blueprint.svg';
+      } else {
+        btnDetailed.classList.remove('active');
+        btnSimplified.classList.add('active');
+        svgObject.data = 'resqmesh-system-blueprint-simplified.svg';
+      }
+      
+      // Allow minor delay for SVG parsing before centering
+      setTimeout(initView, 150);
+    }
+    
+    btnDetailed.addEventListener('click', () => switchMode('detailed'));
+    btnSimplified.addEventListener('click', () => switchMode('simplified'));
+    
+    // Pan operations
+    viewport.addEventListener('mousedown', (e) => {
+      isDragging = true;
+      startX = e.clientX - panX;
+      startY = e.clientY - panY;
+    });
+    
+    window.addEventListener('mousemove', (e) => {
+      if (!isDragging) return;
+      panX = e.clientX - startX;
+      panY = e.clientY - startY;
+      updateTransform();
+    });
+    
+    window.addEventListener('mouseup', () => {
+      isDragging = false;
+    });
+    
+    // Zoom operations
+    viewport.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      
+      const zoomFactor = 1.1;
+      const mouseX = e.clientX - viewport.getBoundingClientRect().left;
+      const mouseY = e.clientY - viewport.getBoundingClientRect().top;
+      
+      // Calculate matching coordinates on the container
+      const containerMouseX = (mouseX - panX) / scale;
+      const containerMouseY = (mouseY - panY) / scale;
+      
+      if (e.deltaY < 0) {
+        scale *= zoomFactor;
+      } else {
+        scale /= zoomFactor;
+      }
+      
+      // Enforce limits
+      scale = Math.max(0.15, Math.min(scale, 4));
+      
+      // Reposition to zoom on mouse pointer
+      panX = mouseX - containerMouseX * scale;
+      panY = mouseY - containerMouseY * scale;
+      
+      updateTransform();
+    }, { passive: false });
+    
+    // Button Event Handlers
+    document.getElementById('btn-zoom-in').addEventListener('click', () => {
+      const centerViewportX = viewport.clientWidth / 2;
+      const centerViewportY = viewport.clientHeight / 2;
+      const containerCenterX = (centerViewportX - panX) / scale;
+      const containerCenterY = (centerViewportY - panY) / scale;
+      
+      scale *= 1.25;
+      scale = Math.min(scale, 4);
+      
+      panX = centerViewportX - containerCenterX * scale;
+      panY = centerViewportY - containerCenterY * scale;
+      updateTransform();
+    });
+    
+    document.getElementById('btn-zoom-out').addEventListener('click', () => {
+      const centerViewportX = viewport.clientWidth / 2;
+      const centerViewportY = viewport.clientHeight / 2;
+      const containerCenterX = (centerViewportX - panX) / scale;
+      const containerCenterY = (centerViewportY - panY) / scale;
+      
+      scale /= 1.25;
+      scale = Math.max(0.15, scale);
+      
+      panX = centerViewportX - containerCenterX * scale;
+      panY = centerViewportY - containerCenterY * scale;
+      updateTransform();
+    });
+    
+    document.getElementById('btn-reset').addEventListener('click', initView);
+    viewport.addEventListener('dblclick', initView);
+    
+    document.getElementById('btn-download').addEventListener('click', () => {
+      const filename = currentMode === 'detailed' ? 'resqmesh-system-blueprint.svg' : 'resqmesh-system-blueprint-simplified.svg';
+      const link = document.createElement('a');
+      link.href = filename;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    });
+    
+    // Run on mount
+    window.addEventListener('load', initView);
+    window.addEventListener('resize', initView);
+    setTimeout(initView, 250);
+  </script>
+</body>
+</html>

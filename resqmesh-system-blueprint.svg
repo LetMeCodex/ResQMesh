@@ -1,0 +1,879 @@
+<svg width="100%" height="100%" viewBox="0 0 1800 1150" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap');
+      
+      /* Typography Classes */
+      .font-sans { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+      .font-mono { font-family: 'JetBrains Mono', 'Fira Code', monospace; }
+      
+      .title-main { font-family: 'Inter', sans-serif; font-weight: 800; font-size: 32px; fill: #0F172A; }
+      .subtitle-main { font-family: 'Inter', sans-serif; font-weight: 500; font-size: 15px; fill: #64748B; }
+      .tagline-main { font-family: 'Inter', sans-serif; font-weight: 700; font-size: 12px; fill: #EF4444; font-style: italic; }
+      
+      .card-title { font-family: 'Inter', sans-serif; font-weight: 700; font-size: 16px; fill: #0F172A; }
+      .card-subtitle { font-family: 'Inter', sans-serif; font-weight: 500; font-size: 12px; fill: #64748B; }
+      .card-body { font-family: 'Inter', sans-serif; font-weight: 400; font-size: 12px; fill: #334155; }
+      
+      .label-mono { font-family: 'JetBrains Mono', monospace; font-weight: 500; font-size: 11px; fill: #0F172A; }
+      .label-mono-sm { font-family: 'JetBrains Mono', monospace; font-weight: 500; font-size: 9px; fill: #64748B; }
+      .terminal-text { font-family: 'JetBrains Mono', monospace; font-weight: 500; font-size: 9px; fill: #F59E0B; }
+      
+      /* Colors and Styles */
+      .bg-canvas { fill: #FBFAF7; }
+      .card-bg { fill: #FFFFFF; stroke: #CBD5E1; stroke-width: 1.5; }
+      .card-bg-selected { fill: #FFFFFF; stroke: #EF4444; stroke-width: 2.5; }
+      .card-bg-amber { fill: #FFFFFF; stroke: #F59E0B; stroke-width: 1.5; }
+      .card-bg-green { fill: #FFFFFF; stroke: #16A34A; stroke-width: 2; }
+      
+      .sticky-bg { fill: #FEF08A; stroke: #FDE047; stroke-width: 1; }
+      .sticky-text { font-family: 'Inter', sans-serif; font-weight: 600; font-size: 11px; fill: #713F12; }
+      
+      /* Grid Patterns */
+      .grid-major { fill: url(#gridPatternMajor); }
+      .grid-minor { fill: url(#gridPatternMinor); }
+      
+      /* Animations and Pulsing Effects */
+      @keyframes pulseRed {
+        0% { r: 40px; opacity: 0.8; }
+        50% { r: 55px; opacity: 0.2; }
+        100% { r: 70px; opacity: 0; }
+      }
+      .pulsing-circle-red {
+        animation: pulseRed 2.5s infinite;
+        fill: none;
+        stroke: #EF4444;
+        stroke-width: 2;
+      }
+      
+      @keyframes pulseBlue {
+        0% { r: 4px; opacity: 0.9; }
+        100% { r: 12px; opacity: 0; }
+      }
+      .pulsing-node-blue {
+        animation: pulseBlue 1.8s infinite;
+        fill: #2563EB;
+      }
+      
+      .shadow { filter: url(#dropShadow); }
+      .sticky-shadow { filter: url(#stickyShadow); }
+    </style>
+
+    <filter id="dropShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="3" dy="5" stdDeviation="5" flood-color="#0F172A" flood-opacity="0.08" />
+    </filter>
+    
+    <filter id="stickyShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="2" dy="3" stdDeviation="3" flood-color="#0F172A" flood-opacity="0.15" />
+    </filter>
+
+    <pattern id="gridPatternMinor" width="10" height="10" patternUnits="userSpaceOnUse">
+      <path d="M 10 0 L 0 0 0 10" fill="none" stroke="#E2E8F0" stroke-width="0.5" opacity="0.35"/>
+    </pattern>
+    <pattern id="gridPatternMajor" width="50" height="50" patternUnits="userSpaceOnUse">
+      <path d="M 50 0 L 0 0 0 50" fill="none" stroke="#E2E8F0" stroke-width="1.2" opacity="0.6"/>
+    </pattern>
+
+    <!-- Thick Arrow Markers -->
+    <marker id="arrow-red" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+      <path d="M 0 1 L 9 5 L 0 9 z" fill="#EF4444"/>
+    </marker>
+    <marker id="arrow-blue" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+      <path d="M 0 1 L 9 5 L 0 9 z" fill="#2563EB"/>
+    </marker>
+    <marker id="arrow-green" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+      <path d="M 0 1 L 9 5 L 0 9 z" fill="#16A34A"/>
+    </marker>
+    <marker id="arrow-orange" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+      <path d="M 0 1 L 9 5 L 0 9 z" fill="#F59E0B"/>
+    </marker>
+  </defs>
+
+  <!-- CANVAS BACKGROUND -->
+  <rect width="1800" height="1150" class="bg-canvas" />
+  <rect width="1800" height="1150" class="grid-minor" />
+  <rect width="1800" height="1150" class="grid-major" />
+
+  <!-- TERRAIN CONTOUR VECTOR LINES (Humanitarian disaster response map aesthetic) -->
+  <g opacity="0.2">
+    <path d="M -100 220 Q 200 170 350 420 T 900 650 T 1450 320 T 2000 480" fill="none" stroke="#94A3B8" stroke-width="1.5" stroke-dasharray="10 15" />
+    <path d="M -100 370 Q 250 340 450 580 T 1000 800 T 1550 480 T 2000 630" fill="none" stroke="#94A3B8" stroke-width="1.2" />
+    <path d="M -100 520 Q 300 500 550 730 T 1100 950 T 1650 630 T 2000 780" fill="none" stroke="#94A3B8" stroke-width="1" stroke-dasharray="4 8" />
+  </g>
+
+  <!-- ==================== HEADER ==================== -->
+  <g transform="translate(60, 45)">
+    <g transform="translate(0, 0)">
+      <!-- Shield Outer -->
+      <path d="M 0 5 L 25 0 L 50 5 C 50 25 35 45 25 50 C 15 45 0 25 0 5 Z" fill="none" stroke="#0F172A" stroke-width="3" stroke-linejoin="round" />
+      <polygon points="12,38 25,18 38,38" fill="none" stroke="#0F172A" stroke-width="2.5" />
+      <polygon points="20,38 27,27 34,38" fill="#EF4444" opacity="0.3" stroke="#EF4444" stroke-width="1" />
+      <path d="M 12 10 A 18 18 0 0 1 38 10" fill="none" stroke="#EF4444" stroke-width="2.5" stroke-linecap="round" />
+      <path d="M 17 15 A 11 11 0 0 1 33 15" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round" />
+    </g>
+    
+    <!-- Title block -->
+    <g transform="translate(65, 10)">
+      <text x="0" y="0" class="title-main">ResQMesh System Blueprint</text>
+      <text x="0" y="22" class="subtitle-main">Offline SOS Relay + AI Incident Command + Rescue Lifecycle</text>
+      <text x="0" y="38" class="tagline-main">“When networks fail, people become the network.”</text>
+    </g>
+  </g>
+
+  <!-- ==================== SYSTEM LEGEND (Top Right) ==================== -->
+  <g transform="translate(900, 45)" class="font-sans">
+    <rect width="400" height="60" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.5" rx="8" class="shadow"/>
+    <text x="15" y="20" font-weight="700" font-size="10" fill="#64748B" letter-spacing="1">SYSTEM FLOW LEGEND</text>
+    
+    <g transform="translate(15, 30)" font-size="11" font-weight="600" fill="#334155">
+      <!-- SOS -->
+      <circle cx="10" cy="10" r="6" fill="#EF4444" />
+      <text x="22" y="14">SOS Flow</text>
+      
+      <!-- Data -->
+      <circle cx="110" cy="10" r="6" fill="#2563EB" />
+      <text x="122" y="14">Data/AI Flow</text>
+      
+      <!-- Rescue -->
+      <circle cx="215" cy="10" r="6" fill="#16A34A" />
+      <text x="227" y="14">Rescue Flow</text>
+      
+      <!-- Hazard -->
+      <circle cx="310" cy="10" r="6" fill="#F59E0B" />
+      <text x="322" y="14">Simulation</text>
+    </g>
+  </g>
+
+  <!-- Technical Spec Block (Top Right) -->
+  <g transform="translate(1340, 45)" class="font-mono label-mono-sm">
+    <rect width="400" height="60" fill="none" stroke="#CBD5E1" stroke-width="1.5" rx="8"/>
+    <text x="15" y="20" fill="#0F172A" font-weight="700">SPECIFICATION: RESQMESH-DETAILED-v1.2</text>
+    <text x="15" y="35">COORDINATES: KEDARNATH FIELD GRID [30.73° N, 79.06° E]</text>
+    <text x="15" y="50">SYSTEM STATUS: OPERATIONAL // ASI:ONE AGENT ACTIVE</text>
+  </g>
+
+  <!-- ==================== COLUMN 1: VICTIM MOBILE APP AND SIMULATOR ==================== -->
+  
+  <!-- SECTION 1: VICTIM MOBILE APP -->
+  <g transform="translate(60, 150)" class="shadow">
+    <rect width="320" height="540" rx="16" class="card-bg" />
+    
+    <!-- Step Badge -->
+    <g transform="translate(-12, -12)">
+      <circle cx="20" cy="20" r="16" fill="#EF4444" stroke="#FFFFFF" stroke-width="2"/>
+      <text x="20" y="24" class="font-sans" font-weight="800" font-size="12" fill="#FFFFFF" text-anchor="middle">1</text>
+    </g>
+
+    <!-- Header Details -->
+    <g transform="translate(25, 20)">
+      <rect width="110" height="18" rx="3" fill="#EF4444" opacity="0.1" />
+      <text x="6" y="13" class="font-sans" font-size="10" font-weight="700" fill="#EF4444">VICTIM NODE #01</text>
+      <text x="0" y="38" class="card-title">Victim Mobile App</text>
+      <text x="0" y="53" class="card-subtitle">Offline SOS Broadcast System</text>
+    </g>
+    
+    <!-- iPhone Device Mockup -->
+    <g transform="translate(25, 90)">
+      <!-- Phone body -->
+      <rect width="270" height="425" rx="28" fill="#F8FAFC" stroke="#0F172A" stroke-width="4.5" />
+      <!-- Inner Screen screen -->
+      <rect x="5" y="5" width="260" height="415" rx="24" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1"/>
+      <!-- Speaker Notch -->
+      <rect x="85" y="0" width="100" height="14" rx="7" fill="#0F172A" />
+      
+      <!-- Top screen elements -->
+      <text x="25" y="26" class="font-sans" font-size="10" font-weight="700" fill="#94A3B8">09:41</text>
+      <rect x="220" y="18" width="22" height="10" rx="2" fill="none" stroke="#EF4444" stroke-width="1.5" />
+      <rect x="222" y="20" width="12" height="6" fill="#EF4444" />
+      <text x="195" y="27" class="font-sans" font-size="9" font-weight="700" fill="#EF4444">42%</text>
+      <path d="M 160 23 L 175 23 M 165 19 L 170 27 M 162 26 L 173 20" stroke="#EF4444" stroke-width="1.5" />
+      
+      <!-- Cellular Blackout Banner -->
+      <g transform="translate(15, 40)">
+        <rect width="240" height="28" rx="6" fill="#EF4444" />
+        <text x="120" y="18" class="font-mono" font-size="9" font-weight="700" fill="#FFFFFF" text-anchor="middle">▲ CELLULAR BLACKOUT DETECTED</text>
+      </g>
+      
+      <!-- Mesh Scanning Card -->
+      <g transform="translate(15, 78)">
+        <rect width="240" height="52" rx="8" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="12" y="18" class="font-sans" font-weight="700" font-size="10" fill="#0F172A">Scanning Local Beacons...</text>
+        <circle cx="215" cy="26" r="6" fill="none" stroke="#2563EB" stroke-width="1" />
+        <circle cx="215" cy="26" r="3" fill="#2563EB" />
+        <text x="12" y="32" class="font-mono" font-size="8.5" fill="#2563EB">Bluetooth P2P: ACTIVE</text>
+        <text x="12" y="43" class="font-mono" font-size="8.5" fill="#16A34A">Wi-Fi Direct: ACTIVE</text>
+      </g>
+      
+      <!-- Red SOS Button and Pulsing waves -->
+      <g transform="translate(135, 215)">
+        <circle cx="0" cy="0" r="42" class="pulsing-circle-red" />
+        <circle cx="0" cy="0" r="36" fill="#EF4444" opacity="0.15" />
+        <circle cx="0" cy="0" r="30" fill="#EF4444" />
+        <text x="0" y="7" class="font-sans" font-weight="800" font-size="18" fill="#FFFFFF" text-anchor="middle">SOS</text>
+      </g>
+      
+      <text x="135" y="275" class="font-sans" font-size="9" font-weight="600" fill="#64748B" text-anchor="middle">HOLD BUTTON FOR 3 SECONDS</text>
+      
+      <!-- Active Volunteer Status card -->
+      <g transform="translate(15, 295)">
+        <rect width="240" height="50" rx="8" fill="#F0FDF4" stroke="#BBF7D0" stroke-width="1" />
+        <text x="12" y="16" class="font-sans" font-weight="700" font-size="9" fill="#16A34A">RESPONDER EN ROUTE</text>
+        <text x="12" y="30" class="font-sans" font-weight="700" font-size="11" fill="#0F172A">Devendra Singh</text>
+        <text x="12" y="42" class="font-mono" font-size="8" fill="#64748B">Distance: 1.2 km | ETA: 18 min</text>
+        <circle cx="215" cy="25" r="8" fill="#16A34A" />
+        <path d="M 212 25 L 214 27 L 218 22" fill="none" stroke="#FFFFFF" stroke-width="1.5" />
+      </g>
+      
+      <!-- Emergency packet details subtext -->
+      <g transform="translate(15, 360)">
+        <rect width="240" height="42" rx="4" fill="#F1F5F9" stroke="#E2E8F0" stroke-width="1" />
+        <text x="10" y="15" class="font-mono" font-size="8" fill="#475569">PACKET: {id: "47b9", hops: 0, ttl: 255}</text>
+        <text x="10" y="28" class="font-mono" font-size="8" fill="#475569">TELEMETRY: BAT 42% | LAT 30.73 | LON 79.06</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- SECTION: DISASTER EVENT SIMULATOR (No Step Badge as it is a testing utility) -->
+  <g transform="translate(60, 710)" class="shadow">
+    <rect width="320" height="230" rx="16" class="card-bg-amber" />
+    
+    <g transform="translate(20, 20)">
+      <rect width="130" height="18" rx="3" fill="#F59E0B" opacity="0.1" />
+      <text x="6" y="13" class="font-sans" font-size="9" font-weight="700" fill="#F59E0B">OPERATIONAL TESTING</text>
+      <text x="0" y="40" class="card-title">Disaster Event Simulator</text>
+      <text x="0" y="55" class="card-subtitle">Injects disaster events into the mesh network</text>
+      
+      <!-- Checkbox Simulations list -->
+      <g transform="translate(0, 75)" class="font-sans" font-size="11" fill="#334155">
+        <!-- Event 1 -->
+        <rect x="0" y="0" width="12" height="12" rx="3.5" fill="none" stroke="#F59E0B" stroke-width="1.8" />
+        <path d="M 2.5 6 L 5 8.5 L 9.5 3.5" fill="none" stroke="#F59E0B" stroke-width="1.8" />
+        <text x="20" y="10" font-weight="600">Landslide Blockage</text>
+        
+        <!-- Event 2 -->
+        <g transform="translate(0, 22)">
+          <rect x="0" y="0" width="12" height="12" rx="3.5" fill="none" stroke="#F59E0B" stroke-width="1.8" />
+          <path d="M 2.5 6 L 5 8.5 L 9.5 3.5" fill="none" stroke="#F59E0B" stroke-width="1.8" />
+          <text x="20" y="10" font-weight="600">Cellular Outage Simulation</text>
+        </g>
+        
+        <!-- Event 3 -->
+        <g transform="translate(0, 44)">
+          <rect x="0" y="0" width="12" height="12" rx="3.5" fill="none" stroke="#CBD5E1" stroke-width="1.2" />
+          <text x="20" y="10" fill="#64748B">Heavy Rain Event (Standby)</text>
+        </g>
+      </g>
+      
+      <!-- Terminal Output Overlay -->
+      <g transform="translate(0, 150)">
+        <rect width="280" height="60" rx="6" fill="#0F172A" />
+        <text x="10" y="18" class="terminal-text">&gt; [SIM] CELL OUTAGE TRIGGERED IN ZONE-B</text>
+        <text x="10" y="32" class="terminal-text">&gt; [SIM] INITIATING STRESS-TEST FOR MESH RELAYS</text>
+        <text x="10" y="46" class="terminal-text">&gt; [SIM] ACTIVE LANDSLIDE EVENT INJECTED IN SEC 4</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- ==================== COLUMN 2: OFFLINE MESH RELAY AND ASI:ONE AI ==================== -->
+  
+  <!-- SECTION 2: OFFLINE MESH RELAY -->
+  <g transform="translate(420, 150)" class="shadow">
+    <rect width="440" height="280" rx="16" class="card-bg" />
+    
+    <!-- Step Badge -->
+    <g transform="translate(-12, -12)">
+      <circle cx="20" cy="20" r="16" fill="#EF4444" stroke="#FFFFFF" stroke-width="2"/>
+      <text x="20" y="24" class="font-sans" font-weight="800" font-size="12" fill="#FFFFFF" text-anchor="middle">2</text>
+    </g>
+
+    <g transform="translate(20, 20)">
+      <rect width="230" height="18" rx="3" fill="#2563EB" opacity="0.1" />
+      <text x="6" y="13" class="font-sans" font-size="9" font-weight="700" fill="#2563EB">DELAY-TOLERANT STORE AND FORWARD RELAY</text>
+      <text x="0" y="35" class="card-title">Offline Mesh Relay Layer</text>
+      <text x="0" y="48" class="card-subtitle">SOS hops dynamically between offline civilian devices</text>
+      
+      <!-- Mesh Nodes Visual Grid -->
+      <g transform="translate(0, 60)">
+        <!-- Node Connections (Dotted lines representing mesh link) -->
+        <path d="M 50 85 L 140 40" stroke="#EF4444" stroke-width="2" stroke-dasharray="3 4" stroke-linecap="round" fill="none" />
+        <path d="M 140 40 L 250 110" stroke="#EF4444" stroke-width="2" stroke-dasharray="3 4" fill="none" />
+        <path d="M 140 40 L 190 15" stroke="#94A3B8" stroke-width="1.2" stroke-dasharray="3 4" fill="none" />
+        <path d="M 250 110 L 360 55" stroke="#EF4444" stroke-width="2" stroke-dasharray="3 4" fill="none" />
+        <path d="M 190 15 L 300 20" stroke="#94A3B8" stroke-width="1.2" stroke-dasharray="3 4" fill="none" />
+        
+        <!-- Packet icons sliding along the lines -->
+        <circle cx="95" cy="62" r="4.5" fill="#EF4444" />
+        <circle cx="195" cy="75" r="4.5" fill="#EF4444" />
+        <circle cx="305" cy="82" r="4.5" fill="#EF4444" />
+        
+        <!-- Node A: Victim Node (Red Accent) -->
+        <g transform="translate(50, 85)">
+          <circle cx="0" cy="0" r="10" fill="#FFFFFF" stroke="#EF4444" stroke-width="2.5" />
+          <circle cx="0" cy="0" r="4" fill="#EF4444" />
+          <text x="-35" y="20" class="font-mono" font-size="7" font-weight="700">VICTIM (HOP 0)</text>
+        </g>
+        
+        <!-- Node B: Civilian Peer (Blue) -->
+        <g transform="translate(140, 40)">
+          <circle cx="0" cy="0" r="9" fill="#FFFFFF" stroke="#2563EB" stroke-width="2" />
+          <circle cx="0" cy="0" r="3" fill="#2563EB" />
+          <text x="-15" y="-14" class="font-mono" font-size="7" font-weight="700">CIVILIAN A (HOP 1)</text>
+          <text x="-15" y="-6" class="font-mono" font-size="6" fill="#64748B">RSSI: -74 dBm</text>
+        </g>
+        
+        <!-- Node C: Volunteer Node (Green) -->
+        <g transform="translate(250, 110)">
+          <circle cx="0" cy="0" r="9" fill="#FFFFFF" stroke="#16A34A" stroke-width="2" />
+          <polygon points="0,-4 3.5,3 -3.5,3" fill="#16A34A" />
+          <text x="-15" y="16" class="font-mono" font-size="7" font-weight="700">VOLUNTEER (HOP 2)</text>
+          <text x="-15" y="24" class="font-mono" font-size="6" fill="#16A34A">CACHED STATE</text>
+        </g>
+        
+        <!-- Node D: Passive Peer Node C -->
+        <g transform="translate(190, 15)">
+          <circle cx="0" cy="0" r="6" fill="#FFFFFF" stroke="#94A3B8" stroke-width="1.5" />
+          <text x="8" y="3" class="font-mono" font-size="6.5" fill="#64748B">PEER C</text>
+        </g>
+
+        <!-- Node F: Gateway Entry Node (Amber Accent) -->
+        <g transform="translate(360, 55)">
+          <circle cx="0" cy="0" r="10" fill="#FFFFFF" stroke="#F59E0B" stroke-width="2.5" />
+          <polygon points="-4,4 0,-4 4,4" fill="#F59E0B" />
+          <text x="14" y="3" class="font-mono" font-size="7" font-weight="700" fill="#F59E0B">GATEWAY (HOP 3)</text>
+        </g>
+      </g>
+      
+      <!-- Terminal log output inside card -->
+      <g transform="translate(10, 195)">
+        <rect width="380" height="42" rx="5" fill="#0F172A" />
+        <text x="10" y="16" class="font-mono" font-size="8" fill="#E2E8F0">&gt; Broadcasted packet ID #47b9 via Bluetooth P2P mesh</text>
+        <text x="10" y="30" class="font-mono" font-size="8" fill="#38BDF8">&gt; Sync complete: HopCount=3. Packet reached Camp Gateway Node</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- SECTION 5: ASI:ONE INCIDENT AI -->
+  <g transform="translate(420, 460)" class="shadow">
+    <rect width="440" height="360" rx="16" class="card-bg-selected" />
+    
+    <!-- Step Badge -->
+    <g transform="translate(-12, -12)">
+      <circle cx="20" cy="20" r="16" fill="#2563EB" stroke="#FFFFFF" stroke-width="2"/>
+      <text x="20" y="24" class="font-sans" font-weight="800" font-size="12" fill="#FFFFFF" text-anchor="middle">5</text>
+    </g>
+
+    <g transform="translate(20, 20)">
+      <rect width="130" height="18" rx="3" fill="#EF4444" opacity="0.1" />
+      <text x="6" y="13" class="font-sans" font-size="9" font-weight="700" fill="#EF4444">INTELLIGENCE ENGINE</text>
+      <text x="0" y="35" class="card-title">ASI:ONE Incident AI</text>
+      <text x="0" y="48" class="card-subtitle">Turns raw offline telemetry into rescue intelligence</text>
+      
+      <!-- AI Core Interface -->
+      <g transform="translate(0, 65)">
+        <!-- Inputs Column -->
+        <rect width="180" height="185" rx="8" fill="#F8FAFC" stroke="#CBD5E1" stroke-width="1" />
+        <rect width="180" height="22" rx="4" fill="#0F172A" />
+        <text x="90" y="14" class="font-sans" font-weight="700" font-size="9" fill="#FFFFFF" text-anchor="middle">INCIDENT INPUTS</text>
+        
+        <g transform="translate(10, 36)" class="font-sans" font-size="9.5" fill="#334155">
+          <text x="0" y="10">■ SOS Message text</text>
+          <text x="0" y="26">■ GPS Location data</text>
+          <text x="0" y="42">■ Realtime Weather feeds</text>
+          <text x="0" y="58">■ Known Hazard maps</text>
+          <text x="0" y="74">■ Device Battery levels</text>
+          <text x="0" y="90">■ Mesh Hop Hysteresis</text>
+          <text x="0" y="106">■ Responder Availability</text>
+        </g>
+        
+        <!-- Outputs Column -->
+        <g transform="translate(220, 0)">
+          <rect width="180" height="185" rx="8" fill="#F8FAFC" stroke="#CBD5E1" stroke-width="1" />
+          <rect width="180" height="22" rx="4" fill="#2563EB" />
+          <text x="90" y="14" class="font-sans" font-weight="700" font-size="9" fill="#FFFFFF" text-anchor="middle">ASI:ONE OUTPUTS</text>
+          
+          <g transform="translate(10, 36)" class="font-sans" font-size="9.5" fill="#334155">
+            <text x="0" y="10" font-weight="700" fill="#EF4444">■ Severity: CRITICAL</text>
+            <text x="0" y="26" font-weight="700" fill="#2563EB">■ Priority Score: 94%</text>
+            <text x="0" y="42">■ Triage Rescue Summary</text>
+            <text x="0" y="58">■ Recommended Action</text>
+            <text x="0" y="74">■ Optimal Volunteer Match</text>
+            <text x="0" y="90">■ Evacuation ETA: 18m</text>
+            <text x="0" y="106" font-weight="700" fill="#16A34A">■ Match Confidence: 97.4%</text>
+          </g>
+        </g>
+
+        <!-- Connecting Brain Sphere -->
+        <g transform="translate(200, 92)" opacity="0.15">
+          <circle cx="0" cy="0" r="30" fill="#2563EB" />
+          <circle cx="0" cy="0" r="20" fill="#EF4444" />
+        </g>
+      </g>
+      
+      <!-- API Badge -->
+      <g transform="translate(125, 270)">
+        <rect width="150" height="22" rx="4" fill="#0F172A" />
+        <text x="75" y="14" class="font-mono" font-weight="700" font-size="9" fill="#FFFFFF" text-anchor="middle">Powered by ASI:ONE API</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- ==================== COLUMN 3: GATEWAY NODES AND COMMAND DASHBOARD ==================== -->
+  
+  <!-- SECTION 3: GATEWAY NODES -->
+  <g transform="translate(900, 150)" class="shadow">
+    <rect width="400" height="280" rx="16" class="card-bg" />
+    
+    <!-- Step Badge -->
+    <g transform="translate(-12, -12)">
+      <circle cx="20" cy="20" r="16" fill="#EF4444" stroke="#FFFFFF" stroke-width="2"/>
+      <text x="20" y="24" class="font-sans" font-weight="800" font-size="12" fill="#FFFFFF" text-anchor="middle">3</text>
+    </g>
+
+    <g transform="translate(20, 20)">
+      <rect width="110" height="18" rx="3" fill="#F59E0B" opacity="0.1" />
+      <text x="6" y="13" class="font-sans" font-size="9" font-weight="700" fill="#F59E0B">LOCAL CONNECTIVITY</text>
+      <text x="0" y="35" class="card-title">Gateway Nodes</text>
+      <text x="0" y="48" class="card-subtitle">Connected nodes that sync offline packets to command DB</text>
+      
+      <!-- Grid Layout for 4 Gateways -->
+      <g transform="translate(0, 65)">
+        <g transform="translate(0, 0)" font-size="10">
+          <rect width="170" height="55" rx="8" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1" />
+          <polygon points="12,38 20,20 28,38" fill="none" stroke="#0F172A" stroke-width="1.5" />
+          <polygon points="16,38 20,30 24,38" fill="#16A34A" />
+          <text x="36" y="23" class="font-sans" font-weight="700" fill="#0F172A">Army / ITBP Camp</text>
+          <text x="36" y="35" class="font-sans" font-size="8.5" fill="#16A34A">ONLINE (Starlink)</text>
+        </g>
+        
+        <g transform="translate(190, 0)" font-size="10">
+          <rect width="170" height="55" rx="8" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1" />
+          <path d="M 16 22 L 20 20 L 24 22 C 24 30 20 36 20 38 C 20 36 16 30 16 22 Z" fill="none" stroke="#0F172A" stroke-width="1.5" />
+          <text x="34" y="23" class="font-sans" font-weight="700" fill="#0F172A">Police Station</text>
+          <text x="34" y="35" class="font-sans" font-size="8.5" fill="#16A34A">ONLINE (Fiber Relay)</text>
+        </g>
+        
+        <g transform="translate(0, 68)" font-size="10">
+          <rect width="170" height="55" rx="8" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1" />
+          <path d="M 20 34 C 20 34 14 28 14 25 A 3 3 0 0 1 20 25 A 3 3 0 0 1 26 25 C 26 28 20 34 20 34 Z" fill="#EF4444" />
+          <text x="36" y="23" class="font-sans" font-weight="700" fill="#0F172A">NGO Relief Hub</text>
+          <text x="36" y="35" class="font-sans" font-size="8.5" fill="#F59E0B">CACHED STATUS</text>
+        </g>
+        
+        <g transform="translate(190, 68)" font-size="10">
+          <rect width="170" height="55" rx="8" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1" />
+          <path d="M 15 32 A 8 8 0 0 1 25 32" fill="none" stroke="#0F172A" stroke-width="1.5" />
+          <line x1="20" y1="26" x2="20" y2="34" stroke="#EF4444" stroke-width="1.5" />
+          <text x="34" y="23" class="font-sans" font-weight="700" fill="#0F172A">LoRa / Starlink Uplink</text>
+          <text x="34" y="35" class="font-sans" font-size="8.5" fill="#16A34A">UPLINK ACTIVE</text>
+        </g>
+      </g>
+      
+      <!-- Caching explanation note -->
+      <g transform="translate(0, 202)">
+        <rect width="360" height="34" rx="4" fill="#FEF3C7" stroke="#FDE68A" stroke-width="1" />
+        <text x="12" y="20" class="font-sans" font-size="9" font-weight="600" fill="#78350F">Any connected node can sync cached SOS packets to the command system.</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- SECTION 6: RESQMESH COMMAND DASHBOARD -->
+  <g transform="translate(900, 460)" class="shadow">
+    <rect width="400" height="360" rx="16" class="card-bg" />
+    
+    <!-- Step Badge -->
+    <g transform="translate(-12, -12)">
+      <circle cx="20" cy="20" r="16" fill="#2563EB" stroke="#FFFFFF" stroke-width="2"/>
+      <text x="20" y="24" class="font-sans" font-weight="800" font-size="12" fill="#FFFFFF" text-anchor="middle">6</text>
+    </g>
+
+    <g transform="translate(20, 20)">
+      <rect width="140" height="18" rx="3" fill="#0F172A" opacity="0.1" />
+      <text x="6" y="13" class="font-sans" font-size="9" font-weight="700" fill="#0F172A">COMMAND SYSTEM</text>
+      <text x="0" y="35" class="card-title">Command Dashboard</text>
+      <text x="0" y="48" class="card-subtitle">Realtime incident coordination center for dispatchers</text>
+      
+      <!-- SaaS App Workspace Graphic -->
+      <g transform="translate(0, 65)">
+        <rect width="360" height="255" rx="8" fill="#F8FAFC" stroke="#94A3B8" stroke-width="1.2" />
+        <rect width="360" height="22" rx="4" fill="#E2E8F0" />
+        <circle cx="10" cy="11" r="3" fill="#EF4444" />
+        <circle cx="18" cy="11" r="3" fill="#F59E0B" />
+        <circle cx="26" cy="11" r="3" fill="#16A34A" />
+        <text x="180" y="14" class="font-sans" font-size="8" fill="#64748B" text-anchor="middle">ResQMesh Incident Console v1.0</text>
+        
+        <!-- Dashboard Statistics Row -->
+        <g transform="translate(10, 32)">
+          <rect width="75" height="32" rx="4" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1" />
+          <text x="8" y="12" class="font-sans" font-size="6.5" fill="#64748B">ACTIVE SOS</text>
+          <text x="8" y="26" class="font-sans" font-weight="800" font-size="12" fill="#EF4444">10</text>
+          
+          <g transform="translate(85, 0)">
+            <rect width="75" height="32" rx="4" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1" />
+            <text x="8" y="12" class="font-sans" font-size="6.5" fill="#64748B">CRITICAL</text>
+            <text x="8" y="26" class="font-sans" font-weight="800" font-size="12" fill="#F59E0B">3</text>
+          </g>
+
+          <g transform="translate(170, 0)">
+            <rect width="80" height="32" rx="4" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1" />
+            <text x="8" y="12" class="font-sans" font-size="6.5" fill="#64748B">VOLUNTEERS</text>
+            <text x="8" y="26" class="font-sans" font-weight="800" font-size="12" fill="#16A34A">4</text>
+          </g>
+
+          <g transform="translate(260, 0)">
+            <rect width="90" height="32" rx="4" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1" />
+            <text x="8" y="12" class="font-sans" font-size="6.5" fill="#64748B">COMPLETED</text>
+            <text x="8" y="26" class="font-sans" font-weight="800" font-size="12" fill="#94A3B8">2</text>
+          </g>
+        </g>
+        
+        <!-- Live Incident Details Widget -->
+        <g transform="translate(10, 75)">
+          <rect width="340" height="80" rx="5" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1" />
+          <rect x="0" y="0" width="4" height="80" fill="#EF4444" rx="2" />
+          
+          <text x="12" y="16" class="font-sans" font-weight="700" font-size="10" fill="#0F172A">Incident #47B9 - Landslide Blockage</text>
+          <rect x="260" y="6" width="70" height="14" rx="4" fill="#EF4444" />
+          <text x="295" y="16" class="font-sans" font-weight="700" font-size="7.5" fill="#FFFFFF" text-anchor="middle">AI PRIORITY 94</text>
+          
+          <text x="12" y="32" class="font-sans" font-size="8.5" fill="#334155"><tspan font-weight="600">Location:</tspan> Kedarnath Trek Rd, Sector 4</text>
+          <text x="12" y="44" class="font-sans" font-size="8.5" fill="#334155"><tspan font-weight="600">Telemetry:</tspan> Battery 14% | Hops 3 | TTL 252</text>
+          <text x="12" y="56" class="font-sans" font-size="8.5" fill="#16A34A"><tspan font-weight="600" fill="#334155">Assigned:</tspan> Devendra Singh (En Route)</text>
+          <text x="12" y="68" class="font-sans" font-size="8" fill="#64748B">Summary: Landslide blockage. Evacuation route calculated.</text>
+        </g>
+        
+        <!-- Mission Timeline tracker -->
+        <g transform="translate(10, 165)">
+          <line x1="10" y1="24" x2="330" y2="24" stroke="#E2E8F0" stroke-width="4" stroke-linecap="round"/>
+          <line x1="10" y1="24" x2="250" y2="24" stroke="#16A34A" stroke-width="4" stroke-linecap="round"/>
+          
+          <circle cx="10" cy="24" r="5" fill="#EF4444" />
+          <text x="10" y="36" class="font-sans" font-size="7" fill="#64748B" text-anchor="middle">Landslide</text>
+          
+          <circle cx="90" cy="24" r="5" fill="#EF4444" />
+          <text x="90" y="36" class="font-sans" font-size="7" fill="#64748B" text-anchor="middle">SOS Sent</text>
+          
+          <circle cx="170" cy="24" r="5" fill="#2563EB" />
+          <text x="170" y="36" class="font-sans" font-size="7" fill="#64748B" text-anchor="middle">AI Triage</text>
+          
+          <circle cx="250" cy="24" r="5" fill="#16A34A" />
+          <text x="250" y="36" class="font-sans" font-size="7" fill="#16A34A" font-weight="600" text-anchor="middle">En Route</text>
+          
+          <circle cx="330" cy="24" r="5" fill="#E2E8F0" stroke="#CBD5E1" stroke-width="1" />
+          <text x="330" y="36" class="font-sans" font-size="7" fill="#64748B" text-anchor="middle">Rescued</text>
+        </g>
+      </g>
+    </g>
+  </g>
+
+  <!-- ==================== COLUMN 4: REALTIME Backend State AND DISASTER MAP ==================== -->
+  
+  <!-- SECTION 4: REALTIME BACKEND STATE -->
+  <g transform="translate(1340, 150)" class="shadow">
+    <rect width="400" height="280" rx="16" class="card-bg" />
+    
+    <!-- Step Badge -->
+    <g transform="translate(-12, -12)">
+      <circle cx="20" cy="20" r="16" fill="#2563EB" stroke="#FFFFFF" stroke-width="2"/>
+      <text x="20" y="24" class="font-sans" font-weight="800" font-size="12" fill="#FFFFFF" text-anchor="middle">4</text>
+    </g>
+
+    <g transform="translate(20, 20)">
+      <rect width="130" height="18" rx="3" fill="#2563EB" opacity="0.1" />
+      <text x="6" y="13" class="font-sans" font-size="9" font-weight="700" fill="#2563EB">DATABASE SYNC</text>
+      <text x="0" y="35" class="card-title">Realtime Backend State</text>
+      <text x="0" y="48" class="card-subtitle">Stores SOS alerts, relay events, volunteers, system status, completed rescues, and operational logs.</text>
+      
+      <!-- Database Cylinders and Schema Layout -->
+      <g transform="translate(0, 68)">
+        <!-- Database schema list -->
+        <rect width="180" height="162" rx="6" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1.5" />
+        <rect width="180" height="22" rx="4" fill="#0F172A" />
+        <text x="12" y="14" class="font-mono" font-size="9" font-weight="700" fill="#FFFFFF">SCHEMA TABLES</text>
+        
+        <g transform="translate(12, 34)" class="font-mono" font-size="9" fill="#334155">
+          <text x="0" y="10" font-weight="700" fill="#EF4444">■ alerts (active SOS)</text>
+          <text x="0" y="26">■ relay_events (mesh hops)</text>
+          <text x="0" y="42">■ volunteers (GPS / Status)</text>
+          <text x="0" y="58">■ gateways (sync state)</text>
+          <text x="0" y="74">■ system_state (outages)</text>
+          <text x="0" y="90" fill="#16A34A">■ completed_rescues</text>
+          <text x="0" y="106">■ operational_logs</text>
+        </g>
+        
+        <!-- DB Engine Stack Graphic -->
+        <g transform="translate(210, 10)">
+          <!-- Top cylinder -->
+          <path d="M 0 10 A 45 10 0 0 0 90 10 A 45 10 0 0 0 0 10" fill="#E2E8F0" stroke="#94A3B8" stroke-width="1.5" />
+          <path d="M 0 10 L 0 45 A 45 10 0 0 0 90 45 L 90 10" fill="#F1F5F9" stroke="#94A3B8" stroke-width="1.5" />
+          <text x="45" y="30" class="font-sans" font-weight="700" font-size="10" fill="#0F172A" text-anchor="middle">Supabase DB</text>
+          
+          <!-- Middle cylinder -->
+          <g transform="translate(0, 50)">
+            <path d="M 0 10 A 45 10 0 0 0 90 10 A 45 10 0 0 0 0 10" fill="#2563EB" opacity="0.8" stroke="#1D4ED8" stroke-width="1.5" />
+            <path d="M 0 10 L 0 45 A 45 10 0 0 0 90 45 L 90 10" fill="#3B82F6" opacity="0.8" stroke="#1D4ED8" stroke-width="1.5" />
+            <text x="45" y="30" class="font-sans" font-weight="700" font-size="10" fill="#FFFFFF" text-anchor="middle">Redis Cache</text>
+          </g>
+
+          <circle cx="45" cy="5" r="4" class="pulsing-node-blue" />
+        </g>
+      </g>
+    </g>
+  </g>
+
+  <!-- SECTION 7: DISASTER MAP & LAYERS -->
+  <g transform="translate(1340, 460)" class="shadow">
+    <rect width="400" height="480" rx="16" class="card-bg" />
+    
+    <!-- Step Badge -->
+    <g transform="translate(-12, -12)">
+      <circle cx="20" cy="20" r="16" fill="#2563EB" stroke="#FFFFFF" stroke-width="2"/>
+      <text x="20" y="24" class="font-sans" font-weight="800" font-size="12" fill="#FFFFFF" text-anchor="middle">7</text>
+    </g>
+
+    <g transform="translate(20, 20)">
+      <rect width="180" height="18" rx="3" fill="#EF4444" opacity="0.1" />
+      <text x="6" y="13" class="font-sans" font-size="9" font-weight="700" fill="#EF4444">TACTICAL OPERATING MAP</text>
+      <text x="0" y="35" class="card-title">Disaster Map &amp; Layers</text>
+      <text x="0" y="48" class="card-subtitle">Layer-controlled map prevents operational clutter.</text>
+      
+      <!-- Interactive Grid Map Graphic -->
+      <g transform="translate(0, 65)">
+        <rect width="360" height="260" rx="10" fill="#F1F5F9" stroke="#CBD5E1" stroke-width="1.5" />
+        
+        <path d="M 30 50 Q 80 40 120 70 T 200 60 T 320 80" fill="none" stroke="#E2E8F0" stroke-width="1" />
+        <path d="M 40 120 Q 100 110 160 150 T 260 120 T 340 150" fill="none" stroke="#E2E8F0" stroke-width="1" />
+        
+        <!-- Orange Landslide Shaded Zone (Hazards) -->
+        <polygon points="120,40 200,60 170,110 110,90" fill="#F59E0B" fill-opacity="0.18" stroke="#F59E0B" stroke-dasharray="2 2" stroke-width="1.5" />
+        
+        <!-- Blue Safe Relief Camp Zone -->
+        <g transform="translate(50, 40)">
+          <circle cx="0" cy="0" r="14" fill="#3B82F6" fill-opacity="0.15" stroke="#2563EB" stroke-width="1.2" stroke-dasharray="3 3"/>
+          <circle cx="0" cy="0" r="3" fill="#2563EB" />
+          <text x="14" y="3" class="font-sans" font-size="7.5" font-weight="700" fill="#2563EB">Relief Camp A</text>
+        </g>
+        
+        <!-- Red Victim SOS Marker & Radius -->
+        <g transform="translate(140, 180)">
+          <circle cx="0" cy="0" r="22" fill="none" stroke="#EF4444" stroke-width="1.5" stroke-dasharray="2 3" opacity="0.7" />
+          <path d="M 0 -8 C -4 -8 -8 -4 -8 0 C -8 5 0 12 0 12 C 0 12 8 5 8 0 C 8 -4 4 -8 0 -8 Z" fill="#EF4444" />
+          <circle cx="0" cy="-2" r="3.5" fill="#FFFFFF" />
+          <text x="10" y="3" class="font-sans" font-weight="800" font-size="8" fill="#EF4444">SOS (Trapped)</text>
+        </g>
+        
+        <!-- Green Volunteer Route Marker -->
+        <g transform="translate(280, 150)">
+          <circle cx="0" cy="0" r="5" fill="#16A34A" />
+          <text x="-40" y="-10" class="font-sans" font-weight="700" font-size="7.5" fill="#16A34A">Volunteer (Devendra)</text>
+        </g>
+        
+        <!-- GPS Route Path Line -->
+        <path d="M 280 150 L 220 170 L 140 180" fill="none" stroke="#16A34A" stroke-width="2.2" stroke-dasharray="3 3" stroke-linecap="round" />
+        
+        <!-- Mesh Link paths -->
+        <path d="M 140 180 Q 90 140 50 40" fill="none" stroke="#2563EB" stroke-width="1.2" stroke-dasharray="2 3" />
+      </g>
+      
+      <!-- Layer Selection panel at bottom of map -->
+      <g transform="translate(0, 340)">
+        <rect width="360" height="90" rx="6" fill="#F8FAFC" stroke="#CBD5E1" stroke-width="1.2" />
+        <text x="12" y="16" class="font-sans" font-weight="700" font-size="9" fill="#0F172A">MAP TOGGLE LAYERS</text>
+        
+        <g transform="translate(12, 30)" class="font-sans" font-size="10" fill="#334155">
+          <text x="0" y="10">☑ Hazards Layer</text>
+          <text x="110" y="10">☑ Rescue Routes</text>
+          <text x="230" y="10">☑ Mesh Topology</text>
+          <text x="0" y="30">☑ Network Telemetry</text>
+          <text x="110" y="30">☐ Focus Mode [Sec 4]</text>
+        </g>
+      </g>
+    </g>
+  </g>
+
+  <!-- ==================== ROW 3: VOLUNTEER RESCUE LIFECYCLE ==================== -->
+  
+  <!-- SECTION 8: VOLUNTEER RESCUE LIFECYCLE (HORIZONTAL FLOW) -->
+  <g transform="translate(420, 850)" class="shadow">
+    <rect width="880" height="95" rx="16" class="card-bg-green" />
+    
+    <!-- Step Badge -->
+    <g transform="translate(-12, -12)">
+      <circle cx="20" cy="20" r="16" fill="#16A34A" stroke="#FFFFFF" stroke-width="2"/>
+      <text x="20" y="24" class="font-sans" font-weight="800" font-size="12" fill="#FFFFFF" text-anchor="middle">8</text>
+    </g>
+
+    <g transform="translate(20, 16)">
+      <text x="0" y="15" class="card-title" fill="#16A34A">Volunteer Rescue Lifecycle</text>
+      <text x="220" y="14" class="font-sans" font-size="9.5" fill="#64748B">| After rescue, marker fades from map and card moves to Completed Rescues.</text>
+      
+      <!-- Chevron timeline list -->
+      <g transform="translate(0, 32)" class="font-sans" font-size="9.5" font-weight="700">
+        <!-- Chevron 1 -->
+        <g transform="translate(0, 0)">
+          <rect width="90" height="24" rx="4" fill="#EF4444" />
+          <text x="45" y="15" fill="#FFFFFF" text-anchor="middle">SOS Received</text>
+        </g>
+        <path d="M 95 12 L 105 12" stroke="#64748B" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+        
+        <!-- Chevron 2 -->
+        <g transform="translate(110, 0)">
+          <rect width="90" height="24" rx="4" fill="#2563EB" />
+          <text x="45" y="15" fill="#FFFFFF" text-anchor="middle">AI Triaged</text>
+        </g>
+        <path d="M 205 12 L 215 12" stroke="#64748B" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+
+        <!-- Chevron 3 -->
+        <g transform="translate(220, 0)">
+          <rect width="115" height="24" rx="4" fill="#2563EB" />
+          <text x="57.5" y="15" fill="#FFFFFF" text-anchor="middle">Assigned Responder</text>
+        </g>
+        <path d="M 340 12 L 350 12" stroke="#64748B" stroke-width="1.5" marker-end="url(#arrow-orange)"/>
+
+        <!-- Chevron 4 -->
+        <g transform="translate(355, 0)">
+          <rect width="90" height="24" rx="4" fill="#F59E0B" />
+          <text x="45" y="15" fill="#FFFFFF" text-anchor="middle">In Transit</text>
+        </g>
+        <path d="M 450 12 L 460 12" stroke="#64748B" stroke-width="1.5" marker-end="url(#arrow-green)"/>
+
+        <!-- Chevron 5 -->
+        <g transform="translate(465, 0)">
+          <rect width="110" height="24" rx="4" fill="#16A34A" />
+          <text x="55" y="15" fill="#FFFFFF" text-anchor="middle">Survivor Rescued</text>
+        </g>
+        <path d="M 580 12 L 590 12" stroke="#64748B" stroke-width="1.5" marker-end="url(#arrow-green)"/>
+
+        <!-- Chevron 6 -->
+        <g transform="translate(595, 0)">
+          <rect width="105" height="24" rx="4" fill="#16A34A" />
+          <text x="52.5" y="15" fill="#FFFFFF" text-anchor="middle">Evacuated Camp</text>
+        </g>
+        <path d="M 705 12 L 715 12" stroke="#64748B" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+
+        <!-- Chevron 7 -->
+        <g transform="translate(720, 0)">
+          <rect width="90" height="24" rx="4" fill="#64748B" />
+          <text x="45" y="15" fill="#FFFFFF" text-anchor="middle">Archived</text>
+        </g>
+      </g>
+    </g>
+  </g>
+
+  <!-- ==================== BOTTOM TIMELINE: REPLAY MODE ==================== -->
+  
+  <!-- SECTION 9: REPLAY MODE AND AUDIT TRAIL -->
+  <g transform="translate(60, 970)" class="shadow">
+    <rect width="1680" height="110" rx="16" class="card-bg" />
+    
+    <!-- Step Badge -->
+    <g transform="translate(-12, -12)">
+      <circle cx="20" cy="20" r="16" fill="#475569" stroke="#FFFFFF" stroke-width="2"/>
+      <text x="20" y="24" class="font-sans" font-weight="800" font-size="12" fill="#FFFFFF" text-anchor="middle">9</text>
+    </g>
+
+    <g transform="translate(20, 18)">
+      <g transform="translate(0, 10)">
+        <rect width="110" height="50" rx="6" fill="#F1F5F9" stroke="#CBD5E1" stroke-width="1.2" />
+        <polygon points="20,25 20,45 35,35" fill="#0F172A" />
+        <rect x="45" y="25" width="4" height="20" rx="1" fill="#64748B" />
+        <rect x="53" y="25" width="4" height="20" rx="1" fill="#64748B" />
+        <text x="70" y="37" class="font-mono" font-weight="700" font-size="10" fill="#0F172A">2x SPEED</text>
+      </g>
+      
+      <g transform="translate(130, 0)">
+        <text x="0" y="12" class="card-title">Replay Mode &amp; Audit Trail</text>
+        <text x="200" y="11" class="card-subtitle">| Used for demo replay, audit trail, training, and after-action review.</text>
+        
+        <!-- Timeline Slider Bar -->
+        <g transform="translate(0, 36)">
+          <line x1="0" y1="10" x2="1480" y2="10" stroke="#E2E8F0" stroke-width="6" stroke-linecap="round" />
+          <line x1="0" y1="10" x2="950" y2="10" stroke="#2563EB" stroke-width="6" stroke-linecap="round" />
+          <circle cx="950" cy="10" r="9" fill="#2563EB" stroke="#FFFFFF" stroke-width="2" />
+          
+          <!-- Event checkpoints -->
+          <circle cx="0" cy="10" r="4" fill="#0F172A" />
+          <text x="0" y="24" class="font-mono label-mono-sm">00:00 [Landslide]</text>
+          
+          <circle cx="210" cy="10" r="4" fill="#EF4444" />
+          <text x="210" y="24" class="font-mono label-mono-sm" fill="#EF4444">00:15 [Outage]</text>
+          
+          <circle cx="420" cy="10" r="4" fill="#EF4444" />
+          <text x="420" y="24" class="font-mono label-mono-sm" fill="#EF4444">00:30 [SOS Broadcast]</text>
+          
+          <circle cx="630" cy="10" r="4" fill="#2563EB" />
+          <text x="630" y="24" class="font-mono label-mono-sm">00:45 [Mesh Active]</text>
+
+          <circle cx="840" cy="10" r="4" fill="#2563EB" />
+          <text x="840" y="24" class="font-mono label-mono-sm">01:00 [ASI:ONE Triage]</text>
+
+          <circle cx="950" cy="10" r="5" fill="#F59E0B" />
+          <text x="950" y="24" class="font-mono label-mono-sm" font-weight="700" fill="#B45309">01:20 [Volunteer Assigned]</text>
+
+          <circle cx="1480" cy="10" r="4" fill="#16A34A" />
+          <text x="1480" y="24" class="font-mono label-mono-sm" fill="#16A34A">02:00 [Rescue Complete]</text>
+        </g>
+      </g>
+    </g>
+  </g>
+
+  <!-- ==================== SYSTEM INTEGRATION ARROWS (FLOWS) ==================== -->
+  
+  <!-- Arrow 1: Victim Mobile App -> Offline Mesh Relay -->
+  <path d="M 380 320 Q 400 320, 420 320" fill="none" stroke="#EF4444" stroke-width="4.5" stroke-linecap="round" marker-end="url(#arrow-red)" />
+  <g transform="translate(400, 310)">
+    <text x="0" y="0" class="font-mono" font-size="8" fill="#EF4444" text-anchor="middle">SOS Packet</text>
+  </g>
+  
+  <!-- Arrow 2: Offline Mesh Relay -> Gateway Nodes -->
+  <path d="M 860 270 Q 880 270, 900 270" fill="none" stroke="#EF4444" stroke-width="4.5" stroke-linecap="round" marker-end="url(#arrow-red)" />
+  
+  <!-- Arrow 3: Gateway Nodes -> Realtime Backend State -->
+  <path d="M 1300 270 Q 1320 270, 1340 270" fill="none" stroke="#2563EB" stroke-width="4.5" stroke-linecap="round" marker-end="url(#arrow-blue)" />
+  
+  <!-- Arrow 4: Realtime Backend State -> ASI:ONE Incident AI -->
+  <path d="M 1340 370 C 1140 370, 1140 500, 860 550" fill="none" stroke="#2563EB" stroke-width="4.5" stroke-linecap="round" marker-end="url(#arrow-blue)" />
+  
+  <!-- Arrow 5: ASI:ONE Incident AI -> Command Dashboard -->
+  <path d="M 860 655 Q 880 655, 900 655" fill="none" stroke="#2563EB" stroke-width="4.5" stroke-linecap="round" marker-end="url(#arrow-blue)" />
+
+  <!-- Arrow 6: Command Dashboard -> Volunteer Rescue Lifecycle -->
+  <path d="M 940 820 Q 940 835, 940 850" fill="none" stroke="#16A34A" stroke-width="4.5" marker-end="url(#arrow-green)" />
+
+  <!-- Arrow 7: Volunteer Rescue Lifecycle -> Realtime Backend State -->
+  <path d="M 1300 910 C 1370 910, 1400 680, 1430 430" fill="none" stroke="#16A34A" stroke-width="4.5" stroke-linecap="round" marker-end="url(#arrow-green)" />
+
+  <!-- Arrow 8: Realtime Backend State -> Replay Mode -->
+  <path d="M 1720 430 L 1720 970" fill="none" stroke="#2563EB" stroke-width="4.5" stroke-dasharray="4 4" marker-end="url(#arrow-blue)" />
+
+  <!-- Arrow 9: Event Simulator -> Realtime Backend / Map / AI -->
+  <path d="M 220 710 C 220 620, 350 560, 420 560" fill="none" stroke="#F59E0B" stroke-width="3.5" stroke-linecap="round" marker-end="url(#arrow-orange)" />
+
+  <!-- ==================== HAND-DRAWN ANNOTATION STICKY NOTES ==================== -->
+  
+  <!-- Sticky Note 1: Mobile App Offline mesh -->
+  <g transform="translate(355, 75) rotate(-3)" class="sticky-shadow">
+    <rect width="115" height="65" rx="4" class="sticky-bg" />
+    <circle cx="57.5" cy="5" r="3.5" fill="#EF4444" />
+    <g transform="translate(10, 18)" class="sticky-text">
+      <text x="0" y="10">No direct internet</text>
+      <text x="0" y="22">required! SOS moves</text>
+      <text x="0" y="34">completely offline.</text>
+    </g>
+  </g>
+  
+  <!-- Sticky Note 2: Gateway sync -->
+  <g transform="translate(1220, 75) rotate(2)" class="sticky-shadow">
+    <rect width="115" height="65" rx="4" class="sticky-bg" />
+    <circle cx="57.5" cy="5" r="3.5" fill="#EF4444" />
+    <g transform="translate(10, 18)" class="sticky-text">
+      <text x="0" y="10">Any connected node</text>
+      <text x="0" y="22">automatically uploads</text>
+      <text x="0" y="34">cached mesh packets.</text>
+    </g>
+  </g>
+
+  <!-- ==================== FINAL SYSTEM FOOTER ==================== -->
+  <g transform="translate(900, 1115)">
+    <text x="0" y="0" class="font-sans" font-weight="700" font-size="12" fill="#64748B" text-anchor="middle">ResQMesh keeps emergency communication alive when infrastructure fails.</text>
+  </g>
+</svg>
